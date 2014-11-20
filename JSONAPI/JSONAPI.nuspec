@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>S&apos;pht&apos;Kr</authors>
+    <owners>S&apos;pht&apos;Kr</owners>
+    <licenseUrl></licenseUrl>
+    <projectUrl>https://jsonapi.codeplex.com/license</projectUrl>
+    <iconUrl>https://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&DownloadId=938876&Build=20941</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>First release, v0.1a.</releaseNotes>
+    <copyright>Copyright 2014</copyright>
+    <tags>JSON WebAPI REST ember emberjs ember.js ember-data</tags>
+  </metadata>
+</package>

@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("JSONAPI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ERMC")]
-[assembly: AssemblyProduct("JSONAPI")]
-[assembly: AssemblyCopyright("Copyright © ERMC 2013")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("JSONAPI.NET")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]

@@ -8,15 +8,25 @@ using System.Runtime.InteropServices;
 namespace JSONAPI.Core
 {
     /// <summary>
-    /// An interface for a pluralization service. It happens to exactly match the methods in 
-    /// <see cref="System.Data.EntityDesign.PluralizationServices.PluralizationService"/>.
-    /// Go figure.
+    /// A mirror of System.Data.Entity.Infrastructure.Pluralization.IPluralizationService,
+    /// but redefined here to allow usage without a dependency on Entity Framework.
     /// </summary>
     public interface IPluralizationService
     {
-        Boolean IsPlural(string word);
-        Boolean IsSingular(string word);
+        /// <summary>
+        /// Return the plural form of a word. This function should be idempotent! (Allowing for the caveat that
+        /// explicit mappings may be required to make this be true.)
+        /// </summary>
+        /// <param name="word">The word to pluralize</param>
+        /// <returns>The plural form of the word</returns>
         string Pluralize(string word);
+
+        /// <summary>
+        /// Return the plural form of a word. This function should be idempotent! (Allowing for the caveat that
+        /// explicit mappings may be required to make this be true.)
+        /// </summary>
+        /// <param name="word">The word to singularize</param>
+        /// <returns>The singular form of the word</returns>
         string Singularize(string word);
     }
 
@@ -72,28 +82,16 @@ namespace JSONAPI.Core
             }
         }
 
-        public Boolean IsPlural(string word)
-        {
-            if (p2s.ContainsKey(word)) return true;
-            if (s2p.ContainsKey(word)) return false;
-            return word.EndsWith("s");
-        }
-        public Boolean IsSingular(string word)
-        {
-            if (s2p.ContainsKey(word)) return true;
-            if (p2s.ContainsKey(word)) return false;
-            return !word.EndsWith("s");
-        }
         public string Pluralize(string word)
         {
             if (s2p.ContainsKey(word)) return s2p[word];
-            if (p2s.ContainsKey(word)) return word;
+            if (p2s.ContainsKey(word)) return word; // idempotence!
             return word + "s";
         }
         public string Singularize(string word)
         {
             if (p2s.ContainsKey(word)) return p2s[word];
-            if (s2p.ContainsKey(word)) return word;
+            if (s2p.ContainsKey(word)) return word; // idempotentce!
             return word.TrimEnd('s');
         }
     }
