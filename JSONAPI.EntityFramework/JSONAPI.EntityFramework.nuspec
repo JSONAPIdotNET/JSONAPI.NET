@@ -13,6 +13,6 @@
     <description>A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).</description>
     <releaseNotes>First release, v0.1a.</releaseNotes>
     <copyright>Copyright 2014</copyright>
-    <tags>JSON WebAPI REST ember emberjs ember.js ember-data</tags>
+    <tags>JSON WebAPI REST ember emberjs ember.js ember-data Entity Framework EF entity-framework</tags>
   </metadata>
 </package>
