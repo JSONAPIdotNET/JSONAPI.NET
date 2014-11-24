@@ -3,12 +3,12 @@
   <metadata>
     <id>$id$</id>
     <version>0.1.0.0</version>
-    <title>$title$</title>
+    <title>JSONAPI.NET Entity Framework Integration</title>
     <authors>S&apos;pht&apos;Kr</authors>
     <owners>S&apos;pht&apos;Kr</owners>
     <licenseUrl>https://jsonapi.codeplex.com/license</licenseUrl>
     <projectUrl>https://jsonapi.codeplex.com/</projectUrl>
-    <iconUrl>https://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&amp;DownloadId=938876&amp;Build=20941</iconUrl>
+    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&amp;DownloadId=939025</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).</description>
     <releaseNotes>First release, v0.1a.</releaseNotes>
