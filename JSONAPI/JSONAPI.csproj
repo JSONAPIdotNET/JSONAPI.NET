@@ -81,6 +81,7 @@
     <Compile Include="Attributes\SerializeAs.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
+    <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Http\ApiController.cs" />
     <Compile Include="Json\JsonApiFormatter.cs" />
     <Compile Include="Json\RelationAggregator.cs" />

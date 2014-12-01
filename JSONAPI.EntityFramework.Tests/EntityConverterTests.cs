@@ -155,5 +155,30 @@ namespace JSONAPI.EntityFramework.Tests
             //Debug.WriteLine(sw.ToString());
         }
 
+        [TestMethod]
+        public void UnderpostingTest()
+        {
+            // Arrange
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            MemoryStream stream = new MemoryStream();
+
+            EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context);
+
+            string underpost = @"{""posts"":{""id"":""" + p.Id.ToString() + @""",""title"":""Not at all linkbait!""}}";
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(underpost));
+
+            int previousCommentsCount = p.Comments.Count;
+
+            // Act
+            Post pUpdated;
+            pUpdated = (Post)formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+            pUpdated = materializer.MaterializeUpdate<Post>(pUpdated);
+
+            // Assert
+            Assert.AreEqual(previousCommentsCount, pUpdated.Comments.Count, "Comments were wiped out!");
+            Assert.AreEqual("Not at all linkbait!", pUpdated.Title, "Title was not updated.");
+        }
+
     }
 }

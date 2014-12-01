@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>0.1.0.0</version>
+    <version>0.2.0.0</version>
     <title>JSONAPI.NET Entity Framework Integration</title>
     <authors>S&apos;pht&apos;Kr</authors>
     <owners>S&apos;pht&apos;Kr</owners>
@@ -11,8 +11,11 @@
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&amp;DownloadId=939025</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).</description>
-    <releaseNotes>First release, v0.1a.</releaseNotes>
+    <releaseNotes>Updated to take advantage of PropertyWasPresent(...) in JSONAPI--see release notes for JSONAPI.</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>JSON WebAPI REST ember emberjs ember.js ember-data Entity Framework EF entity-framework</tags>
+    <dependencies>
+      <dependency id="JSONAPI" version="0.2.0"></dependency>
+    </dependencies>
   </metadata>
 </package>

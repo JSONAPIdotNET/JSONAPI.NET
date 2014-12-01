@@ -251,6 +251,9 @@ namespace JSONAPI.EntityFramework
             PropertyInfo[] props = type.GetProperties();
             foreach (PropertyInfo prop in props)
             {
+                // Comply with the spec, if a key was not set, it should not be updated!
+                if (!MetadataManager.Instance.PropertyWasPresent(ephemeral, prop)) continue;
+
                 if (IsMany(prop.PropertyType))
                 {
                     Type elementType = GetSingleType(prop.PropertyType);

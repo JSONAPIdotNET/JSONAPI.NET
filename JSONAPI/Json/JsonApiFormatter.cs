@@ -543,6 +543,9 @@ namespace JSONAPI.Json
 
                         prop.SetValue(retval, DeserializePrimitive(prop.PropertyType, reader), null);
 
+                        // Tell the MetadataManager that we deserialized this property
+                        MetadataManager.Instance.SetMetaForProperty(retval, prop, true);
+
                         // pop the value off the reader, so we catch the EndObject token below!.
                         reader.Read();
                     }
@@ -689,6 +692,9 @@ namespace JSONAPI.Json
 
                             prop.SetValue(obj, GetById(relType, (string)reader.Value));
                         }
+
+                        // Tell the MetadataManager that we deserialized this property
+                        MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
                     }
                     else
                         reader.Skip();

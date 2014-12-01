@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>0.1.0.0</version>
+    <version>0.2.0.0</version>
     <title>JSONAPI.NET</title>
     <authors>S&apos;pht&apos;Kr</authors>
     <owners>S&apos;pht&apos;Kr</owners>
@@ -11,7 +11,11 @@
     <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&amp;DownloadId=939025</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).</description>
-    <releaseNotes>First release, v0.1a.</releaseNotes>
+    <releaseNotes>
+      Implemented an important part of the spec, "Attributes omitted from the resource object should not be updated." This requires us to be able to communicate to the IMaterializer (which does actual updating) that attributes were or were not specified on the original JSON resource object. Therefore, we created the new MetadataManager singleton, and its public method PropertyWasPresent(object deserialized, PropertyInfo prop). It is tightly coupled with JsonApiFormatter, but loosely with an IMaterializer such as EntityFrameworkMaterializer.
+
+      The ability to check for the presence of a specified value in the JSON also makes it possible to use default values on a POSTed object--before we could not tell if there was underposting going on!
+    </releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>JSON WebAPI REST ember emberjs ember.js ember-data</tags>
   </metadata>
