@@ -138,5 +138,41 @@ namespace JSONAPI.Tests.Json
             
 
         }
+
+        // Issue #1
+        [TestMethod(), Timeout(1000)]
+        public void DeserializeExtraPropertyTest()
+        {
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            MemoryStream stream = new MemoryStream();
+
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":[]}}}"));
+
+            // Act
+            Author a;
+            a = (Author)formatter.ReadFromStreamAsync(typeof(Author), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+
+            // Assert
+            Assert.AreEqual("Jason Hater", a.Name); // Completed without exceptions and didn't timeout!
+        }
+
+        // Issue #1
+        [TestMethod(), Timeout(1000)]
+        public void DeserializeExtraRelationshipTest()
+        {
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            MemoryStream stream = new MemoryStream();
+
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":[],""bogus"":[""PANIC!""]}}}"));
+
+            // Act
+            Author a;
+            a = (Author)formatter.ReadFromStreamAsync(typeof(Author), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+
+            // Assert
+            Assert.AreEqual("Jason Hater", a.Name); // Completed without exceptions and didn't timeout!
+        }
     }
 }

@@ -92,9 +92,9 @@ namespace JSONAPI.Json
 
             writer.WriteStartObject();
             writer.WritePropertyName(root);
-            if (IsMany(value.GetType())) 
+            if (IsMany(value.GetType()))
                 this.SerializeMany(value, writeStream, writer, serializer, aggregator);
-            else 
+            else
                 this.Serialize(value, writeStream, writer, serializer, aggregator);
 
             // Include links from aggregator
@@ -120,7 +120,8 @@ namespace JSONAPI.Json
         protected void SerializeMany(object value, Stream writeStream, JsonWriter writer, JsonSerializer serializer, RelationAggregator aggregator)
         {
             writer.WriteStartArray();
-            foreach (object singleVal in (IEnumerable)value) {
+            foreach (object singleVal in (IEnumerable)value)
+            {
                 this.Serialize(singleVal, writeStream, writer, serializer, aggregator);
             }
             writer.WriteEndArray();
@@ -170,11 +171,11 @@ namespace JSONAPI.Json
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
 
                 object[] attrs = prop.GetCustomAttributes(true);
-                
+
                 foreach (object attr in attrs)
                 {
                     Type attrType = attr.GetType();
-                    if (typeof(JsonIgnoreAttribute).IsAssignableFrom(attrType)) 
+                    if (typeof(JsonIgnoreAttribute).IsAssignableFrom(attrType))
                     {
                         skip = true;
                         continue;
@@ -224,7 +225,7 @@ namespace JSONAPI.Json
                                     // Must be an array at this point, right??
                                     itemType = prop.PropertyType.GetElementType();
                                 }
-                                if(aggregator != null) aggregator.Add(itemType, items); // should call the IEnumerable one...right?
+                                if (aggregator != null) aggregator.Add(itemType, items); // should call the IEnumerable one...right?
                             }
                             break;
                         case SerializeAsOptions.Link:
@@ -373,7 +374,7 @@ namespace JSONAPI.Json
 
         }
 
-#endregion Serialization
+        #endregion Serialization
 
         #region Deserialization
 
@@ -384,7 +385,7 @@ namespace JSONAPI.Json
 
         private object ReadFromStream(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
-            object retval  = null;
+            object retval = null;
             Type singleType = GetSingleType(type);
             var pripropname = GetPropertyName(type);
             var contentHeaders = content == null ? null : content.Headers;
@@ -432,7 +433,7 @@ namespace JSONAPI.Json
                                         while (reader.TokenType == JsonToken.StartObject)
                                         {
                                             ((IList)retval).Add(Deserialize(singleType, readStream, reader, serializer));
-                                        } 
+                                        }
                                         // burn EndArray token...
                                         if (reader.TokenType != JsonToken.EndArray) throw new JsonReaderException(String.Format("Expected JsonToken.EndArray but got {0}", reader.TokenType));
                                         reader.Read();
@@ -529,15 +530,16 @@ namespace JSONAPI.Json
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
                     string value = (string)reader.Value;
-                    reader.Read(); // burn the PropertyName token
                     PropertyInfo prop;
                     if (value == "links")
                     {
+                        reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, readStream, reader, serializer);
                     }
                     else if (propMap.TryGetValue(value, out prop))
                     {
+                        reader.Read(); // burn the PropertyName token
                         //TODO: Embedded would be dropped here!
                         if (!CanWriteTypeAsPrimitive(prop.PropertyType)) continue; // These aren't supposed to be here, they're supposed to be in "links"!
 
@@ -550,7 +552,12 @@ namespace JSONAPI.Json
                         reader.Read();
                     }
                     else
+                    {
+                        // Unexpected/unknown property--Skip the propertyname and its value
                         reader.Skip();
+                        if (reader.TokenType == JsonToken.StartArray || reader.TokenType == JsonToken.StartObject) reader.Skip();
+                        else reader.Read();
+                    }
                 }
 
             } while (reader.TokenType != JsonToken.EndObject);
@@ -657,7 +664,7 @@ namespace JSONAPI.Json
                                             hmrel = (IEnumerable<Object>)Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(relType));
                                         }
                                         //TODO: Other likely candidates??
-                                        else 
+                                        else
                                         {
                                             // punt!
                                             throw new JsonReaderException(String.Format("Could not create empty container for relationship property {0}!", prop));
@@ -675,7 +682,7 @@ namespace JSONAPI.Json
                             // being we'll brute-force it in super-dynamic language style...
                             Type hmtype = hmrel.GetType();
                             MethodInfo add = hmtype.GetMethod("Add");
-                            
+
                             foreach (JToken token in ids)
                             {
                                 //((ICollection<object>)prop.GetValue(obj, null)).Add(Activator.CreateInstance(relType));

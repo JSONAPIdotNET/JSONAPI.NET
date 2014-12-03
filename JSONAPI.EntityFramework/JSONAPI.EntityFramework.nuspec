@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>0.2.0.0</version>
+    <version>$version$</version>
     <title>JSONAPI.NET Entity Framework Integration</title>
     <authors>S&apos;pht&apos;Kr</authors>
     <owners>S&apos;pht&apos;Kr</owners>
