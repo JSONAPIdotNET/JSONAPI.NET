@@ -6,12 +6,14 @@
     <title>JSONAPI.NET Entity Framework Integration</title>
     <authors>S&apos;pht&apos;Kr</authors>
     <owners>S&apos;pht&apos;Kr</owners>
-    <licenseUrl>https://jsonapi.codeplex.com/license</licenseUrl>
-    <projectUrl>https://jsonapi.codeplex.com/</projectUrl>
-    <iconUrl>http://download-codeplex.sec.s-msft.com/Download?ProjectName=jsonapi&amp;DownloadId=939025</iconUrl>
+    <licenseUrl>https://github.com/SphtKr/JSONAPI.NET/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/SphtKr/JSONAPI.NET</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/SphtKr/JSONAPI.NET/master/JSONAPI/JSONAPI_NET_icon_512.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A toolkit for using WebAPI and (optionally) EntityFramework to quickly build REST services complying with the JSON API spec (jsonapi.org).</description>
-    <releaseNotes>Updated to take advantage of PropertyWasPresent(...) in JSONAPI--see release notes for JSONAPI.</releaseNotes>
+    <description>Entity Framework integration for JSONAPI.NET, including an EntityFrameworkMaterializer and ApiController to highly automate building JSON API web services from EF6+ data models.</description>
+    <releaseNotes>
+      No changes in this package for 0.2.1, just updating the projectUrl (moved to GitHub).
+    </releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>JSON WebAPI REST ember emberjs ember.js ember-data Entity Framework EF entity-framework</tags>
     <dependencies>
