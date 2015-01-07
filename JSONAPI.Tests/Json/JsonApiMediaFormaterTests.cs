@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.Tests.Models;
 using Newtonsoft.Json;
@@ -14,7 +15,7 @@ namespace JSONAPI.Tests.Json
     public class JsonApiMediaFormaterTests
     {
         Author a;
-        Post p, p2, p3;
+        Post p, p2, p3, p4;
 
         [TestInitialize]
         public void SetupModels()
@@ -42,6 +43,11 @@ namespace JSONAPI.Tests.Json
                 Id = 3,
                 Title = "Polemic in E-flat minor #824",
                 Author = a
+            };
+            p4 = new Post
+            {
+                Id = 4,
+                Title = "This post has no author."
             };
 
             a.Posts = new List<Post> { p, p2, p3 };
@@ -108,7 +114,7 @@ namespace JSONAPI.Tests.Json
             // Act
             //Payload payload = new Payload(a.Posts);
             //js.Serialize(jw, payload);
-            formatter.WriteToStreamAsync(typeof(Post), a.Posts, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+            formatter.WriteToStreamAsync(typeof(Post), new[] { p, p2, p3, p4 }.ToList(), stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
