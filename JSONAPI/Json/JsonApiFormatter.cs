@@ -147,6 +147,9 @@ namespace JSONAPI.Json
 
                 if (this.CanWriteTypeAsPrimitive(prop.PropertyType))
                 {
+                    if (prop.GetCustomAttributes().Any(attr => attr is JsonIgnoreAttribute))
+                        continue;
+
                     // numbers, strings, dates...
                     writer.WritePropertyName(FormatPropertyName(prop.Name));
                     serializer.Serialize(writer, prop.GetValue(value, null));
