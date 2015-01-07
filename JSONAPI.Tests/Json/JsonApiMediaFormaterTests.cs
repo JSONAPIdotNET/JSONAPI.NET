@@ -73,6 +73,11 @@ namespace JSONAPI.Tests.Json
 
         }
 
+        private enum TestEnum
+        {
+            
+        }
+
         [TestMethod]
         public void CanWritePrimitiveTest()
         {
@@ -89,6 +94,8 @@ namespace JSONAPI.Tests.Json
             Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(DateTime?)), "CanWriteTypeAsPrimitive returned wrong answer for nullable DateTime!");
             Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(DateTimeOffset?)), "CanWriteTypeAsPrimitive returned wrong answer for nullable DateTimeOffset!");
             Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(Guid?)), "CanWriteTypeAsPrimitive returned wrong answer for nullable Guid!");
+            Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(TestEnum)), "CanWriteTypeAsPrimitive returned wrong answer for enum!");
+            Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(TestEnum?)), "CanWriteTypeAsPrimitive returned wrong answer for nullable enum!");
             Assert.IsFalse(formatter.CanWriteTypeAsPrimitive(typeof(Object)), "CanWriteTypeAsPrimitive returned wrong answer for Object!");
         }
 
