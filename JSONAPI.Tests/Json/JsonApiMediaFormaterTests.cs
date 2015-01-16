@@ -146,7 +146,7 @@ namespace JSONAPI.Tests.Json
             // Act
             //Payload payload = new Payload(a.Posts);
             //js.Serialize(jw, payload);
-            formatter.WriteToStreamAsync(typeof(Post), a.Posts.ToArray(), stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+            formatter.WriteToStreamAsync(typeof(Post), new[] { p, p2, p3, p4 }, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
