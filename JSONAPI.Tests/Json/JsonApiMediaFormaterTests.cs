@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Http;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.Tests.Models;
 using Newtonsoft.Json;
@@ -16,6 +19,22 @@ namespace JSONAPI.Tests.Json
     {
         Author a;
         Post p, p2, p3, p4;
+
+        private class MockErrorSerializer : IErrorSerializer
+        {
+            public bool CanSerialize(Type type)
+            {
+                return true;
+            }
+
+            public void SerializeError(object error, Stream writeStream, JsonWriter writer, JsonSerializer serializer)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("test");
+                serializer.Serialize(writer, "foo");
+                writer.WriteEndObject();
+            }
+        }
 
         [TestInitialize]
         public void SetupModels()
@@ -153,6 +172,52 @@ namespace JSONAPI.Tests.Json
             Trace.WriteLine(output);
             Assert.AreEqual(output.Trim(), File.ReadAllText("SerializerIntegrationTest.json").Trim());
             //Assert.AreEqual("[2,3,4]", sw.ToString());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\FormatterErrorSerializationTest.json")]
+        public void Should_serialize_error()
+        {
+            // Arrange
+            var formatter = new JSONAPI.Json.JsonApiFormatter(new MockErrorSerializer());
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            var stream = new MemoryStream();
+
+            // Act
+            var payload = new HttpError(new Exception(), true);
+            formatter.WriteToStreamAsync(typeof(HttpError), payload, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+
+            // Assert
+            var expectedJson = File.ReadAllText("FormatterErrorSerializationTest.json");
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
+            var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\ErrorSerializerTest.json")]
+        public void SerializeErrorIntegrationTest()
+        {
+            // Arrange
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            var payload = new HttpError(new Exception("This is the exception message!"), true)
+            {
+                StackTrace = "Stack trace would go here"
+            };
+            formatter.WriteToStreamAsync(typeof(HttpError), payload, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+
+            // Assert
+            var expectedJson = File.ReadAllText("ErrorSerializerTest.json");
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
+            var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            output = Regex.Replace(output,
+                @"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}",
+                "TEST-ERROR-ID"); // We don't know what the GUID will be, so replace it
+            output.Should().Be(minifiedExpectedJson);
         }
 
         [TestMethod]

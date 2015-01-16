@@ -20,11 +20,18 @@ namespace JSONAPI.Json
     public class JsonApiFormatter : JsonMediaTypeFormatter
     {
         public JsonApiFormatter()
+            : this(new ErrorSerializer())
         {
+        }
+
+        internal JsonApiFormatter(IErrorSerializer errorSerializer)
+        {
+            _errorSerializer = errorSerializer;
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
         public IPluralizationService PluralizationService { get; set; }
+        private readonly IErrorSerializer _errorSerializer;
 
         private Lazy<Dictionary<Stream, RelationAggregator>> _relationAggregators
             = new Lazy<Dictionary<Stream, RelationAggregator>>(
@@ -79,32 +86,40 @@ namespace JSONAPI.Json
                     this.RelationAggregators[writeStream] = aggregator;
                 }
             }
-
-            Type valtype = GetSingleType(value.GetType());
-            if (IsMany(value.GetType()))
-                aggregator.AddPrimary(valtype, (IEnumerable<object>)value);
-            else
-                aggregator.AddPrimary(valtype, value);
-
+            
             var contentHeaders = content == null ? null : content.Headers;
             var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
             JsonWriter writer = this.CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
             JsonSerializer serializer = this.CreateJsonSerializer();
-            //writer.Formatting = Formatting.Indented;
-
-            var root = GetPropertyName(type, value);
-
-            writer.WriteStartObject();
-            writer.WritePropertyName(root);
-            if (IsMany(value.GetType()))
-                this.SerializeMany(value, writeStream, writer, serializer, aggregator);
+            if (_errorSerializer.CanSerialize(type))
+            {
+                // `value` is an error
+                _errorSerializer.SerializeError(value, writeStream, writer, serializer);
+            }
             else
-                this.Serialize(value, writeStream, writer, serializer, aggregator);
+            {
+                Type valtype = GetSingleType(value.GetType());
+                if (IsMany(value.GetType()))
+                    aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
+                else
+                    aggregator.AddPrimary(valtype, value);
 
-            // Include links from aggregator
-            SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                //writer.Formatting = Formatting.Indented;
 
-            writer.WriteEndObject();
+                var root = GetPropertyName(type, value);
+
+                writer.WriteStartObject();
+                writer.WritePropertyName(root);
+                if (IsMany(value.GetType()))
+                    this.SerializeMany(value, writeStream, writer, serializer, aggregator);
+                else
+                    this.Serialize(value, writeStream, writer, serializer, aggregator);
+
+                // Include links from aggregator
+                SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+
+                writer.WriteEndObject();
+            }
             writer.Flush();
 
             lock (this.RelationAggregators)
