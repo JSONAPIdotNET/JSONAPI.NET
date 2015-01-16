@@ -55,6 +55,10 @@ namespace JSONAPI.Json
                 || typeof(System.DateTime?).IsAssignableFrom(objectType)
                 || typeof(System.DateTimeOffset?).IsAssignableFrom(objectType)
                 || typeof(String).IsAssignableFrom(objectType)
+                || objectType.IsEnum
+                || (objectType.IsGenericType &&
+                    objectType.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                    objectType.GetGenericArguments()[0].IsEnum)
                 )
                 return true;
             else return false;
