@@ -763,8 +763,9 @@ namespace JSONAPI.Json
 
         private bool IsMany(Type type)
         {
-            //TODO: Should we check for arrays also? (They aren't generics.)
-            return (type.GetInterfaces().Contains(typeof(IEnumerable)) && type.IsGenericType);
+            return
+                type.IsArray ||
+                (type.GetInterfaces().Contains(typeof(IEnumerable)) && type.IsGenericType);
         }
 
         private Type GetSingleType(Type type)//dynamic value = null)

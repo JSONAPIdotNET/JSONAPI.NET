@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.Tests.Models;
 using Newtonsoft.Json;
@@ -116,6 +117,31 @@ namespace JSONAPI.Tests.Json
             //Payload payload = new Payload(a.Posts);
             //js.Serialize(jw, payload);
             formatter.WriteToStreamAsync(typeof(Post), a.Posts, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+
+            // Assert
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            Assert.AreEqual(output.Trim(), File.ReadAllText("SerializerIntegrationTest.json").Trim());
+            //Assert.AreEqual("[2,3,4]", sw.ToString());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\SerializerIntegrationTest.json")]
+        public void SerializeArrayIntegrationTest()
+        {
+            // Arrange
+            //PayloadConverter pc = new PayloadConverter();
+            //ModelConverter mc = new ModelConverter();
+            //ContractResolver.PluralizationService = new PluralizationService();
+
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            //Payload payload = new Payload(a.Posts);
+            //js.Serialize(jw, payload);
+            formatter.WriteToStreamAsync(typeof(Post), a.Posts.ToArray(), stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
