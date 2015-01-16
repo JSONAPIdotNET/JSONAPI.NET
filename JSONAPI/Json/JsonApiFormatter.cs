@@ -253,30 +253,40 @@ namespace JSONAPI.Json
                 }
                 else
                 {
-                    string objId;
-
-                    objId = GetIdFor(prop.GetValue(value, null));
-
-                    switch (sa)
+                    var propertyValue = prop.GetValue(value, null);
+                    if (propertyValue == null)
                     {
-                        case SerializeAsOptions.Ids:
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
-                            serializer.Serialize(writer, objId);
-                            if (iip)
-                                if (aggregator != null) aggregator.Add(prop.PropertyType, prop.GetValue(value, null));
-                            break;
-                        case SerializeAsOptions.Link:
-                            if (lt == null) throw new JsonSerializationException("A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                            string link = String.Format(lt, objId, value.GetType().GetProperty("Id").GetValue(value, null));
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
-                            writer.WriteValue(link);
-                            break;
-                        case SerializeAsOptions.Embedded:
-                            // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
-                            //serializer.Serialize(writer, prop.GetValue(value, null));
-                            this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
-                            break;
+                        writer.WriteNull();
+                    }
+                    else
+                    {
+                        string objId = GetIdFor(propertyValue);
+
+                        switch (sa)
+                        {
+                            case SerializeAsOptions.Ids:
+                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                serializer.Serialize(writer, objId);
+                                if (iip)
+                                    if (aggregator != null)
+                                        aggregator.Add(prop.PropertyType, prop.GetValue(value, null));
+                                break;
+                            case SerializeAsOptions.Link:
+                                if (lt == null)
+                                    throw new JsonSerializationException(
+                                        "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
+                                string link = String.Format(lt, objId,
+                                    value.GetType().GetProperty("Id").GetValue(value, null));
+                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                writer.WriteValue(link);
+                                break;
+                            case SerializeAsOptions.Embedded:
+                                // Not really supported by Ember Data yet, incidentally...but easy to implement here.
+                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                //serializer.Serialize(writer, prop.GetValue(value, null));
+                                this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
+                                break;
+                        }
                     }
                 }
 
