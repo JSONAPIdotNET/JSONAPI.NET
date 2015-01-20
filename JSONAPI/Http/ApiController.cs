@@ -5,7 +5,6 @@ using System.Text;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.OData.Query;
 using System.Reflection;
 using JSONAPI.Core;
 
@@ -26,10 +25,8 @@ namespace JSONAPI.Http
         }
 
         /// <summary>
-        /// Override this method to provide an IQueryable set of objects of type T, which
-        /// will be passed to the OData query processor to support OData queries. If this
-        /// method is not overridden, an empty List&lt;T&gt; will be returned, which will
-        /// mean that using OData query parameters will always return no results.
+        /// Override this method to provide an IQueryable set of objects of type T. If this
+        /// method is not overridden, an empty List&lt;T&gt; will be returned.
         /// </summary>
         /// <param name="materializer"></param>
         /// <returns></returns>
@@ -39,15 +36,18 @@ namespace JSONAPI.Http
         }
 
         //[System.Web.OData.EnableQuery] // Do this yourself!
+        /// <summary>
+        /// Default Get method implementation. Returns the result of
+        /// Note: You can easily add OData query support by overriding this method and decorating
+        /// it with the [System.Web.OData.EnableQuery] attribute.
+        /// </summary>
+        /// <returns></returns>
         public virtual IQueryable<T> Get()
         {
             IMaterializer materializer = MaterializerFactory();
 
             IQueryable<T> es = QueryableFactory(materializer);
-            // Apply the OData query
-            //IQueryable<T> queryResults = query.ApplyTo(es) as IQueryable<T>;
-            
-            //return queryResults;
+
             return es;
         }
 
