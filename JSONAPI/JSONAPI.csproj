@@ -71,6 +71,10 @@
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Http\ApiController.cs" />
+    <Compile Include="Json\ErrorSerializer.cs" />
+    <Compile Include="Json\GuidErrorIdProvider.cs" />
+    <Compile Include="Json\IErrorIdProvider.cs" />
+    <Compile Include="Json\IErrorSerializer.cs" />
     <Compile Include="Json\JsonApiFormatter.cs" />
     <Compile Include="Json\RelationAggregator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,0 +1,12 @@
+{
+    "errors": [
+        {
+            "id": "TEST-ERROR-ID",
+            "status": "500",
+            "title": "System.Exception",
+            "detail": "This is the exception message!",
+            "inner": null,
+            "stackTrace": "Stack trace would go here"
+        }
+    ]
+}
