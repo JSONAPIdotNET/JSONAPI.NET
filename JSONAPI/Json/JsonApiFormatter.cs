@@ -152,7 +152,8 @@ namespace JSONAPI.Json
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            writer.WriteValue(GetIdFor(value));
+            var idProp = GetIdProperty(value.GetType());
+            writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             PropertyInfo[] props = value.GetType().GetProperties();
             // Do non-model properties first, everything else goes in "links"
@@ -161,8 +162,7 @@ namespace JSONAPI.Json
 
             foreach (PropertyInfo prop in props)
             {
-                //FIXME: The "id" property might not be named "Id"!
-                if (FormatPropertyName(prop.Name) == "id") continue; // We did the Id above, don't do it twice!
+                if (prop == idProp) continue;
 
                 if (this.CanWriteTypeAsPrimitive(prop.PropertyType))
                 {
@@ -826,10 +826,8 @@ namespace JSONAPI.Json
             return type.GetProperty("Id");
         }
 
-        protected string GetIdFor(object obj)
+        protected string GetValueForIdProperty(PropertyInfo idprop, object obj)
         {
-            Type type = obj.GetType();
-            PropertyInfo idprop = GetIdProperty(type);
             if (idprop != null)
             {
                 if (idprop.PropertyType == typeof(string))
@@ -840,6 +838,13 @@ namespace JSONAPI.Json
                     return ((int)idprop.GetValue(obj, null)).ToString();
             }
             return "NOIDCOMPUTABLE!";
+        }
+
+        protected string GetIdFor(object obj)
+        {
+            Type type = obj.GetType();
+            PropertyInfo idprop = GetIdProperty(type);
+            return GetValueForIdProperty(idprop, obj);
         }
 
         private void WriteIdsArrayJson(Newtonsoft.Json.JsonWriter writer, IEnumerable<object> value, Newtonsoft.Json.JsonSerializer serializer)
