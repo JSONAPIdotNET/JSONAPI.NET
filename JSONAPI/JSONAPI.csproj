@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionFilters\EnableFilteringAttribute.cs" />
     <Compile Include="Attributes\IncludeInPayload.cs" />
     <Compile Include="Attributes\LinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAs.cs" />
