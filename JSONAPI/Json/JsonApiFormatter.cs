@@ -296,7 +296,10 @@ namespace JSONAPI.Json
                                 string link = String.Format(lt, objId,
                                     value.GetType().GetProperty("Id").GetValue(value, null));
                                 //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                writer.WriteStartObject();
+                                writer.WritePropertyName("href");
                                 writer.WriteValue(link);
+                                writer.WriteEndObject();
                                 break;
                             case SerializeAsOptions.Embedded:
                                 // Not really supported by Ember Data yet, incidentally...but easy to implement here.

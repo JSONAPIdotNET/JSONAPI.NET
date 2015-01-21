@@ -79,6 +79,7 @@
     <Compile Include="Json\ErrorSerializerTests.cs" />
     <Compile Include="Json\JsonApiMediaFormaterTests.cs" />
     <Compile Include="Json\JsonHelpers.cs" />
+    <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Post.cs" />
@@ -96,6 +97,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\ErrorSerializerTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\LinkTemplateTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\SerializerIntegrationTest.json">
