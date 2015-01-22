@@ -1,5 +1,6 @@
 JSONAPI.NET
 ===========
+[![jsonapi MyGet Build Status](https://www.myget.org/BuildSource/Badge/jsonapi?identifier=caf48269-c15b-4850-a29e-b41a23d9854d)](https://www.myget.org/)
 
 News
 ----
