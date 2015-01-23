@@ -14,6 +14,14 @@ namespace JSONAPI.Tests.Core
             public string Data { get; set; }
         }
 
+        private class CustomIdModel
+        {
+            [JSONAPI.Attributes.UseAsId]
+            public Guid Uuid { get; set; }
+
+            public string Data { get; set; }
+        }
+
         [TestMethod]
         public void FindsIdNamedId()
         {
@@ -35,6 +43,17 @@ namespace JSONAPI.Tests.Core
 
             // Assert
             Assert.Fail("An InvalidOperationException should be thrown and we shouldn't get here!");
+        }
+
+        [TestMethod]
+        public void FindsIdFromAttribute()
+        {
+            // Arrange
+            // Act
+            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(typeof(CustomIdModel));
+
+            // Assert
+            Assert.AreSame(typeof(CustomIdModel).GetProperty("Uuid"), idprop);
         }
 
         [TestMethod]
