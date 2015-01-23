@@ -48,16 +48,19 @@ namespace JSONAPI.Core
 
             var idPropCache = _idProperties.Value;
 
-            if (idPropCache.TryGetValue(type, out idprop)) return idprop;
-            
-            //TODO: Enable attribute-based determination
+            lock (idPropCache)
+            {
+                if (idPropCache.TryGetValue(type, out idprop)) return idprop;
 
-            idprop = type.GetProperty("Id");
+                //TODO: Enable attribute-based determination
 
-            if (idprop == null)
-                throw new InvalidOperationException(String.Format("Unable to determine Id property for type {0}", type));
+                idprop = type.GetProperty("Id");
 
-            _idProperties.Value.Add(type, idprop);
+                if (idprop == null)
+                    throw new InvalidOperationException(String.Format("Unable to determine Id property for type {0}", type));
+
+                idPropCache.Add(type, idprop);
+            }
 
             return idprop;
         }
