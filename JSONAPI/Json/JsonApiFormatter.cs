@@ -106,7 +106,7 @@ namespace JSONAPI.Json
 
                 //writer.Formatting = Formatting.Indented;
 
-                var root = GetPropertyName(type, value);
+                var root = GetJsonKeyForType(type, value);
 
                 writer.WriteStartObject();
                 writer.WritePropertyName(root);
@@ -155,7 +155,9 @@ namespace JSONAPI.Json
             var idProp = ModelManager.Instance.GetIdProperty(value.GetType());
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
-            PropertyInfo[] props = value.GetType().GetProperties();
+            // Leverage the cached map to avoid another costly call to GetProperties()
+            PropertyInfo[] props = ModelManager.Instance.GetPropertyMap(value.GetType()).Values.ToArray();
+
             // Do non-model properties first, everything else goes in "links"
             //TODO: Unless embedded???
             IList<PropertyInfo> modelProps = new List<PropertyInfo>();
@@ -293,8 +295,9 @@ namespace JSONAPI.Json
                                 if (lt == null)
                                     throw new JsonSerializationException(
                                         "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                                string link = String.Format(lt, objId,
-                                    value.GetType().GetProperty("Id").GetValue(value, null));
+                                string link = String.Format(lt, objId,  
+                                    GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
+                                    
                                 //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
                                 writer.WriteStartObject();
                                 writer.WritePropertyName("href");
@@ -399,7 +402,7 @@ namespace JSONAPI.Json
                 foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
                 {
                     apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(GetPropertyName(apair.Key));
+                    writer.WritePropertyName(GetJsonKeyForType(apair.Key));
                     writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
                 }
 
@@ -422,7 +425,7 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = GetPropertyName(type);
+            var pripropname = GetJsonKeyForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type
@@ -749,22 +752,10 @@ namespace JSONAPI.Json
 
         #endregion
 
-        private string GetPropertyName(Type type, dynamic value = null)
+        //TODO: Could be expensive, and is called often...move to ModelManager and cache result?
+        private string GetJsonKeyForType(Type type, dynamic value = null)
         {
-            if (IsMany(type))
-                type = GetSingleType(type);
-
-            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
-
-            string title = type.Name;
-            if (attrs.Any())
-            {
-                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
-                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
-                if (titles.Any()) title = titles.First();
-            }
-
-            return FormatPropertyName(this.PluralizationService.Pluralize(title));
+            return ModelManager.Instance.GetJsonKeyForType(type, this.PluralizationService);
         }
 
         //private string GetPropertyName(Type type)
@@ -780,14 +771,14 @@ namespace JSONAPI.Json
                 return false;
         }
 
-        private bool IsMany(Type type)
+        internal static bool IsMany(Type type)
         {
             return
                 type.IsArray ||
                 (type.GetInterfaces().Contains(typeof(IEnumerable)) && type.IsGenericType);
         }
 
-        private Type GetSingleType(Type type)//dynamic value = null)
+        internal static Type GetSingleType(Type type)//dynamic value = null)
         {
             if (IsMany(type))
                 if (type.IsGenericType)
