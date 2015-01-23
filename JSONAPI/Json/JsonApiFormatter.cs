@@ -152,7 +152,7 @@ namespace JSONAPI.Json
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            var idProp = GetIdProperty(value.GetType());
+            var idProp = ModelManager.Instance.GetIdProperty(value.GetType());
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             PropertyInfo[] props = value.GetType().GetProperties();
@@ -819,15 +819,17 @@ namespace JSONAPI.Json
         {
             // Only good for creating dummy relationship objects...
             object retval = Activator.CreateInstance(type);
-            PropertyInfo idprop = GetIdProperty(type);
+            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(type);
             idprop.SetValue(retval, System.Convert.ChangeType(id, idprop.PropertyType));
             return retval;
         }
 
+        /*
         protected PropertyInfo GetIdProperty(Type type)
         {
             return type.GetProperty("Id");
         }
+        */
 
         protected string GetValueForIdProperty(PropertyInfo idprop, object obj)
         {
@@ -846,7 +848,7 @@ namespace JSONAPI.Json
         protected string GetIdFor(object obj)
         {
             Type type = obj.GetType();
-            PropertyInfo idprop = GetIdProperty(type);
+            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(type);
             return GetValueForIdProperty(idprop, obj);
         }
 
