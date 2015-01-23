@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JSONAPI.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -32,6 +33,11 @@ namespace JSONAPI.Core
                 () => new Dictionary<Type, PropertyInfo>()
             );
 
+        private Lazy<Dictionary<Type, Dictionary<string, PropertyInfo>>> _propertyMaps
+            = new Lazy<Dictionary<Type, Dictionary<string, PropertyInfo>>>(
+                () => new Dictionary<Type, Dictionary<string, PropertyInfo>>()
+            );
+
         #endregion
 
         #region Id property determination
@@ -54,6 +60,30 @@ namespace JSONAPI.Core
             _idProperties.Value.Add(type, idprop);
 
             return idprop;
+        }
+
+        #endregion
+
+        #region Property Maps
+
+        public Dictionary<string, PropertyInfo> GetPropertyMap(Type type)
+        {
+            Dictionary<string, PropertyInfo> propMap = null;
+
+            var propMapCache = _propertyMaps.Value;
+
+            if (propMapCache.TryGetValue(type, out propMap)) return propMap;
+
+            propMap = new Dictionary<string, PropertyInfo>();
+            PropertyInfo[] props = type.GetProperties();
+            foreach (PropertyInfo prop in props)
+            {
+                propMap[JsonApiFormatter.FormatPropertyName(prop.Name)] = prop;
+            }
+
+            propMapCache.Add(type, propMap);
+
+            return propMap;
         }
 
         #endregion

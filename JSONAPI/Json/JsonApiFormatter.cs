@@ -549,15 +549,9 @@ namespace JSONAPI.Json
         public object Deserialize(Type objectType, Stream readStream, JsonReader reader, JsonSerializer serializer)
         {
             object retval = Activator.CreateInstance(objectType);
-            PropertyInfo[] props = objectType.GetProperties();
 
-            //TODO: This could get expensive...cache these maps per type, so we only build the map once?
-            IDictionary<string, PropertyInfo> propMap = new Dictionary<string, PropertyInfo>();
-            foreach (PropertyInfo prop in props)
-            {
-                propMap[FormatPropertyName(prop.Name)] = prop;
-            }
-
+            IDictionary<string, PropertyInfo> propMap = ModelManager.Instance.GetPropertyMap(objectType);
+            
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException(String.Format("Expected JsonToken.StartObject, got {0}", reader.TokenType.ToString()));
             reader.Read(); // Burn the StartObject token
             do
@@ -640,13 +634,7 @@ namespace JSONAPI.Json
             //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
 
-            //TODO: Redundant, already done in Deserialize method...optimize?
-            PropertyInfo[] props = obj.GetType().GetProperties();
-            IDictionary<string, PropertyInfo> propMap = new Dictionary<string, PropertyInfo>();
-            foreach (PropertyInfo prop in props)
-            {
-                propMap[FormatPropertyName(prop.Name)] = prop;
-            }
+            IDictionary<string, PropertyInfo> propMap = ModelManager.Instance.GetPropertyMap(obj.GetType());
 
             while (reader.Read())
             {
@@ -809,6 +797,7 @@ namespace JSONAPI.Json
             return type;
         }
 
+        //TODO: Should this move to ModelManager? Could be cached there to improve performance?
         public static string FormatPropertyName(string propertyName)
         {
             string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
