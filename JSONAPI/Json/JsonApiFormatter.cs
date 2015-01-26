@@ -22,16 +22,23 @@ namespace JSONAPI.Json
         public JsonApiFormatter()
             : this(new ErrorSerializer())
         {
+            if (_modelManager == null) _modelManager = new ModelManager();
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
         internal JsonApiFormatter(IErrorSerializer errorSerializer)
         {
             _errorSerializer = errorSerializer;
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
-        public IPluralizationService PluralizationService { get; set; }
+        public JsonApiFormatter(IModelManager modelManager) : this()
+        {
+            _modelManager = modelManager;
+        }
+
+        public IPluralizationService PluralizationService { get; set; } //FIXME: Deprecated, will be removed shortly
         private readonly IErrorSerializer _errorSerializer;
+        private readonly IModelManager _modelManager;
 
         private Lazy<Dictionary<Stream, RelationAggregator>> _relationAggregators
             = new Lazy<Dictionary<Stream, RelationAggregator>>(
@@ -152,7 +159,7 @@ namespace JSONAPI.Json
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            var idProp = ModelManager.Instance.GetIdProperty(value.GetType());
+            var idProp = _modelManager.GetIdProperty(value.GetType());
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             PropertyInfo[] props = value.GetType().GetProperties();
@@ -819,7 +826,7 @@ namespace JSONAPI.Json
         {
             // Only good for creating dummy relationship objects...
             object retval = Activator.CreateInstance(type);
-            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(type);
+            PropertyInfo idprop = _modelManager.GetIdProperty(type);
             idprop.SetValue(retval, System.Convert.ChangeType(id, idprop.PropertyType));
             return retval;
         }
@@ -848,7 +855,7 @@ namespace JSONAPI.Json
         protected string GetIdFor(object obj)
         {
             Type type = obj.GetType();
-            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(type);
+            PropertyInfo idprop = _modelManager.GetIdProperty(type);
             return GetValueForIdProperty(idprop, obj);
         }
 

@@ -18,8 +18,10 @@ namespace JSONAPI.Tests.Core
         public void FindsIdNamedId()
         {
             // Arrange
+            var mm = new ModelManager();
+
             // Act
-            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(typeof(Author));
+            PropertyInfo idprop = mm.GetIdProperty(typeof(Author));
 
             // Assert
             Assert.AreSame(typeof(Author).GetProperty("Id"), idprop);
@@ -30,8 +32,10 @@ namespace JSONAPI.Tests.Core
         public void DoesntFindMissingId()
         {
             // Arrange
+            var mm = new ModelManager();
+
             // Act
-            PropertyInfo idprop = ModelManager.Instance.GetIdProperty(typeof(InvalidModel));
+            PropertyInfo idprop = mm.GetIdProperty(typeof(InvalidModel));
 
             // Assert
             Assert.Fail("An InvalidOperationException should be thrown and we shouldn't get here!");

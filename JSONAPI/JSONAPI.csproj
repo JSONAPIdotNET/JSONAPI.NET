@@ -68,6 +68,7 @@
     <Compile Include="Attributes\IncludeInPayload.cs" />
     <Compile Include="Attributes\LinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAs.cs" />
+    <Compile Include="Core\IModelManager.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\MetadataManager.cs" />

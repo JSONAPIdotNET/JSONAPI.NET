@@ -7,23 +7,9 @@ using System.Threading.Tasks;
 
 namespace JSONAPI.Core
 {
-    class ModelManager
+    public class ModelManager : IModelManager
     {
-        #region Singleton pattern
-
-        private static readonly ModelManager instance = new ModelManager();
-
-        private ModelManager() { }
-
-        public static ModelManager Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
-        #endregion
+        public ModelManager() { }
 
         #region Cache storage
 
