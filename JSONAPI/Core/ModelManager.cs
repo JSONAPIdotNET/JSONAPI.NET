@@ -10,7 +10,23 @@ namespace JSONAPI.Core
 {
     public class ModelManager : IModelManager
     {
-        public ModelManager() { }
+        public ModelManager() {
+            _pluralizationService = new PluralizationService();
+        }
+
+        public ModelManager(IPluralizationService pluralizationService)
+        {
+            _pluralizationService = pluralizationService;
+        }
+
+        private IPluralizationService _pluralizationService = null;
+        public IPluralizationService PluralizationService
+        {
+            get
+            {
+                return _pluralizationService;
+            }
+        }
 
         #region Cache storage
 
@@ -60,7 +76,7 @@ namespace JSONAPI.Core
 
         #region Property Maps
 
-        public Dictionary<string, PropertyInfo> GetPropertyMap(Type type)
+        public IDictionary<string, PropertyInfo> GetPropertyMap(Type type) //FIXME: Will become protected
         {
             Dictionary<string, PropertyInfo> propMap = null;
 
@@ -74,7 +90,7 @@ namespace JSONAPI.Core
                 PropertyInfo[] props = type.GetProperties();
                 foreach (PropertyInfo prop in props)
                 {
-                    propMap[JsonApiFormatter.FormatPropertyName(prop.Name)] = prop;
+                    propMap[GetJsonKeyForProperty(prop)] = prop;
                 }
 
                 propMapCache.Add(type, propMap);
@@ -83,13 +99,20 @@ namespace JSONAPI.Core
             return propMap;
         }
 
+        public PropertyInfo GetPropertyForJsonKey(Type type, string jsonKey)
+        {
+            PropertyInfo propInfo;
+            if (GetPropertyMap(type).TryGetValue(jsonKey, out propInfo)) return propInfo;
+            else return null; // Or, throw an exception here??
+        }
+
         #endregion
 
         //TODO: This has been "moved" here so we can cache the results and improve performance...but
         // it raises the question of whether the various methods called within here should belong
         // to JsonApiFormatter at all...should they move here also? Should the IPluralizationService
         // instance belong to ModelManager instead?
-        internal string GetJsonKeyForType(Type type, IPluralizationService pluralizationService)
+        public string GetJsonKeyForType(Type type)
         {
             string key = null;
 
@@ -112,12 +135,24 @@ namespace JSONAPI.Core
                     if (titles.Any()) title = titles.First();
                 }
 
-                key = JsonApiFormatter.FormatPropertyName(pluralizationService.Pluralize(title));
+                key = FormatPropertyName(PluralizationService.Pluralize(title));
 
                 keyCache.Add(type, key);
             }
 
             return key;
+        }
+
+        public string GetJsonKeyForProperty(PropertyInfo propInfo)
+        {
+            return FormatPropertyName(propInfo.Name);
+            //TODO: Respect [JsonProperty(PropertyName = "FooBar")], and probably cache the result.
+        }
+
+        protected static string FormatPropertyName(string propertyName)
+        {
+            string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
+            return result;
         }
     }
 }

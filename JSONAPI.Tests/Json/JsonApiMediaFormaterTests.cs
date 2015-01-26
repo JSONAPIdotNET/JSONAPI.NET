@@ -133,8 +133,7 @@ namespace JSONAPI.Tests.Json
             //ModelConverter mc = new ModelConverter();
             //ContractResolver.PluralizationService = new PluralizationService();
 
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -158,8 +157,7 @@ namespace JSONAPI.Tests.Json
             //ModelConverter mc = new ModelConverter();
             //ContractResolver.PluralizationService = new PluralizationService();
 
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -180,7 +178,6 @@ namespace JSONAPI.Tests.Json
         {
             // Arrange
             var formatter = new JSONAPI.Json.JsonApiFormatter(new MockErrorSerializer());
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
             var stream = new MemoryStream();
 
             // Act
@@ -199,8 +196,7 @@ namespace JSONAPI.Tests.Json
         public void SerializeErrorIntegrationTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -224,8 +220,7 @@ namespace JSONAPI.Tests.Json
         public void DeserializeCollectionIntegrationTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             formatter.WriteToStreamAsync(typeof(Post), new List<Post> {p, p2}, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
@@ -246,8 +241,7 @@ namespace JSONAPI.Tests.Json
         [TestMethod(), Timeout(1000)]
         public void DeserializeExtraPropertyTest()
         {
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":[]}}}"));
@@ -264,8 +258,7 @@ namespace JSONAPI.Tests.Json
         [TestMethod(), Timeout(1000)]
         public void DeserializeExtraRelationshipTest()
         {
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":[],""bogus"":[""PANIC!""]}}}"));

@@ -45,8 +45,10 @@ namespace JSONAPI.Tests.Core
         public void GetPropertyMapTest()
         {
             // Arrange
+            var mm = new ModelManager();
+
             // Act
-            var propMap = ModelManager.Instance.GetPropertyMap(typeof(Post));
+            var propMap = mm.GetPropertyMap(typeof(Post));
             
             // Assert
             Assert.AreSame(typeof(Post).GetProperty("Id"), propMap["id"]);
@@ -58,11 +60,12 @@ namespace JSONAPI.Tests.Core
         {
             // Arrange
             var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
 
             // Act
-            var postKey = ModelManager.Instance.GetJsonKeyForType(typeof(Post), pluralizationService);
-            var authorKey = ModelManager.Instance.GetJsonKeyForType(typeof(Author), pluralizationService);
-            var commentKey = ModelManager.Instance.GetJsonKeyForType(typeof(Comment), pluralizationService);
+            var postKey = mm.GetJsonKeyForType(typeof(Post));
+            var authorKey = mm.GetJsonKeyForType(typeof(Author));
+            var commentKey = mm.GetJsonKeyForType(typeof(Comment));
 
             // Assert
             Assert.AreEqual("posts", postKey);
