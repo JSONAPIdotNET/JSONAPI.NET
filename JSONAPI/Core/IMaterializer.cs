@@ -8,12 +8,18 @@ namespace JSONAPI.Core
 {
     public interface IMaterializer
     {
+        Task<T> GetByIdAsync<T>(params Object[] keyValues);
+        Task<object> GetByIdAsync(Type type, params Object[] keyValues);
+        Task<T> MaterializeAsync<T>(T ephemeral);
+        Task<object> MaterializeAsync(Type type, object ephemeral);
+        Task<T> MaterializeUpdateAsync<T>(T ephemeral);
+        Task<object> MaterializeUpdateAsync(Type type, object ephemeral);
 
-        T GetById<T>(params Object[] keyValues);
-        object GetById(Type type, params Object[] keyValues);
-        T Materialize<T>(T ephemeral);
-        object Materialize(Type type, object ephemeral);
-        T MaterializeUpdate<T>(T ephemeral);
-        object MaterializeUpdate(Type type, object ephemeral);
+        [Obsolete]T GetById<T>(params Object[] keyValues);
+        [Obsolete]object GetById(Type type, params Object[] keyValues);
+        [Obsolete]T Materialize<T>(T ephemeral);
+        [Obsolete]object Materialize(Type type, object ephemeral);
+        [Obsolete]T MaterializeUpdate<T>(T ephemeral);
+        [Obsolete]object MaterializeUpdate(Type type, object ephemeral);
     }
 }

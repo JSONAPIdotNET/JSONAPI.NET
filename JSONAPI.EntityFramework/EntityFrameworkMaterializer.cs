@@ -35,7 +35,7 @@ namespace JSONAPI.EntityFramework
         /// <param name="type"></param>
         /// <param name="idValues"></param>
         /// <returns></returns>
-        public virtual object GetById(Type type, params Object[] idValues)
+        public virtual Task<object> GetByIdAsync(Type type, params Object[] idValues)
         {
             //TODO: How to react if the type isn't in the context?
 
@@ -58,20 +58,20 @@ namespace JSONAPI.EntityFramework
                     i++;
                 }
             }
-            return this.context.Set(type).Find(idv2);
+            return this.context.Set(type).FindAsync(idv2);
         }
 
-        public T GetById<T>(params Object[] idValues)
+        public async Task<T> GetByIdAsync<T>(params Object[] idValues)
         {
-            return (T)GetById(typeof(T), idValues);
+            return (T) await GetByIdAsync(typeof(T), idValues);
         }
 
-        public T Materialize<T>(T ephemeral)
+        public async Task<T> MaterializeAsync<T>(T ephemeral)
         {
-            return (T)Materialize(typeof(T), ephemeral);
+            return (T) await MaterializeAsync(typeof(T), ephemeral);
         }
 
-        public virtual object Materialize(Type type, object ephemeral)
+        public virtual async Task<object> MaterializeAsync(Type type, object ephemeral)
         {
             IEnumerable<string> keyNames = GetKeyNames(type);
             List<Object> idValues = new List<Object>();
@@ -90,7 +90,7 @@ namespace JSONAPI.EntityFramework
             object retval = null;
             if (!anyNull)
             {
-                retval = context.Set(type).Find(idValues.ToArray());
+                retval = await context.Set(type).FindAsync(idValues.ToArray());
             }
             if (retval == null)
             {
@@ -101,22 +101,56 @@ namespace JSONAPI.EntityFramework
                 {
                     // For a new object, if a key is specified, we want to merge the key, at least.
                     // For simplicity then, make the behavior equivalent to MergeMaterialize in this case.
-                    this.Merge(type, ephemeral, retval);
+                    await this.Merge(type, ephemeral, retval);
                 }
             }
             return retval;
         }
 
+        public async Task<T> MaterializeUpdateAsync<T>(T ephemeral)
+        {
+            return (T) await MaterializeUpdateAsync(typeof(T), ephemeral);
+        }
+
+        public async Task<object> MaterializeUpdateAsync(Type type, object ephemeral)
+        {
+            object material = await MaterializeAsync(type, ephemeral);
+            await this.Merge(type, ephemeral, material);
+            return material;
+        }
+
+        #endregion
+
+        #region Obsolete IMaterializer contract methods
+
+        public T GetById<T>(params object[] keyValues)
+        {
+            return GetByIdAsync<T>(keyValues).Result;
+        }
+
+        public object GetById(Type type, params object[] keyValues)
+        {
+            return GetByIdAsync(type, keyValues).Result;
+        }
+
+        public T Materialize<T>(T ephemeral)
+        {
+            return MaterializeAsync<T>(ephemeral).Result;
+        }
+
+        public object Materialize(Type type, object ephemeral)
+        {
+            return MaterializeAsync(type, ephemeral).Result;
+        }
+
         public T MaterializeUpdate<T>(T ephemeral)
         {
-            return (T)MaterializeUpdate(typeof(T), ephemeral);
+            return MaterializeUpdateAsync<T>(ephemeral).Result;
         }
 
         public object MaterializeUpdate(Type type, object ephemeral)
         {
-            object material = Materialize(type, ephemeral);
-            this.Merge(type, ephemeral, material);
-            return material;
+            return MaterializeUpdateAsync(type, ephemeral).Result;
         }
 
         #endregion
@@ -246,7 +280,7 @@ namespace JSONAPI.EntityFramework
             return key;
         }
 
-        private void Merge (Type type, object ephemeral, object material)
+        private async Task Merge (Type type, object ephemeral, object material)
         {
             PropertyInfo[] props = type.GetProperties();
             foreach (PropertyInfo prop in props)
@@ -286,7 +320,7 @@ namespace JSONAPI.EntityFramework
                         foreach (EntityKey key in ephemeralKeys.Except(materialKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = GetById(elementType, idParams);
+                            object obj = await GetByIdAsync(elementType, idParams);
                             mmadd.Invoke(materialMany, new object[] { obj });
                         }
                     // Remove from hasMany
@@ -294,7 +328,7 @@ namespace JSONAPI.EntityFramework
                         foreach (EntityKey key in materialKeys.Except(ephemeralKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = GetById(elementType, idParams);
+                            object obj = await GetByIdAsync(elementType, idParams);
                             mmremove.Invoke(materialMany, new object[] { obj });
                         }
                 }
@@ -312,7 +346,7 @@ namespace JSONAPI.EntityFramework
                     if (materialKey != ephemeralKey)
                     {
                         object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                        prop.SetValue(material, GetById(prop.PropertyType, idParams), null);
+                        prop.SetValue(material, await GetByIdAsync(prop.PropertyType, idParams), null);
                     }
                     // else, 
                 }
@@ -328,6 +362,5 @@ namespace JSONAPI.EntityFramework
             }
 
         }
-
     }
 }
