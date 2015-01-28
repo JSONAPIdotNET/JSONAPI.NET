@@ -43,6 +43,7 @@ namespace JSONAPI.Json
             _modelManager = new ModelManager(pluralizationService);
         }
 
+        [Obsolete]
         public IPluralizationService PluralizationService  //FIXME: Deprecated, will be removed shortly
         {
             get
@@ -50,8 +51,17 @@ namespace JSONAPI.Json
                 return _modelManager.PluralizationService;
             }
         }
+
         private readonly IErrorSerializer _errorSerializer;
+
         private readonly IModelManager _modelManager;
+        public IModelManager ModelManager
+        {
+            get
+            {
+                return _modelManager;
+            }
+        }
 
         private Lazy<Dictionary<Stream, RelationAggregator>> _relationAggregators
             = new Lazy<Dictionary<Stream, RelationAggregator>>(
