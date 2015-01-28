@@ -3,13 +3,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.Core;
 using JSONAPI.Tests.Models;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace JSONAPI.Tests.Core
 {
     [TestClass]
     public class ModelManagerTests
     {
-        private class InvalidModel
+        private class InvalidModel // No Id discernable!
         {
             public string Data { get; set; }
         }
@@ -96,6 +98,55 @@ namespace JSONAPI.Tests.Core
             Assert.AreSame(authorType.GetProperty("Name"), nameProp);
             Assert.AreSame(authorType.GetProperty("Posts"), postsProp);
 
+        }
+
+        [TestMethod]
+        public void IsSerializedAsManyTest()
+        {
+            // Arrange
+            var mm = new ModelManager();
+
+            // Act
+            bool isArray = mm.IsSerializedAsMany(typeof(Post[]));
+            bool isGenericEnumerable = mm.IsSerializedAsMany(typeof(IEnumerable<Post>));
+            bool isString = mm.IsSerializedAsMany(typeof(string));
+            bool isAuthor = mm.IsSerializedAsMany(typeof(Author));
+            bool isNonGenericEnumerable = mm.IsSerializedAsMany(typeof(IEnumerable));
+
+            // Assert
+            Assert.IsTrue(isArray);
+            Assert.IsTrue(isGenericEnumerable);
+            Assert.IsFalse(isString);
+            Assert.IsFalse(isAuthor);
+            Assert.IsFalse(isNonGenericEnumerable);
+        }
+
+        [TestMethod]
+        public void GetElementTypeTest()
+        {
+            // Arrange
+            var mm = new ModelManager();
+
+            // Act
+            Type postTypeFromArray = mm.GetElementType(typeof(Post[]));
+            Type postTypeFromEnumerable = mm.GetElementType(typeof(IEnumerable<Post>));
+
+            // Assert
+            Assert.AreSame(typeof(Post), postTypeFromArray);
+            Assert.AreSame(typeof(Post), postTypeFromEnumerable);
+        }
+
+        [TestMethod]
+        public void GetElementTypeInvalidArgumentTest()
+        {
+            // Arrange
+            var mm = new ModelManager();
+
+            // Act
+            Type x = mm.GetElementType(typeof(Author));
+
+            // Assert
+            Assert.IsNull(x, "Return value of GetElementType should be null for a non-Many type argument!");
         }
     }
 }

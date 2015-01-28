@@ -119,18 +119,18 @@ namespace JSONAPI.Json
             else
             {
                 Type valtype = GetSingleType(value.GetType());
-                if (IsMany(value.GetType()))
+                if (_modelManager.IsSerializedAsMany(value.GetType()))
                     aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
                 else
                     aggregator.AddPrimary(valtype, value);
 
                 //writer.Formatting = Formatting.Indented;
 
-                var root = GetJsonKeyForType(type, value);
+                var root = _modelManager.GetJsonKeyForType(type);
 
                 writer.WriteStartObject();
                 writer.WritePropertyName(root);
-                if (IsMany(value.GetType()))
+                if (_modelManager.IsSerializedAsMany(value.GetType()))
                     this.SerializeMany(value, writeStream, writer, serializer, aggregator);
                 else
                     this.Serialize(value, writeStream, writer, serializer, aggregator);
@@ -422,7 +422,7 @@ namespace JSONAPI.Json
                 foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
                 {
                     apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(GetJsonKeyForType(apair.Key));
+                    writer.WritePropertyName(_modelManager.GetJsonKeyForType(apair.Key));
                     writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
                 }
 
@@ -445,7 +445,7 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = GetJsonKeyForType(type);
+            var pripropname = _modelManager.GetJsonKeyForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type
@@ -522,7 +522,7 @@ namespace JSONAPI.Json
                  */
                 if (retval != null)
                 {
-                    if (!type.IsAssignableFrom(retval.GetType()) && IsMany(type))
+                    if (!type.IsAssignableFrom(retval.GetType()) && _modelManager.IsSerializedAsMany(type))
                     {
                         IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(singleType));
                         list.Add(retval);
@@ -770,41 +770,10 @@ namespace JSONAPI.Json
 
         #endregion
 
-        //TODO: Remove shell function, call _modelManager.GetJsonKeyForType directly.
-        private string GetJsonKeyForType(Type type, dynamic value = null)
+        private Type GetSingleType(Type type)//dynamic value = null)
         {
-            return _modelManager.GetJsonKeyForType(type);
+            return _modelManager.IsSerializedAsMany(type) ? _modelManager.GetElementType(type) : type;
         }
-
-        //private string GetPropertyName(Type type)
-        //{
-        //    return FormatPropertyName(PluralizationService.Pluralize(type.Name));
-        //}
-
-        internal static bool IsMany(Type type)
-        {
-            return
-                type.IsArray ||
-                (type.GetInterfaces().Contains(typeof(IEnumerable)) && type.IsGenericType);
-        }
-
-        internal static Type GetSingleType(Type type)//dynamic value = null)
-        {
-            if (IsMany(type))
-                if (type.IsGenericType)
-                    return type.GetGenericArguments()[0];
-                else
-                    return type.GetElementType();
-            return type;
-        }
-
-        /*
-        public static string FormatPropertyName(string propertyName)
-        {
-            string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
-            return result;
-        }
-        */
 
         protected object GetById(Type type, string id)
         {
@@ -814,13 +783,6 @@ namespace JSONAPI.Json
             idprop.SetValue(retval, System.Convert.ChangeType(id, idprop.PropertyType));
             return retval;
         }
-
-        /*
-        protected PropertyInfo GetIdProperty(Type type)
-        {
-            return type.GetProperty("Id");
-        }
-        */
 
         protected string GetValueForIdProperty(PropertyInfo idprop, object obj)
         {

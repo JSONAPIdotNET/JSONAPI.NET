@@ -113,10 +113,6 @@ namespace JSONAPI.Core
 
         #endregion
 
-        //TODO: This has been "moved" here so we can cache the results and improve performance...but
-        // it raises the question of whether the various methods called within here should belong
-        // to JsonApiFormatter at all...should they move here also? Should the IPluralizationService
-        // instance belong to ModelManager instead?
         public string GetJsonKeyForType(Type type)
         {
             string key = null;
@@ -127,8 +123,8 @@ namespace JSONAPI.Core
             {
                 if (keyCache.TryGetValue(type, out key)) return key;
 
-                if (JsonApiFormatter.IsMany(type))
-                    type = JsonApiFormatter.GetSingleType(type);
+                if (IsSerializedAsMany(type))
+                    type = GetElementType(type);
 
                 var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
 
@@ -159,5 +155,26 @@ namespace JSONAPI.Core
             string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
             return result;
         }
+
+        public bool IsSerializedAsMany(Type type)
+        {
+            bool isMany = 
+                type.IsArray ||
+                (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
+
+            return isMany;
+        }
+
+        public Type GetElementType(Type manyType)
+        {
+            Type etype = null;
+            if (manyType.IsGenericType)
+                etype = manyType.GetGenericArguments()[0];
+            else
+                etype = manyType.GetElementType();
+
+            return etype;
+        }
+
     }
 }
