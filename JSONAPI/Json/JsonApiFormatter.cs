@@ -20,27 +20,32 @@ namespace JSONAPI.Json
     public class JsonApiFormatter : JsonMediaTypeFormatter
     {
         public JsonApiFormatter()
-            : this(new ErrorSerializer())
+            : this(new ModelManager(), new ErrorSerializer())
         {
-            if (_modelManager == null) _modelManager = new ModelManager();
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
+        }
+
+        public JsonApiFormatter(IModelManager modelManager) :
+            this(modelManager, new ErrorSerializer())
+        {
+        }
+
+        public JsonApiFormatter(IPluralizationService pluralizationService) :
+            this(new ModelManager(pluralizationService))
+        {
         }
 
         // Currently for tests only.
         internal JsonApiFormatter(IErrorSerializer errorSerializer)
+            : this(new ModelManager(), errorSerializer)
         {
-            _modelManager = new ModelManager(new PluralizationService());
-            _errorSerializer = errorSerializer;
+            
         }
 
-        public JsonApiFormatter(IModelManager modelManager) : this()
+        internal JsonApiFormatter(IModelManager modelManager, IErrorSerializer errorSerializer)
         {
             _modelManager = modelManager;
-        }
-
-        public JsonApiFormatter(IPluralizationService pluralizationService) : this()
-        {
-            _modelManager = new ModelManager(pluralizationService);
+            _errorSerializer = errorSerializer;
+            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
         [Obsolete]
