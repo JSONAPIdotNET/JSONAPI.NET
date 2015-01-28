@@ -175,8 +175,8 @@ namespace JSONAPI.Json
             var idProp = _modelManager.GetIdProperty(value.GetType());
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
-            // Leverage the cached map to avoid another costly call to GetProperties()
-            PropertyInfo[] props = _modelManager.GetPropertyMap(value.GetType()).Values.ToArray();
+            // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
+            PropertyInfo[] props = _modelManager.GetProperties(value.GetType());
 
             // Do non-model properties first, everything else goes in "links"
             //TODO: Unless embedded???
@@ -573,8 +573,6 @@ namespace JSONAPI.Json
         {
             object retval = Activator.CreateInstance(objectType);
 
-            IDictionary<string, PropertyInfo> propMap = _modelManager.GetPropertyMap(objectType);
-            
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException(String.Format("Expected JsonToken.StartObject, got {0}", reader.TokenType.ToString()));
             reader.Read(); // Burn the StartObject token
             do
@@ -589,7 +587,7 @@ namespace JSONAPI.Json
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, readStream, reader, serializer);
                     }
-                    else if (propMap.TryGetValue(value, out prop))
+                    else if ((prop = _modelManager.GetPropertyForJsonKey(objectType, value)) != null)
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: Embedded would be dropped here!
@@ -657,7 +655,7 @@ namespace JSONAPI.Json
             //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
 
-            IDictionary<string, PropertyInfo> propMap = _modelManager.GetPropertyMap(obj.GetType());
+            Type objectType = obj.GetType();
 
             while (reader.Read())
             {
@@ -665,8 +663,8 @@ namespace JSONAPI.Json
                 {
                     string value = (string)reader.Value;
                     reader.Read(); // burn the PropertyName token
-                    PropertyInfo prop;
-                    if (propMap.TryGetValue(value, out prop) && !CanWriteTypeAsPrimitive(prop.PropertyType))
+                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
+                    if (prop != null && !CanWriteTypeAsPrimitive(prop.PropertyType))
                     {
                         //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
                         if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)

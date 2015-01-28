@@ -76,7 +76,7 @@ namespace JSONAPI.Core
 
         #region Property Maps
 
-        public IDictionary<string, PropertyInfo> GetPropertyMap(Type type) //FIXME: Will become protected
+        protected IDictionary<string, PropertyInfo> GetPropertyMap(Type type) //FIXME: Will become protected
         {
             Dictionary<string, PropertyInfo> propMap = null;
 
@@ -97,6 +97,11 @@ namespace JSONAPI.Core
             }
 
             return propMap;
+        }
+
+        public PropertyInfo[] GetProperties(Type type)
+        {
+            return GetPropertyMap(type).Values.ToArray();
         }
 
         public PropertyInfo GetPropertyForJsonKey(Type type, string jsonKey)
