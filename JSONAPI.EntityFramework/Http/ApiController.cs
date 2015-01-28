@@ -47,7 +47,7 @@ namespace JSONAPI.EntityFramework.Http
                 var material = await materializer.MaterializeUpdateAsync(postedObj);
                 if (context.Entry<T>(material).State == EntityState.Added)
                 {
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     materialList.Add(material);
                 }
                 else
@@ -71,7 +71,7 @@ namespace JSONAPI.EntityFramework.Http
                 var material = await materializer.MaterializeUpdateAsync(putObj);
                 materialList.Add(material);
             }
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return materialList;
         }
 
@@ -81,7 +81,7 @@ namespace JSONAPI.EntityFramework.Http
             DbContext context = materializer.DbContext;
             T target = await materializer.GetByIdAsync<T>(id);
             context.Set<T>().Remove(target);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             await base.Delete(id);
         }
 
