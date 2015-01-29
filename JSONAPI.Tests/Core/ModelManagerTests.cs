@@ -20,7 +20,7 @@ namespace JSONAPI.Tests.Core
         public void FindsIdNamedId()
         {
             // Arrange
-            var mm = new ModelManager();
+            var mm = new ModelManager(new PluralizationService());
 
             // Act
             PropertyInfo idprop = mm.GetIdProperty(typeof(Author));
@@ -34,7 +34,7 @@ namespace JSONAPI.Tests.Core
         public void DoesntFindMissingId()
         {
             // Arrange
-            var mm = new ModelManager();
+            var mm = new ModelManager(new PluralizationService());
 
             // Act
             PropertyInfo idprop = mm.GetIdProperty(typeof(InvalidModel));
@@ -104,7 +104,7 @@ namespace JSONAPI.Tests.Core
         public void IsSerializedAsManyTest()
         {
             // Arrange
-            var mm = new ModelManager();
+            var mm = new ModelManager(new PluralizationService());
 
             // Act
             bool isArray = mm.IsSerializedAsMany(typeof(Post[]));
@@ -125,7 +125,7 @@ namespace JSONAPI.Tests.Core
         public void GetElementTypeTest()
         {
             // Arrange
-            var mm = new ModelManager();
+            var mm = new ModelManager(new PluralizationService());
 
             // Act
             Type postTypeFromArray = mm.GetElementType(typeof(Post[]));
@@ -140,7 +140,7 @@ namespace JSONAPI.Tests.Core
         public void GetElementTypeInvalidArgumentTest()
         {
             // Arrange
-            var mm = new ModelManager();
+            var mm = new ModelManager(new PluralizationService());
 
             // Act
             Type x = mm.GetElementType(typeof(Author));

@@ -42,7 +42,7 @@ namespace JSONAPI.Core
         string GetJsonKeyForProperty(PropertyInfo propInfo); //TODO: Do we need to have a type parameter here, in case the property is inherited?
 
         /// <summary>
-        /// Returns the property corresponding to a given JSON Key. Inverse of GetJsonKeyForType.
+        /// Returns the property corresponding to a given JSON Key. Inverse of GetJsonKeyForProperty.
         /// </summary>
         /// <param name="type">The Type to find the property on</param>
         /// <param name="jsonKey">The JSON key representing a property</param>

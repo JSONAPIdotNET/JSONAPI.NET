@@ -107,7 +107,7 @@ namespace JSONAPI.Tests.Json
         public void CanWritePrimitiveTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
             // Act
             // Assert
             Assert.IsTrue(formatter.CanWriteTypeAsPrimitive(typeof(Int32)), "CanWriteTypeAsPrimitive returned wrong answer for Integer!");

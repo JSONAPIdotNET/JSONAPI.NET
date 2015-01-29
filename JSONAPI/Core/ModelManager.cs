@@ -10,16 +10,12 @@ namespace JSONAPI.Core
 {
     public class ModelManager : IModelManager
     {
-        public ModelManager() {
-            _pluralizationService = new PluralizationService();
-        }
-
         public ModelManager(IPluralizationService pluralizationService)
         {
             _pluralizationService = pluralizationService;
         }
 
-        private IPluralizationService _pluralizationService = null;
+        protected IPluralizationService _pluralizationService = null;
         public IPluralizationService PluralizationService
         {
             get
@@ -30,19 +26,29 @@ namespace JSONAPI.Core
 
         #region Cache storage
 
-        private Lazy<Dictionary<Type, PropertyInfo>> _idProperties
+        protected Lazy<Dictionary<Type, PropertyInfo>> _idProperties
             = new Lazy<Dictionary<Type,PropertyInfo>>(
                 () => new Dictionary<Type, PropertyInfo>()
             );
 
-        private Lazy<Dictionary<Type, Dictionary<string, PropertyInfo>>> _propertyMaps
+        protected Lazy<Dictionary<Type, Dictionary<string, PropertyInfo>>> _propertyMaps
             = new Lazy<Dictionary<Type, Dictionary<string, PropertyInfo>>>(
                 () => new Dictionary<Type, Dictionary<string, PropertyInfo>>()
             );
 
-        private Lazy<Dictionary<Type, string>> _jsonKeysForType
+        protected Lazy<Dictionary<Type, string>> _jsonKeysForType
             = new Lazy<Dictionary<Type, string>>(
                 () => new Dictionary<Type, string>()
+            );
+
+        protected Lazy<Dictionary<Type, bool>> _isSerializedAsMany
+            = new Lazy<Dictionary<Type, bool>>(
+                () => new Dictionary<Type, bool>()
+            );
+
+        protected Lazy<Dictionary<Type, Type>> _getElementType
+            = new Lazy<Dictionary<Type, Type>>(
+                () => new Dictionary<Type, Type>()
             );
 
         #endregion
@@ -76,7 +82,7 @@ namespace JSONAPI.Core
 
         #region Property Maps
 
-        protected IDictionary<string, PropertyInfo> GetPropertyMap(Type type) //FIXME: Will become protected
+        protected IDictionary<string, PropertyInfo> GetPropertyMap(Type type)
         {
             Dictionary<string, PropertyInfo> propMap = null;
 
@@ -158,9 +164,20 @@ namespace JSONAPI.Core
 
         public bool IsSerializedAsMany(Type type)
         {
-            bool isMany = 
-                type.IsArray ||
-                (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
+            bool isMany;
+
+            var isManyCache = _isSerializedAsMany.Value;
+
+            lock (isManyCache)
+            {
+                if (isManyCache.TryGetValue(type, out isMany)) return isMany;
+
+                isMany =
+                    type.IsArray ||
+                    (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
+
+                isManyCache.Add(type, isMany);
+            }
 
             return isMany;
         }
@@ -168,10 +185,20 @@ namespace JSONAPI.Core
         public Type GetElementType(Type manyType)
         {
             Type etype = null;
-            if (manyType.IsGenericType)
-                etype = manyType.GetGenericArguments()[0];
-            else
-                etype = manyType.GetElementType();
+
+            var etypeCache = _getElementType.Value;
+
+            lock (etypeCache)
+            {
+                if (etypeCache.TryGetValue(manyType, out etype)) return etype;
+
+                if (manyType.IsGenericType)
+                    etype = manyType.GetGenericArguments()[0];
+                else
+                    etype = manyType.GetElementType();
+
+                etypeCache.Add(manyType, etype);
+            }
 
             return etype;
         }

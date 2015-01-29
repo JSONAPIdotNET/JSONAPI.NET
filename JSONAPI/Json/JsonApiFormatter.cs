@@ -19,11 +19,6 @@ namespace JSONAPI.Json
 {
     public class JsonApiFormatter : JsonMediaTypeFormatter
     {
-        public JsonApiFormatter()
-            : this(new ModelManager(), new ErrorSerializer())
-        {
-        }
-
         public JsonApiFormatter(IModelManager modelManager) :
             this(modelManager, new ErrorSerializer())
         {
@@ -36,7 +31,7 @@ namespace JSONAPI.Json
 
         // Currently for tests only.
         internal JsonApiFormatter(IErrorSerializer errorSerializer)
-            : this(new ModelManager(), errorSerializer)
+            : this(new ModelManager(new PluralizationService()), errorSerializer)
         {
             
         }
@@ -48,7 +43,7 @@ namespace JSONAPI.Json
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
-        [Obsolete]
+        [Obsolete("Use ModelManager.PluralizationService instead")]
         public IPluralizationService PluralizationService  //FIXME: Deprecated, will be removed shortly
         {
             get
