@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace JSONAPI.Core
+{
+    public class ModelManager : IModelManager
+    {
+        public ModelManager() { }
+
+        #region Cache storage
+
+        private Lazy<Dictionary<Type, PropertyInfo>> _idProperties
+            = new Lazy<Dictionary<Type,PropertyInfo>>(
+                () => new Dictionary<Type, PropertyInfo>()
+            );
+
+        #endregion
+
+        #region Id property determination
+
+        public PropertyInfo GetIdProperty(Type type)
+        {
+            PropertyInfo idprop = null;
+
+            var idPropCache = _idProperties.Value;
+
+            lock (idPropCache)
+            {
+                if (idPropCache.TryGetValue(type, out idprop)) return idprop;
+
+                //TODO: Enable attribute-based determination
+
+                idprop = type.GetProperty("Id");
+
+                if (idprop == null)
+                    throw new InvalidOperationException(String.Format("Unable to determine Id property for type {0}", type));
+
+                idPropCache.Add(type, idprop);
+            }
+
+            return idprop;
+        }
+
+        #endregion
+    }
+}
