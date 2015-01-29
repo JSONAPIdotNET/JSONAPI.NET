@@ -50,9 +50,9 @@ namespace JSONAPI.Tests.Json
         public void GetResourceWithLinkTemplateRelationship()
         {
             var formatter = new JsonApiFormatter
-            {
-                PluralizationService = new JSONAPI.Core.PluralizationService()
-            };
+            (
+                new JSONAPI.Core.PluralizationService()
+            );
             var stream = new MemoryStream();
 
             formatter.WriteToStreamAsync(typeof(Post), ThePost, stream, null, null);

@@ -107,8 +107,7 @@ namespace JSONAPI.EntityFramework.Tests
         public void SerializeTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -125,8 +124,7 @@ namespace JSONAPI.EntityFramework.Tests
         public async Task DeserializePostIntegrationTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context);
@@ -160,8 +158,7 @@ namespace JSONAPI.EntityFramework.Tests
         public async Task UnderpostingTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context);

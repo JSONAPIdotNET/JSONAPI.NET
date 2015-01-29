@@ -15,8 +15,7 @@ namespace JSONAPI.Tests.Core
         {
             // Arrange
 
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
-            formatter.PluralizationService = new JSONAPI.Core.PluralizationService();
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""posts"":{""id"":42,""links"":{""author"":""18""}}}"));

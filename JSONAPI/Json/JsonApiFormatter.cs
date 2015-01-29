@@ -19,26 +19,49 @@ namespace JSONAPI.Json
 {
     public class JsonApiFormatter : JsonMediaTypeFormatter
     {
-        public JsonApiFormatter()
-            : this(new ErrorSerializer())
+        public JsonApiFormatter(IModelManager modelManager) :
+            this(modelManager, new ErrorSerializer())
         {
-            if (_modelManager == null) _modelManager = new ModelManager();
+        }
+
+        public JsonApiFormatter(IPluralizationService pluralizationService) :
+            this(new ModelManager(pluralizationService))
+        {
+        }
+
+        // Currently for tests only.
+        internal JsonApiFormatter(IErrorSerializer errorSerializer)
+            : this(new ModelManager(new PluralizationService()), errorSerializer)
+        {
+            
+        }
+
+        internal JsonApiFormatter(IModelManager modelManager, IErrorSerializer errorSerializer)
+        {
+            _modelManager = modelManager;
+            _errorSerializer = errorSerializer;
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
         }
 
-        internal JsonApiFormatter(IErrorSerializer errorSerializer)
+        [Obsolete("Use ModelManager.PluralizationService instead")]
+        public IPluralizationService PluralizationService  //FIXME: Deprecated, will be removed shortly
         {
-            _errorSerializer = errorSerializer;
+            get
+            {
+                return _modelManager.PluralizationService;
+            }
         }
 
-        public JsonApiFormatter(IModelManager modelManager) : this()
-        {
-            _modelManager = modelManager;
-        }
-
-        public IPluralizationService PluralizationService { get; set; } //FIXME: Deprecated, will be removed shortly
         private readonly IErrorSerializer _errorSerializer;
+
         private readonly IModelManager _modelManager;
+        public IModelManager ModelManager
+        {
+            get
+            {
+                return _modelManager;
+            }
+        }
 
         private Lazy<Dictionary<Stream, RelationAggregator>> _relationAggregators
             = new Lazy<Dictionary<Stream, RelationAggregator>>(
@@ -106,18 +129,18 @@ namespace JSONAPI.Json
             else
             {
                 Type valtype = GetSingleType(value.GetType());
-                if (IsMany(value.GetType()))
+                if (_modelManager.IsSerializedAsMany(value.GetType()))
                     aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
                 else
                     aggregator.AddPrimary(valtype, value);
 
                 //writer.Formatting = Formatting.Indented;
 
-                var root = GetPropertyName(type, value);
+                var root = _modelManager.GetJsonKeyForType(type);
 
                 writer.WriteStartObject();
                 writer.WritePropertyName(root);
-                if (IsMany(value.GetType()))
+                if (_modelManager.IsSerializedAsMany(value.GetType()))
                     this.SerializeMany(value, writeStream, writer, serializer, aggregator);
                 else
                     this.Serialize(value, writeStream, writer, serializer, aggregator);
@@ -162,7 +185,9 @@ namespace JSONAPI.Json
             var idProp = _modelManager.GetIdProperty(value.GetType());
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
-            PropertyInfo[] props = value.GetType().GetProperties();
+            // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
+            PropertyInfo[] props = _modelManager.GetProperties(value.GetType());
+
             // Do non-model properties first, everything else goes in "links"
             //TODO: Unless embedded???
             IList<PropertyInfo> modelProps = new List<PropertyInfo>();
@@ -177,7 +202,7 @@ namespace JSONAPI.Json
                         continue;
 
                     // numbers, strings, dates...
-                    writer.WritePropertyName(FormatPropertyName(prop.Name));
+                    writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
                     serializer.Serialize(writer, prop.GetValue(value, null));
                 }
                 else
@@ -218,7 +243,7 @@ namespace JSONAPI.Json
                 }
                 if (skip) continue;
 
-                writer.WritePropertyName(FormatPropertyName(prop.Name));
+                writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
 
                 // Look out! If we want to SerializeAs a link, computing the property is probably 
                 // expensive...so don't force it just to check for null early!
@@ -234,7 +259,7 @@ namespace JSONAPI.Json
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             IEnumerable<object> items = (IEnumerable<object>)prop.GetValue(value, null);
                             if (items == null)
                             {
@@ -261,7 +286,7 @@ namespace JSONAPI.Json
                             if (lt == null) throw new JsonSerializationException("A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
                             //TODO: Check for "{0}" in linkTemplate and (only) if it's there, get the Ids of all objects and "implode" them.
                             string href = String.Format(lt, null, GetIdFor(value));
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
                             writer.WritePropertyName("href");
@@ -270,7 +295,7 @@ namespace JSONAPI.Json
                             break;
                         case SerializeAsOptions.Embedded:
                             // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                            //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //serializer.Serialize(writer, prop.GetValue(value, null));
                             this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
                             break;
@@ -290,7 +315,7 @@ namespace JSONAPI.Json
                         switch (sa)
                         {
                             case SerializeAsOptions.Ids:
-                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                                 serializer.Serialize(writer, objId);
                                 if (iip)
                                     if (aggregator != null)
@@ -300,9 +325,10 @@ namespace JSONAPI.Json
                                 if (lt == null)
                                     throw new JsonSerializationException(
                                         "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                                string link = String.Format(lt, objId,
-                                    value.GetType().GetProperty("Id").GetValue(value, null));
-                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                string link = String.Format(lt, objId,  
+                                    GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
+                                    
+                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                                 writer.WriteStartObject();
                                 writer.WritePropertyName("href");
                                 writer.WriteValue(link);
@@ -310,7 +336,7 @@ namespace JSONAPI.Json
                                 break;
                             case SerializeAsOptions.Embedded:
                                 // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                                //writer.WritePropertyName(ContractResolver.FormatPropertyName(prop.Name));
+                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                                 //serializer.Serialize(writer, prop.GetValue(value, null));
                                 this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
                                 break;
@@ -406,7 +432,7 @@ namespace JSONAPI.Json
                 foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
                 {
                     apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(GetPropertyName(apair.Key));
+                    writer.WritePropertyName(_modelManager.GetJsonKeyForType(apair.Key));
                     writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
                 }
 
@@ -429,7 +455,7 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = GetPropertyName(type);
+            var pripropname = _modelManager.GetJsonKeyForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type
@@ -506,7 +532,7 @@ namespace JSONAPI.Json
                  */
                 if (retval != null)
                 {
-                    if (!type.IsAssignableFrom(retval.GetType()) && IsMany(type))
+                    if (!type.IsAssignableFrom(retval.GetType()) && _modelManager.IsSerializedAsMany(type))
                     {
                         IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(singleType));
                         list.Add(retval);
@@ -556,14 +582,6 @@ namespace JSONAPI.Json
         public object Deserialize(Type objectType, Stream readStream, JsonReader reader, JsonSerializer serializer)
         {
             object retval = Activator.CreateInstance(objectType);
-            PropertyInfo[] props = objectType.GetProperties();
-
-            //TODO: This could get expensive...cache these maps per type, so we only build the map once?
-            IDictionary<string, PropertyInfo> propMap = new Dictionary<string, PropertyInfo>();
-            foreach (PropertyInfo prop in props)
-            {
-                propMap[FormatPropertyName(prop.Name)] = prop;
-            }
 
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException(String.Format("Expected JsonToken.StartObject, got {0}", reader.TokenType.ToString()));
             reader.Read(); // Burn the StartObject token
@@ -579,7 +597,7 @@ namespace JSONAPI.Json
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, readStream, reader, serializer);
                     }
-                    else if (propMap.TryGetValue(value, out prop))
+                    else if ((prop = _modelManager.GetPropertyForJsonKey(objectType, value)) != null)
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: Embedded would be dropped here!
@@ -623,7 +641,7 @@ namespace JSONAPI.Json
             {
                 if (links == null) break; // Well, apparently we don't have any data for the relationships!
 
-                string btId = (string)links[FormatPropertyName(prop.Name)];
+                string btId = (string)links[_modelManager.GetJsonKeyForProperty(prop)];
                 if (btId == null)
                 {
                     prop.SetValue(retval, null, null); // Important that we set--the value may have been cleared!
@@ -647,13 +665,7 @@ namespace JSONAPI.Json
             //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
 
-            //TODO: Redundant, already done in Deserialize method...optimize?
-            PropertyInfo[] props = obj.GetType().GetProperties();
-            IDictionary<string, PropertyInfo> propMap = new Dictionary<string, PropertyInfo>();
-            foreach (PropertyInfo prop in props)
-            {
-                propMap[FormatPropertyName(prop.Name)] = prop;
-            }
+            Type objectType = obj.GetType();
 
             while (reader.Read())
             {
@@ -661,8 +673,8 @@ namespace JSONAPI.Json
                 {
                     string value = (string)reader.Value;
                     reader.Read(); // burn the PropertyName token
-                    PropertyInfo prop;
-                    if (propMap.TryGetValue(value, out prop) && !CanWriteTypeAsPrimitive(prop.PropertyType))
+                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
+                    if (prop != null && !CanWriteTypeAsPrimitive(prop.PropertyType))
                     {
                         //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
                         if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
@@ -768,58 +780,9 @@ namespace JSONAPI.Json
 
         #endregion
 
-        private string GetPropertyName(Type type, dynamic value = null)
-        {
-            if (IsMany(type))
-                type = GetSingleType(type);
-
-            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
-
-            string title = type.Name;
-            if (attrs.Any())
-            {
-                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
-                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
-                if (titles.Any()) title = titles.First();
-            }
-
-            return FormatPropertyName(this.PluralizationService.Pluralize(title));
-        }
-
-        //private string GetPropertyName(Type type)
-        //{
-        //    return FormatPropertyName(PluralizationService.Pluralize(type.Name));
-        //}
-
-        private bool IsMany(dynamic value = null)
-        {
-            if (value != null && (value is IEnumerable || value.GetType().IsArray))
-                return true;
-            else
-                return false;
-        }
-
-        private bool IsMany(Type type)
-        {
-            return
-                type.IsArray ||
-                (type.GetInterfaces().Contains(typeof(IEnumerable)) && type.IsGenericType);
-        }
-
         private Type GetSingleType(Type type)//dynamic value = null)
         {
-            if (IsMany(type))
-                if (type.IsGenericType)
-                    return type.GetGenericArguments()[0];
-                else
-                    return type.GetElementType();
-            return type;
-        }
-
-        public static string FormatPropertyName(string propertyName)
-        {
-            string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
-            return result;
+            return _modelManager.IsSerializedAsMany(type) ? _modelManager.GetElementType(type) : type;
         }
 
         protected object GetById(Type type, string id)
@@ -830,13 +793,6 @@ namespace JSONAPI.Json
             idprop.SetValue(retval, System.Convert.ChangeType(id, idprop.PropertyType));
             return retval;
         }
-
-        /*
-        protected PropertyInfo GetIdProperty(Type type)
-        {
-            return type.GetProperty("Id");
-        }
-        */
 
         protected string GetValueForIdProperty(PropertyInfo idprop, object obj)
         {
