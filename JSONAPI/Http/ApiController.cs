@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Reflection;
 using JSONAPI.Core;
@@ -51,7 +52,7 @@ namespace JSONAPI.Http
             return es;
         }
 
-        public virtual IEnumerable<T> Get(string id)
+        public virtual async Task<IEnumerable<T>> Get(string id)
         {
             IMaterializer materializer = MaterializerFactory();
 
@@ -67,7 +68,7 @@ namespace JSONAPI.Http
             }
             foreach (string singleid in arrIds)
             {
-                T hit = materializer.GetById<T>(singleid);
+                T hit = await materializer.GetByIdAsync<T>(singleid);
                 if (hit != null)
                 {
                     results.Add(hit);
@@ -85,29 +86,29 @@ namespace JSONAPI.Http
         /// </summary>
         /// <param name="postedObj"></param>
         /// <returns></returns>
-        public virtual IList<T> Post([FromBody] IList<T> postedObjs)
+        public virtual Task<IList<T>> Post([FromBody] IList<T> postedObjs)
         {
             foreach(T postedObj in postedObjs)
             {
                 IMaterializer materializer = this.MaterializerFactory();
             }
-            return postedObjs;
+            return Task.FromResult(postedObjs);
         }
 
         /// <summary>
-        /// Similar to Post, this method doesn't do much. It calls MaterializeUpdate() on the
+        /// Similar to Post, this method doesn't do much. It calls MaterializeUpdateAsync() on the
         /// input and returns it. It should probably always be overridden.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="payload"></param>
         /// <returns></returns>
-        public virtual IList<T> Put(string id, IList<T> putObjs)
+        public virtual async Task<IList<T>> Put(string id, IList<T> putObjs)
         {
             IMaterializer materializer = this.MaterializerFactory();
             IList<T> materialList = new List<T>();
             foreach (T putObj in putObjs)
             {
-                materialList.Add(materializer.MaterializeUpdate<T>(putObj));
+                materialList.Add(await materializer.MaterializeUpdateAsync<T>(putObj));
             }
             return materialList;
         }
@@ -116,9 +117,9 @@ namespace JSONAPI.Http
         /// A no-op method. This should be overriden in subclasses if Delete is to be supported.
         /// </summary>
         /// <param name="id"></param>
-        public virtual void Delete(string id)
+        public virtual Task Delete(string id)
         {
-            return;
+            return Task.FromResult(0);
         }
     }
 }

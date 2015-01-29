@@ -37,14 +37,14 @@ namespace JSONAPI.EntityFramework.Http
             return ((EntityFrameworkMaterializer)materializer).DbContext.Set<T>();
         }
 
-        public override IList<T> Post(IList<T> postedObjs)
+        public override async Task<IList<T>> Post(IList<T> postedObjs)
         {
             var materializer = this.MaterializerFactory<EntityFrameworkMaterializer>();
             List<T> materialList = new List<T>();
             foreach (T postedObj in postedObjs)
             {
                 DbContext context = materializer.DbContext;
-                var material = materializer.MaterializeUpdate(postedObj);
+                var material = await materializer.MaterializeUpdateAsync(postedObj);
                 if (context.Entry<T>(material).State == EntityState.Added)
                 {
                     context.SaveChanges();
@@ -61,28 +61,28 @@ namespace JSONAPI.EntityFramework.Http
             return materialList;
         }
 
-        public override IList<T> Put(string id, IList<T> putObjs)
+        public override async Task<IList<T>> Put(string id, IList<T> putObjs)
         {
             var materializer = this.MaterializerFactory<EntityFrameworkMaterializer>();
             DbContext context = materializer.DbContext;
             List<T> materialList = new List<T>();
             foreach (T putObj in putObjs)
             {
-                var material = materializer.MaterializeUpdate(putObj);
+                var material = await materializer.MaterializeUpdateAsync(putObj);
                 materialList.Add(material);
             }
             context.SaveChanges();
             return materialList;
         }
 
-        public override void Delete(string id)
+        public override async Task Delete(string id)
         {
             var materializer = this.MaterializerFactory<EntityFrameworkMaterializer>();
             DbContext context = materializer.DbContext;
-            T target = materializer.GetById<T>(id);
+            T target = await materializer.GetByIdAsync<T>(id);
             context.Set<T>().Remove(target);
             context.SaveChanges();
-            base.Delete(id);
+            await base.Delete(id);
         }
 
         protected override void Dispose(bool disposing)

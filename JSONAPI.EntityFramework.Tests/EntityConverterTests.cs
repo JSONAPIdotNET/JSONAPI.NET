@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using JSONAPI.Core;
@@ -121,7 +122,7 @@ namespace JSONAPI.EntityFramework.Tests
 
         [TestMethod]
         [DeploymentItem(@"Data\Post.json")]
-        public void DeserializePostIntegrationTest()
+        public async Task DeserializePostIntegrationTest()
         {
             // Arrange
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
@@ -144,8 +145,8 @@ namespace JSONAPI.EntityFramework.Tests
 
             // Act
             Post pUpdated;
-            pUpdated = (Post)formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
-            pUpdated = materializer.MaterializeUpdate<Post>(pUpdated);
+            pUpdated = (Post)await formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null);
+            pUpdated = await materializer.MaterializeUpdateAsync<Post>(pUpdated);
 
             // Assert
             Assert.AreEqual(a, pUpdated.Author);
@@ -156,7 +157,7 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         [TestMethod]
-        public void UnderpostingTest()
+        public async Task UnderpostingTest()
         {
             // Arrange
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter();
@@ -172,8 +173,8 @@ namespace JSONAPI.EntityFramework.Tests
 
             // Act
             Post pUpdated;
-            pUpdated = (Post)formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
-            pUpdated = materializer.MaterializeUpdate<Post>(pUpdated);
+            pUpdated = (Post)await formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null);
+            pUpdated = await materializer.MaterializeUpdateAsync<Post>(pUpdated);
 
             // Assert
             Assert.AreEqual(previousCommentsCount, pUpdated.Comments.Count, "Comments were wiped out!");
