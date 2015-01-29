@@ -68,6 +68,7 @@
     <Compile Include="Attributes\IncludeInPayload.cs" />
     <Compile Include="Attributes\LinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAs.cs" />
+    <Compile Include="Attributes\SerializeStringAsRawJsonAttribute.cs" />
     <Compile Include="Core\IModelManager.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Json\IErrorIdProvider.cs" />
     <Compile Include="Json\IErrorSerializer.cs" />
     <Compile Include="Json\JsonApiFormatter.cs" />
+    <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Json\RelationAggregator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
