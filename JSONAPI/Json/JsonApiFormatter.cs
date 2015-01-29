@@ -180,6 +180,13 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
+            //FIXME: The spec no longer requires that the ID key be "id":
+            //     "An ID SHOULD be represented by an 'id' key..." :-/
+            // But Ember Data does. Spec-wise, we should just serialize the ID as
+            // whatever property name it is defined as...and this is simpler to
+            // implement. Non-standard IDs should be handled in an Ember Data
+            // Adapter if necessary...probably. Discuss?
+
             // Do the Id now...
             writer.WritePropertyName("id");
             var idProp = _modelManager.GetIdProperty(value.GetType());
