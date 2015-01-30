@@ -74,11 +74,13 @@ namespace JSONAPI.Tests.Core
             var postKey = mm.GetJsonKeyForType(typeof(Post));
             var authorKey = mm.GetJsonKeyForType(typeof(Author));
             var commentKey = mm.GetJsonKeyForType(typeof(Comment));
+            var manyCommentKey = mm.GetJsonKeyForType(typeof(Comment[]));
 
             // Assert
             Assert.AreEqual("posts", postKey);
             Assert.AreEqual("authors", authorKey);
             Assert.AreEqual("comments", commentKey);
+            Assert.AreEqual("comments", manyCommentKey);
         }
 
         [TestMethod]

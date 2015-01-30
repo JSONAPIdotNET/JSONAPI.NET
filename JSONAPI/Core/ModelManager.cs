@@ -133,10 +133,10 @@ namespace JSONAPI.Core
 
             lock (keyCache)
             {
-                if (keyCache.TryGetValue(type, out key)) return key;
-
                 if (IsSerializedAsMany(type))
                     type = GetElementType(type);
+
+                if (keyCache.TryGetValue(type, out key)) return key;
 
                 var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
 
