@@ -8,6 +8,8 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
+using JSONAPI.Core;
+using JSONAPI.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters
@@ -24,7 +26,13 @@ namespace JSONAPI.Tests.ActionFilters
 
         private class SomeUnknownType
         {
-            
+
+        }
+
+        private class RelatedItemWithId
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
         }
 
         private class Dummy
@@ -62,10 +70,13 @@ namespace JSONAPI.Tests.ActionFilters
             public Single SingleField { get; set; }
             public Single? NullableSingleField { get; set; }
             public SomeUnknownType UnknownTypeField { get; set; }
+            public RelatedItemWithId ToOneRelatedItem { get; set; }
+            public ICollection<RelatedItemWithId> ToManyRelatedItems { get; set; }
         }
 
-        private IQueryable<Dummy> _fixtures;
-
+        private IList<Dummy> _fixtures;
+        private IQueryable<Dummy> _fixturesQuery;
+            
         [TestInitialize]
         public void SetupFixtures()
         {
@@ -113,7 +124,7 @@ namespace JSONAPI.Tests.ActionFilters
                 {
                     Id = "120",
                     NullableDateTimeField = new DateTime(1961, 2, 18)
-                }, 
+                },
 
                 #endregion
 
@@ -229,7 +240,7 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "211",
                     SByteField = -89
                 },
-                
+
                 #endregion
                 
                 #region NullableSByteField
@@ -314,7 +325,7 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "280",
                     NullableUInt16Field = 65000
                 },
-                
+
                 #endregion
                 
                 #region Int32Field
@@ -364,7 +375,7 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "320",
                     NullableUInt32Field = 345678901
                 },
-                
+
                 #endregion
                 
                 #region Int64Field
@@ -414,7 +425,7 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "360",
                     NullableUInt64Field = 345678901234
                 },
-                
+
                 #endregion
                 
                 #region SingleField
@@ -473,17 +484,65 @@ namespace JSONAPI.Tests.ActionFilters
                 {
                     Id = "1000",
                     UnknownTypeField = new SomeUnknownType()
+                },
+
+                #endregion
+
+                #region ToOneRelatedItem
+
+                new Dummy
+                {
+                    Id = "1100",
+                    ToOneRelatedItem = new RelatedItemWithId
+                    {
+                        Id = "1101",
+                        Name = "Related sample 1"
+                    }
+                },
+                new Dummy
+                {
+                    Id = "1102",
+                    ToOneRelatedItem = new RelatedItemWithId
+                    {
+                        Id = "1103",
+                        Name = "Related sample 2"
+                    }
+                },
+
+                #endregion
+                
+                #region ToManyRelatedItems
+
+                new Dummy
+                {
+                    Id = "1110",
+                    ToManyRelatedItems = new List<RelatedItemWithId>
+                    {
+                        new RelatedItemWithId { Id = "1111", Name = "Related sample 3" },
+                        new RelatedItemWithId { Id = "1112", Name = "Related sample 4" }
+                    }
+                },
+                
+                new Dummy
+                {
+                    Id = "1120",
+                    ToManyRelatedItems = new List<RelatedItemWithId>
+                    {
+                        new RelatedItemWithId { Id = "1121", Name = "Related sample 5" },
+                        new RelatedItemWithId { Id = "1122", Name = "Related sample 6" }
+                    }
                 }
 
                 #endregion
-            }.AsQueryable();
+            };
+            _fixturesQuery = _fixtures.AsQueryable();
         }
 
-        private HttpActionExecutedContext CreateActionExecutedContext(string uri)
+        private HttpActionExecutedContext CreateActionExecutedContext(IModelManager modelManager, string uri)
         {
-            var formatter = new JsonMediaTypeFormatter();
+            var formatter = new JsonApiFormatter(modelManager);
 
-            var httpContent = new ObjectContent(typeof(IQueryable<Dummy>), _fixtures, formatter);
+            var httpContent = new ObjectContent(typeof(IQueryable<Dummy>), _fixturesQuery, formatter);
 
             return new HttpActionExecutedContext
             {
@@ -503,9 +562,11 @@ namespace JSONAPI.Tests.ActionFilters
 
         private T[] GetArray<T>(string uri)
         {
-            var filter = new EnableFilteringAttribute();
+            var modelManager = new ModelManager(new PluralizationService());
 
-            var context = CreateActionExecutedContext(uri);
+            var filter = new EnableFilteringAttribute(modelManager);
+
+            var context = CreateActionExecutedContext(modelManager, uri);
 
             filter.OnActionExecuted(context);
 
@@ -533,7 +594,8 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_string_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?stringField=");
-            returnedArray.Length.Should().Be(46);
+            returnedArray.Length.Should().Be(_fixtures.Count - 3);
+            returnedArray.Any(d => d.Id == "100" || d.Id == "101" || d.Id == "102").Should().BeFalse();
         }
 
         #endregion
@@ -567,7 +629,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_datetime_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableDateTimeField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "120").Should().BeFalse();
         }
 
@@ -602,7 +664,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_datetimeoffset_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableDateTimeOffsetField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "140").Should().BeFalse();
         }
 
@@ -637,7 +699,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_enum_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableEnumField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "160").Should().BeFalse();
         }
 
@@ -672,7 +734,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_decimal_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableDecimalField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "180").Should().BeFalse();
         }
 
@@ -707,7 +769,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_boolean_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableBooleanField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "200").Should().BeFalse();
         }
 
@@ -742,7 +804,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_sbyte_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableSByteField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "220").Should().BeFalse();
         }
 
@@ -777,7 +839,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_byte_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableByteField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "240").Should().BeFalse();
         }
 
@@ -812,7 +874,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_int16_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableInt16Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "260").Should().BeFalse();
         }
 
@@ -847,7 +909,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_uint16_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableUInt16Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "280").Should().BeFalse();
         }
 
@@ -882,7 +944,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_int32_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableInt32Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "300").Should().BeFalse();
         }
 
@@ -917,7 +979,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_uint32_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableUInt32Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "320").Should().BeFalse();
         }
 
@@ -952,7 +1014,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_int64_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableInt64Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "340").Should().BeFalse();
         }
 
@@ -987,7 +1049,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_uint64_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableUInt64Field=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "360").Should().BeFalse();
         }
 
@@ -1022,7 +1084,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_single_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableSingleField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "380").Should().BeFalse();
         }
 
@@ -1057,7 +1119,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_missing_nullable_double_property()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?nullableDoubleField=");
-            returnedArray.Length.Should().Be(48);
+            returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "400").Should().BeFalse();
         }
 
@@ -1069,7 +1131,47 @@ namespace JSONAPI.Tests.ActionFilters
         public void Does_not_filter_unknown_type()
         {
             var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?unknownTypeField=asdfasd");
-            returnedArray.Length.Should().Be(49);
+            returnedArray.Length.Should().Be(_fixtures.Count);
+        }
+
+        #endregion
+
+        #region To-one relationship
+
+        [TestMethod]
+        public void Filters_by_matching_to_one_relationship_id()
+        {
+            var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?toOneRelatedItem=1101");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("1100");
+        }
+
+        [TestMethod]
+        public void Filters_by_missing_to_one_relationship_id()
+        {
+            var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?toOneRelatedItem=");
+            returnedArray.Length.Should().Be(_fixtures.Count - 2);
+            returnedArray.Any(d => d.Id == "1100" || d.Id == "1102").Should().BeFalse();
+        }
+
+        #endregion
+
+        #region To-many relationship
+
+        [TestMethod]
+        public void Filters_by_matching_id_in_to_many_relationship()
+        {
+            var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?toManyRelatedItems=1111");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("1110");
+        }
+
+        [TestMethod]
+        public void Filters_by_missing_id_in_to_many_relationship()
+        {
+            var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?toManyRelatedItems=");
+            returnedArray.Length.Should().Be(_fixtures.Count - 2);
+            returnedArray.Any(d => d.Id == "1110" || d.Id == "1120").Should().BeFalse();
         }
 
         #endregion
