@@ -1,3 +1,81 @@
-{"posts":[{"id":"1","title":"Linkbait!","links":{"comments":["2","3","4"],"author":"1"}},{"id":"2","title":"Rant #1023","links":{"comments":["5"],"author":"1"}},{"id":"3","title":"Polemic in E-flat minor #824","links":{"comments":null,"author":"1"}},{"id":"4","title":"This post has no author.","links":{"comments":null,"author":null}}],"linked":{"comments":[{"id":"2","body":"Nuh uh!","links":{"post":"1"}},{"id":"3","body":"Yeah huh!","links":{"post":"1"}},{"id":"4","body":"Third Reich.","links":{"post":"1"}},{"id":"5","body":"I laughed, I cried!","links":{"post":"2"}}],"authors":[{"id":"1","name":"Jason Hater","links":{"posts":["1","2","3"]}}]}}
-
-
+{
+    "posts": [
+        {
+            "id": "1",
+            "title": "Linkbait!",
+            "links": {
+                "comments": [ "2", "3", "4" ],
+                "author": "1"
+            }
+        },
+        {
+            "id": "2",
+            "title": "Rant #1023",
+            "links": {
+                "comments": [ "5" ],
+                "author": "1"
+            }
+        },
+        {
+            "id": "3",
+            "title": "Polemic in E-flat minor #824",
+            "links": {
+                "comments": null,
+                "author": "1"
+            }
+        },
+        {
+            "id": "4",
+            "title": "This post has no author.",
+            "links": {
+                "comments": null,
+                "author": null
+            }
+        }
+    ],
+    "linked": {
+        "comments": [
+            {
+                "id": "2",
+                "body": "Nuh uh!",
+                "customData": null,
+                "links": { "post": "1" }
+            },
+            {
+                "id": "3",
+                "body": "Yeah huh!",
+                "customData": null,
+                "links": {
+                    "post": "1"
+                }
+            },
+            {
+                "id": "4",
+                "body": "Third Reich.",
+                "customData": {
+                    "foo": "bar"
+                },
+                "links": {
+                    "post": "1"
+                }
+            },
+            {
+                "id": "5",
+                "body": "I laughed, I cried!",
+                "customData": null,
+                "links": {
+                    "post": "2"
+                }
+            }
+        ],
+        "authors": [
+            {
+                "id": "1",
+                "name": "Jason Hater",
+                "links": {
+                    "posts": [ "1", "2", "3" ]
+                }
+            }
+        ]
+    }
+}

@@ -80,7 +80,6 @@
     <Compile Include="Core\ModelManagerTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
     <Compile Include="Json\JsonApiMediaFormaterTests.cs" />
-    <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
@@ -102,6 +101,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\LinkTemplateTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\DeserializeRawJsonTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\SerializerIntegrationTest.json">

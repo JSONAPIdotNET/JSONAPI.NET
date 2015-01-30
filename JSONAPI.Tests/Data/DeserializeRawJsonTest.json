@@ -1,0 +1,14 @@
+{
+    "comments": [
+        {
+            "id": "2",
+            "customData": null
+        },
+        {
+            "id": "4",
+            "customData": {
+                "foo": "bar"
+            }
+        }
+    ]
+}

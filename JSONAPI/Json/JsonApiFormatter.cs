@@ -203,7 +203,26 @@ namespace JSONAPI.Json
 
                     // numbers, strings, dates...
                     writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
-                    serializer.Serialize(writer, prop.GetValue(value, null));
+
+                    var propertyValue = prop.GetValue(value, null);
+
+                    if (prop.PropertyType == typeof (string) &&
+                        prop.GetCustomAttributes().Any(attr => attr is SerializeStringAsRawJsonAttribute))
+                    {
+                        if (propertyValue == null)
+                        {
+                            writer.WriteNull();
+                        }
+                        else
+                        {
+                            var minifiedValue = JsonHelpers.MinifyJson((string) propertyValue);
+                            writer.WriteRawValue(minifiedValue);
+                        }
+                    }
+                    else
+                    {
+                        serializer.Serialize(writer, propertyValue);
+                    }
                 }
                 else
                 {
@@ -603,7 +622,27 @@ namespace JSONAPI.Json
                         //TODO: Embedded would be dropped here!
                         if (!CanWriteTypeAsPrimitive(prop.PropertyType)) continue; // These aren't supposed to be here, they're supposed to be in "links"!
 
-                        prop.SetValue(retval, DeserializePrimitive(prop.PropertyType, reader), null);
+                        object propVal;
+                        if (prop.PropertyType == typeof (string) &&
+                            prop.GetCustomAttributes().Any(attr => attr is SerializeStringAsRawJsonAttribute))
+                        {
+                            if (reader.TokenType == JsonToken.Null)
+                            {
+                                propVal = null;
+                            }
+                            else
+                            {
+                                var token = JToken.Load(reader);
+                                var rawPropVal = token.ToString();
+                                propVal = JsonHelpers.MinifyJson(rawPropVal);
+                            }
+                        }
+                        else
+                        {
+                            propVal = DeserializePrimitive(prop.PropertyType, reader);
+                        }
+
+                        prop.SetValue(retval, propVal, null);
 
                         // Tell the MetadataManager that we deserialized this property
                         MetadataManager.Instance.SetMetaForProperty(retval, prop, true);
