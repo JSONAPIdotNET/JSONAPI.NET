@@ -96,6 +96,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\ReformatsRawJsonStringWithUnquotedKeys.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\MalformedRawJsonString.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\FormatterErrorSerializationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

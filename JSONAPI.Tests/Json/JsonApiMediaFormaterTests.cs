@@ -251,6 +251,44 @@ namespace JSONAPI.Tests.Json
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\ReformatsRawJsonStringWithUnquotedKeys.json")]
+        public void Reformats_raw_json_string_with_unquoted_keys()
+        {
+            // Arrange
+            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            var payload = new [] { new Comment { Id = 5, CustomData = "{ unquotedKey: 5 }"}};
+            formatter.WriteToStreamAsync(typeof(Comment), payload, stream, null, null);
+
+            // Assert
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(File.ReadAllText("ReformatsRawJsonStringWithUnquotedKeys.json"));
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\MalformedRawJsonString.json")]
+        public void Does_not_serialize_malformed_raw_json_string()
+        {
+            // Arrange
+            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            var payload = new[] { new Comment { Id = 5, CustomData = "{ x }" } };
+            formatter.WriteToStreamAsync(typeof(Comment), payload, stream, null, null);
+
+            // Assert
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(File.ReadAllText("MalformedRawJsonString.json"));
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\FormatterErrorSerializationTest.json")]
         public void Should_serialize_error()
         {
