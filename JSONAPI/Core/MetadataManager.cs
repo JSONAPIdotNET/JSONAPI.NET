@@ -10,6 +10,23 @@ namespace JSONAPI.Core
 {
     public sealed class MetadataManager
     {
+        private class PropertyMetadata
+        {
+            public bool PresentInJson { get; set; } // only meaningful for incoming/deserialized models!
+            public Lazy<ISet<System.Attribute>> AttributeOverrides
+                = new Lazy<ISet<System.Attribute>>(
+                    () => new HashSet<System.Attribute>()
+                );
+        }
+
+        private class ModelMetadata
+        {
+            public Lazy<IDictionary<PropertyInfo, PropertyMetadata>> PropertyMetadata
+                = new Lazy<IDictionary<PropertyInfo, PropertyMetadata>>(
+                    () => new Dictionary<PropertyInfo, PropertyMetadata>()
+                );
+        }
+
         #region Singleton pattern
 
         private static readonly MetadataManager instance = new MetadataManager();
@@ -26,8 +43,8 @@ namespace JSONAPI.Core
 
         #endregion
 
-        private readonly ConditionalWeakTable<object, Dictionary<string, object>> cwt
-            = new ConditionalWeakTable<object, Dictionary<string, object>>();
+        private readonly ConditionalWeakTable<object, ModelMetadata> cwt
+            = new ConditionalWeakTable<object, ModelMetadata>();
 
         /*
         internal void SetDeserializationMetadata(object deserialized, Dictionary<string, object> meta)
@@ -36,32 +53,40 @@ namespace JSONAPI.Core
         }
          */
 
-        internal void SetMetaForProperty(object deserialized, PropertyInfo prop, object value)
+        private ModelMetadata GetMetadataForModel(object model)
         {
-            Dictionary<string, object> meta;
-            if (!cwt.TryGetValue(deserialized, out meta))
+            ModelMetadata meta;
+            lock(cwt)
             {
-                meta = new Dictionary<string, object>();
-                cwt.Add(deserialized, meta);
+                if (!cwt.TryGetValue(model, out meta))
+                {
+                    meta = new ModelMetadata();
+                    cwt.Add(model, meta);
+                }
             }
-            if (!meta.ContainsKey(prop.Name)) // Temporary fix for non-standard Id reprecussions...this internal implementation will change soon anyway.
-                meta.Add(prop.Name, value);
-            
+            return meta;
         }
 
-
-        internal Dictionary<String, object> DeserializationMetadata(object deserialized)
+        private PropertyMetadata GetMetadataForProperty(object model, PropertyInfo prop)
         {
-            Dictionary<string, object> retval;
-            if (cwt.TryGetValue(deserialized, out retval))
+            ModelMetadata mmeta = GetMetadataForModel(model);
+            IDictionary<PropertyInfo, PropertyMetadata> pmetadict = mmeta.PropertyMetadata.Value;
+            PropertyMetadata pmeta;
+            lock (pmetadict)
             {
-                return retval;
+                if (!pmetadict.TryGetValue(prop, out pmeta))
+                {
+                    pmeta = new PropertyMetadata();
+                    pmetadict.Add(prop, pmeta);
+                }
             }
-            else
-            {
-                //TODO: Throw an exception here? If you asked for metadata for an object and it's not found, something has probably gone pretty badly wrong!
-                return null;
-            }
+            return pmeta;
+        }
+
+        internal void SetPropertyWasPresent(object deserialized, PropertyInfo prop, bool value)
+        {
+            PropertyMetadata pmeta = GetMetadataForProperty(deserialized, prop);
+            pmeta.PresentInJson = value;
         }
 
         /// <summary>
@@ -75,8 +100,49 @@ namespace JSONAPI.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PropertyWasPresent(object deserialized, PropertyInfo prop)
         {
-            object throwaway;
-            return this.DeserializationMetadata(deserialized).TryGetValue(prop.Name, out throwaway);
+            return this.GetMetadataForProperty(deserialized, prop).PresentInJson;
         }
+
+        /// <summary>
+        /// Set different serialization attributes at runtime than those that were declared on
+        /// a property at compile time. E.g., if you declared a relationship property with
+        /// [SerializeAs(SerializeAsOptions.Link)] but you want to change that to
+        /// SerializeAsOptions.Ids when you are transmitting only one object, you can do:
+        /// 
+        ///     MetadataManager.SetPropertyAttributeOverrides(
+        ///         theModelInstance, theProperty, 
+        ///         new SerializeAsAttribute(SerializeAsOptions.Ids)
+        ///     );
+        /// 
+        /// Further, if you want to also include the related objects in the serialized document:
+        /// 
+        ///     MetadataManager.SetPropertyAttributeOverrides(
+        ///         theModelInstance, theProperty, 
+        ///         new SerializeAs(SerializeAsOptions.Ids),
+        ///         new IncludeInPayload(true)
+        ///     );
+        /// 
+        /// Calling this function resets all overrides, so calling it twice will result in only
+        /// the second set of overrides being applied. At present, the order of the attributes
+        /// is not meaningful.
+        /// </summary>
+        /// <param name="model">The model object that is to be serialized, for which you want to change serialization behavior.</param>
+        /// <param name="prop">The property for which to override attributes.</param>
+        /// <param name="attrs">One or more attribute instances that will override the declared behavior.</param>
+        public void SetPropertyAttributeOverrides(object model, PropertyInfo prop, params System.Attribute[] attrs)
+        {
+            var aoverrides = this.GetMetadataForProperty(model, prop).AttributeOverrides.Value;
+            lock (aoverrides)
+            {
+                aoverrides.Clear();
+                aoverrides.UnionWith(attrs);
+            }
+        }
+
+        internal IEnumerable<System.Attribute> GetPropertyAttributeOverrides(object model, PropertyInfo prop)
+        {
+            return this.GetMetadataForProperty(model, prop).AttributeOverrides.Value;
+        }
+
     }
 }

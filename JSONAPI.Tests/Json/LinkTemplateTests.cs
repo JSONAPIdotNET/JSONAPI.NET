@@ -61,7 +61,33 @@ namespace JSONAPI.Tests.Json
             var expected = JsonHelpers.MinifyJson(File.ReadAllText("LinkTemplateTest.json"));
             var output = Encoding.ASCII.GetString(stream.ToArray());
             Trace.WriteLine(output);
-            Assert.AreEqual(output.Trim(), expected);
+            Assert.AreEqual(expected,output.Trim());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\OverrideSerializationAttributesTest.json")]
+        public void OverrideSerializationAttributesTest()
+        {
+            // Arrange
+            var formatter = new JsonApiFormatter
+            (
+                new JSONAPI.Core.PluralizationService()
+            );
+            var stream = new MemoryStream();
+
+            // Act
+            JSONAPI.Core.MetadataManager.Instance.SetPropertyAttributeOverrides(
+                ThePost, typeof(Post).GetProperty("Author"),
+                new SerializeAs(SerializeAsOptions.Ids),
+                new IncludeInPayload(true)
+                );
+            formatter.WriteToStreamAsync(typeof(Post), ThePost, stream, null, null);
+
+            // Assert
+            var expected = JsonHelpers.MinifyJson(File.ReadAllText("OverrideSerializationAttributesTest.json"));
+            var output = Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            Assert.AreEqual(expected, output.Trim());
         }
     }
 }

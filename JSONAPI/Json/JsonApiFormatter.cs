@@ -252,6 +252,8 @@ namespace JSONAPI.Json
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
 
                 object[] attrs = prop.GetCustomAttributes(true);
+                // aha...this way the overrides will be applied last!
+                attrs = attrs.Concat(MetadataManager.Instance.GetPropertyAttributeOverrides(value, prop)).ToArray();
 
                 foreach (object attr in attrs)
                 {
@@ -656,7 +658,7 @@ namespace JSONAPI.Json
                         prop.SetValue(retval, propVal, null);
 
                         // Tell the MetadataManager that we deserialized this property
-                        MetadataManager.Instance.SetMetaForProperty(retval, prop, true);
+                        MetadataManager.Instance.SetPropertyWasPresent(retval, prop, true);
 
                         // pop the value off the reader, so we catch the EndObject token below!.
                         reader.Read();
@@ -805,7 +807,7 @@ namespace JSONAPI.Json
                         }
 
                         // Tell the MetadataManager that we deserialized this property
-                        MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
+                        MetadataManager.Instance.SetPropertyWasPresent(obj, prop, true);
                     }
                     else
                         reader.Skip();

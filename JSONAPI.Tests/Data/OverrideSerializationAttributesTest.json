@@ -1,0 +1,17 @@
+﻿{
+    "posts": {
+        "id": "2",
+        "title": "How to fry an egg",
+        "links": {
+            "author": "5"
+        }
+    },
+    "linked": {
+        "users": [
+            {
+                "id": "5",
+                "name": "Bob"
+            }
+        ]
+    }
+}

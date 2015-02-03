@@ -109,6 +109,9 @@
     <None Include="Data\NonStandardIdTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\OverrideSerializationAttributesTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\SerializerIntegrationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
