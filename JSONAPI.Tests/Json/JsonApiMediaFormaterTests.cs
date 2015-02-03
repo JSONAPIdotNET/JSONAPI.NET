@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Http;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -92,7 +93,8 @@ namespace JSONAPI.Tests.Json
                 new Comment() {
                     Id = 4,
                     Body = "Third Reich.",
-                    Post = p
+                    Post = p,
+                    CustomData = "{ \"foo\": \"bar\" }"
                 }
             };
             p2.Comments = new List<Comment> {
@@ -151,7 +153,8 @@ namespace JSONAPI.Tests.Json
             // Assert
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
             Trace.WriteLine(output);
-            Assert.AreEqual(output.Trim(), File.ReadAllText("SerializerIntegrationTest.json").Trim());
+            var expected = JsonHelpers.MinifyJson(File.ReadAllText("SerializerIntegrationTest.json"));
+            Assert.AreEqual(expected, output.Trim());
             //Assert.AreEqual("[2,3,4]", sw.ToString());
         }
 
@@ -175,7 +178,8 @@ namespace JSONAPI.Tests.Json
             // Assert
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
             Trace.WriteLine(output);
-            Assert.AreEqual(output.Trim(), File.ReadAllText("SerializerIntegrationTest.json").Trim());
+            var expected = JsonHelpers.MinifyJson(File.ReadAllText("SerializerIntegrationTest.json"));
+            Assert.AreEqual(expected, output.Trim());
             //Assert.AreEqual("[2,3,4]", sw.ToString());
         }
 
@@ -240,8 +244,25 @@ namespace JSONAPI.Tests.Json
             // Assert
             Assert.AreEqual(2, posts.Count);
             Assert.AreEqual(p.Id, posts[0].Id); // Order matters, right?
-            
+        }
 
+        [TestMethod]
+        [DeploymentItem(@"Data\DeserializeRawJsonTest.json")]
+        public async Task DeserializeRawJsonTest()
+        {
+            using (var inputStream = File.OpenRead("DeserializeRawJsonTest.json"))
+            {
+                // Arrange
+                var formatter = new JsonApiFormatter(new PluralizationService());
+
+                // Act
+                var comments = ((IEnumerable<Comment>)await formatter.ReadFromStreamAsync(typeof (Comment), inputStream, null, null)).ToArray();
+
+                // Assert
+                Assert.AreEqual(2, comments.Count());
+                Assert.AreEqual(null, comments[0].CustomData);
+                Assert.AreEqual("{\"foo\":\"bar\"}", comments[1].CustomData);
+            }
         }
 
         // Issue #1

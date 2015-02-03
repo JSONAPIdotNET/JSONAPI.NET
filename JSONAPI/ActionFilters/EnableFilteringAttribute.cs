@@ -4,11 +4,19 @@ using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
 using System.Web.Http.Filters;
+using JSONAPI.Core;
 
 namespace JSONAPI.ActionFilters
 {
     public class EnableFilteringAttribute : ActionFilterAttribute
     {
+        private readonly IModelManager _modelManager;
+
+        public EnableFilteringAttribute(IModelManager modelManager)
+        {
+            _modelManager = modelManager;
+        }
+
         // Borrowed from http://stackoverflow.com/questions/3631547/select-right-generic-method-with-reflection
         private readonly Lazy<MethodInfo> _whereMethod = new Lazy<MethodInfo>(() =>
             typeof(Queryable).GetMethods()
@@ -41,7 +49,7 @@ namespace JSONAPI.ActionFilters
                     {
                         var queryableElementType = objectType.GenericTypeArguments[0];
                         var parameter = Expression.Parameter(queryableElementType);
-                        var bodyExpr = GetPredicateBody(actionExecutedContext, parameter);
+                        var bodyExpr = GetPredicateBody(actionExecutedContext.Request, parameter);
                         var lambdaExpr = Expression.Lambda(bodyExpr, parameter);
 
                         var genericMethod = _whereMethod.Value.MakeGenericMethod(queryableElementType);
@@ -53,19 +61,18 @@ namespace JSONAPI.ActionFilters
             }
         }
 
-        private static Expression GetPredicateBody(HttpActionExecutedContext actionExecutedContext, ParameterExpression param)
+        private Expression GetPredicateBody(HttpRequestMessage request, ParameterExpression param)
         {
             Expression workingExpr = null;
 
             var type = param.Type;
-            var queryPairs = actionExecutedContext.Request.GetQueryNameValuePairs();
+            var queryPairs = request.GetQueryNameValuePairs();
             foreach (var queryPair in queryPairs)
             {
                 if (String.IsNullOrWhiteSpace(queryPair.Key))
                     continue;
 
-                var prop = type.GetProperty(queryPair.Key) ??
-                           type.GetProperty(queryPair.Key.Substring(0, 1).ToUpper() + queryPair.Key.Substring(1));
+                var prop = _modelManager.GetPropertyForJsonKey(type, queryPair.Key);
 
                 if (prop != null)
                 {
@@ -75,7 +82,7 @@ namespace JSONAPI.ActionFilters
                     if (string.IsNullOrWhiteSpace(queryValue))
                         queryValue = null;
 
-                    Expression expr;
+                    Expression expr = null;
                     if (propertyType == typeof (String))
                     {
                         if (String.IsNullOrWhiteSpace(queryValue))
@@ -287,8 +294,105 @@ namespace JSONAPI.ActionFilters
                     }
                     else
                     {
-                        expr = Expression.Constant(true);
+                        // See if it is a relationship property
+                        if (_modelManager.IsSerializedAsMany(propertyType))
+                        {
+                            var elementType = _modelManager.GetElementType(propertyType);
+                            PropertyInfo relatedIdProperty;
+                            try
+                            {
+                                relatedIdProperty = _modelManager.GetIdProperty(elementType);
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                relatedIdProperty = null;
+                            }
+
+                            if (relatedIdProperty != null)
+                            {
+                                var propertyExpr = Expression.Property(param, prop);
+
+                                if (string.IsNullOrWhiteSpace(queryValue))
+                                {
+                                    var leftExpr = Expression.Equal(propertyExpr, Expression.Constant(null));
+
+                                    var asQueryableCallExpr = Expression.Call(
+                                        typeof(Queryable),
+                                        "AsQueryable",
+                                        new[] { elementType },
+                                        propertyExpr);
+                                    var anyCallExpr = Expression.Call(
+                                        typeof(Queryable),
+                                        "Any",
+                                        new[] { elementType },
+                                        asQueryableCallExpr);
+                                    var rightExpr = Expression.Not(anyCallExpr);
+
+                                    expr = Expression.OrElse(leftExpr, rightExpr);
+                                }
+                                else
+                                {
+                                    var leftExpr = Expression.NotEqual(propertyExpr, Expression.Constant(null));
+
+                                    var idValue = queryValue.Trim();
+                                    var idExpr = Expression.Constant(idValue);
+                                    var anyParam = Expression.Parameter(elementType);
+                                    var relatedIdPropertyExpr = Expression.Property(anyParam, relatedIdProperty);
+                                    var relatedIdPropertyEqualsIdExpr = Expression.Equal(relatedIdPropertyExpr, idExpr);
+                                    var anyPredicateExpr = Expression.Lambda(relatedIdPropertyEqualsIdExpr, anyParam);
+                                    var asQueryableCallExpr = Expression.Call(
+                                        typeof(Queryable),
+                                        "AsQueryable",
+                                        new[] { elementType },
+                                        propertyExpr);
+                                    var rightExpr = Expression.Call(
+                                        typeof(Queryable),
+                                        "Any",
+                                        new[] { elementType },
+                                        asQueryableCallExpr,
+                                        anyPredicateExpr);
+
+                                    expr = Expression.AndAlso(leftExpr, rightExpr);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            PropertyInfo relatedIdProperty;
+                            try
+                            {
+                                relatedIdProperty = _modelManager.GetIdProperty(propertyType);
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                relatedIdProperty = null;
+                            }
+
+                            if (relatedIdProperty != null)
+                            {
+                                var propertyExpr = Expression.Property(param, prop);
+
+                                if (string.IsNullOrWhiteSpace(queryValue))
+                                {
+                                    expr = Expression.Equal(propertyExpr, Expression.Constant(null));
+                                }
+                                else
+                                {
+                                    var leftExpr = Expression.NotEqual(propertyExpr, Expression.Constant(null));
+
+                                    var idValue = queryValue.Trim();
+                                    var idExpr = Expression.Constant(idValue);
+                                    var relatedIdPropertyExpr = Expression.Property(propertyExpr, relatedIdProperty);
+                                    var rightExpr = Expression.Equal(relatedIdPropertyExpr, idExpr);
+
+                                    expr = Expression.AndAlso(leftExpr, rightExpr);
+                                }
+                            }
+                        }
                     }
+
+                    if (expr == null)
+                        expr = Expression.Constant(true);
 
                     workingExpr = workingExpr == null ? expr : Expression.AndAlso(workingExpr, expr);
                 }

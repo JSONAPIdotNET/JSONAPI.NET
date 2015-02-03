@@ -108,7 +108,7 @@ namespace JSONAPI.Tests.Core
             // Arrange
             var pluralizationService = new PluralizationService();
             var mm = new ModelManager(pluralizationService);
-            Type authorType = typeof(Author).GetType();
+            Type authorType = typeof(Author);
 
             // Act
             var idProp = mm.GetPropertyForJsonKey(authorType, "id");

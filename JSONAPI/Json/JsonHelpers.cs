@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace JSONAPI.Tests.Json
+namespace JSONAPI.Json
 {
     static class JsonHelpers
     {
