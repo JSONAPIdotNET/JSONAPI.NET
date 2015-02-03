@@ -42,7 +42,10 @@ namespace JSONAPI.Json
             _modelManager = modelManager;
             _errorSerializer = errorSerializer;
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
+            ValidateRawJsonStrings = true;
         }
+
+        public bool ValidateRawJsonStrings { get; set; }
 
         [Obsolete("Use ModelManager.PluralizationService instead")]
         public IPluralizationService PluralizationService  //FIXME: Deprecated, will be removed shortly
@@ -212,8 +215,21 @@ namespace JSONAPI.Json
                         }
                         else
                         {
-                            var minifiedValue = JsonHelpers.MinifyJson((string) propertyValue);
-                            writer.WriteRawValue(minifiedValue);
+                            var json = (string) propertyValue;
+                            if (ValidateRawJsonStrings)
+                            {
+                                try
+                                {
+                                    var token = JToken.Parse(json);
+                                    json = token.ToString();
+                                }
+                                catch (Exception)
+                                {
+                                    json = "{}";
+                                }
+                            }
+                            var valueToSerialize = JsonHelpers.MinifyJson(json);
+                            writer.WriteRawValue(valueToSerialize);
                         }
                     }
                     else
