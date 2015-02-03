@@ -44,7 +44,9 @@ namespace JSONAPI.Core
                 meta = new Dictionary<string, object>();
                 cwt.Add(deserialized, meta);
             }
-            meta.Add(prop.Name, value);
+            if (!meta.ContainsKey(prop.Name)) // Temporary fix for non-standard Id reprecussions...this internal implementation will change soon anyway.
+                meta.Add(prop.Name, value);
+            
         }
 
 
