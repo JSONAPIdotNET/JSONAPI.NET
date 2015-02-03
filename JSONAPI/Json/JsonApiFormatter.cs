@@ -180,6 +180,13 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
+            // The spec no longer requires that the ID key be "id":
+            //     "An ID SHOULD be represented by an 'id' key..." :-/
+            // But Ember Data does. So, we'll add "id" to the document
+            // always, and also serialize the property under its given
+            // name, for now at least.
+            //TODO: Partly because of this, we should probably disallow updates to Id properties where practical.
+
             // Do the Id now...
             writer.WritePropertyName("id");
             var idProp = _modelManager.GetIdProperty(value.GetType());
@@ -194,7 +201,8 @@ namespace JSONAPI.Json
 
             foreach (PropertyInfo prop in props)
             {
-                if (prop == idProp) continue;
+                string propKey = _modelManager.GetJsonKeyForProperty(prop);
+                if (propKey == "id") continue; // Don't write the "id" property twice, see above!
 
                 if (this.CanWriteTypeAsPrimitive(prop.PropertyType))
                 {
@@ -202,7 +210,7 @@ namespace JSONAPI.Json
                         continue;
 
                     // numbers, strings, dates...
-                    writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
+                    writer.WritePropertyName(propKey);
 
                     var propertyValue = prop.GetValue(value, null);
 
@@ -609,14 +617,17 @@ namespace JSONAPI.Json
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
                     string value = (string)reader.Value;
-                    PropertyInfo prop;
+                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
+                    // If the model object has a non-standard Id property, but the "id" key is being used...
+                    if (prop == null && value == "id") prop = _modelManager.GetIdProperty(objectType);
+
                     if (value == "links")
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, readStream, reader, serializer);
                     }
-                    else if ((prop = _modelManager.GetPropertyForJsonKey(objectType, value)) != null)
+                    else if (prop != null)
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: Embedded would be dropped here!

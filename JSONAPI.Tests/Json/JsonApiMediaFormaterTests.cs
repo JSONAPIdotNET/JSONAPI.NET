@@ -37,6 +37,13 @@ namespace JSONAPI.Tests.Json
             }
         }
 
+        private class NonStandardIdThing
+        {
+            [JSONAPI.Attributes.UseAsId]
+            public Guid Uuid { get; set; }
+            public string Data { get; set; }
+        }
+
         [TestInitialize]
         public void SetupModels()
         {
@@ -291,5 +298,86 @@ namespace JSONAPI.Tests.Json
             // Assert
             Assert.AreEqual("Jason Hater", a.Name); // Completed without exceptions and didn't timeout!
         }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\NonStandardIdTest.json")]
+        public void SerializeNonStandardIdTest()
+        {
+            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            var stream = new MemoryStream();
+            var payload = new List<NonStandardIdThing> {
+                new NonStandardIdThing { Uuid = new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"), Data = "Swap" }
+            };
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(List<NonStandardIdThing>), payload, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
+
+            // Assert
+            var expectedJson = File.ReadAllText("NonStandardIdTest.json");
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
+            var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        #region Non-standard Id attribute tests
+
+        [TestMethod]
+        [DeploymentItem(@"Data\NonStandardIdTest.json")]
+        public void DeserializeNonStandardIdTest()
+        {
+            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            var stream = new FileStream("NonStandardIdTest.json",FileMode.Open);
+
+            // Act
+            IList<NonStandardIdThing> things;
+            things = (IList<NonStandardIdThing>)formatter.ReadFromStreamAsync(typeof(NonStandardIdThing), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+            stream.Close();
+
+            // Assert
+            things.Count.Should().Be(1);
+            things.First().Uuid.Should().Be(new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"));
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\NonStandardIdTest.json")]
+        public void DeserializeNonStandardIdWithIdOnly()
+        {
+            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            string json = File.ReadAllText("NonStandardIdTest.json");
+            json = Regex.Replace(json, @"""uuid"":\s*""0657fd6d-a4ab-43c4-84e5-0933c84b4f4f""\s*,",""); // remove the uuid attribute
+            var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(json));
+
+            // Act
+            IList<NonStandardIdThing> things;
+            things = (IList<NonStandardIdThing>)formatter.ReadFromStreamAsync(typeof(NonStandardIdThing), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+
+            // Assert
+            json.Should().NotContain("uuid", "The \"uuid\" attribute was supposed to be removed, test methodology problem!");
+            things.Count.Should().Be(1);
+            things.First().Uuid.Should().Be(new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"));
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\NonStandardIdTest.json")]
+        public void DeserializeNonStandardIdWithoutId()
+        {
+            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            string json = File.ReadAllText("NonStandardIdTest.json");
+            json = Regex.Replace(json, @"""id"":\s*""0657fd6d-a4ab-43c4-84e5-0933c84b4f4f""\s*,", ""); // remove the uuid attribute
+            var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(json));
+
+            // Act
+            IList<NonStandardIdThing> things;
+            things = (IList<NonStandardIdThing>)formatter.ReadFromStreamAsync(typeof(NonStandardIdThing), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
+
+            // Assert
+            json.Should().NotContain("\"id\"", "The \"id\" attribute was supposed to be removed, test methodology problem!");
+            things.Count.Should().Be(1);
+            things.First().Uuid.Should().Be(new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"));
+
+        }
+    
+        #endregion
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using JSONAPI.Json;
+﻿using JSONAPI.Attributes;
+using JSONAPI.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,9 +66,14 @@ namespace JSONAPI.Core
             {
                 if (idPropCache.TryGetValue(type, out idprop)) return idprop;
 
-                //TODO: Enable attribute-based determination
-
-                idprop = type.GetProperty("Id");
+                // First, look for UseAsIdAttribute
+                idprop = type.GetProperties()
+                .Where(p => p.CustomAttributes.Any(attr => attr.AttributeType == typeof(UseAsIdAttribute)))
+                .FirstOrDefault();
+                if (idprop == null)
+                {
+                    idprop = type.GetProperty("Id");
+                }
 
                 if (idprop == null)
                     throw new InvalidOperationException(String.Format("Unable to determine Id property for type {0}", type));

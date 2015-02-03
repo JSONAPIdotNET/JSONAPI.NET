@@ -69,6 +69,7 @@
     <Compile Include="Attributes\LinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAs.cs" />
     <Compile Include="Attributes\SerializeStringAsRawJsonAttribute.cs" />
+    <Compile Include="Attributes\UseAsIdAttribute.cs" />
     <Compile Include="Core\IModelManager.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
