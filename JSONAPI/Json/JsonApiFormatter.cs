@@ -252,6 +252,8 @@ namespace JSONAPI.Json
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
 
                 object[] attrs = prop.GetCustomAttributes(true);
+                // aha...this way the overrides will be applied last!
+                attrs = attrs.Concat(MetadataManager.Instance.GetPropertyAttributeOverrides(value, prop)).ToArray();
 
                 foreach (object attr in attrs)
                 {

@@ -13,9 +13,9 @@ namespace JSONAPI.Core
         private class PropertyMetadata
         {
             public bool PresentInJson { get; set; } // only meaningful for incoming/deserialized models!
-            public Lazy<IEnumerable<System.Attribute>> AttributeOverrides
-                = new Lazy<IEnumerable<System.Attribute>>(
-                    () => new List<System.Attribute>()
+            public Lazy<ISet<System.Attribute>> AttributeOverrides
+                = new Lazy<ISet<System.Attribute>>(
+                    () => new HashSet<System.Attribute>()
                 );
         }
 
@@ -101,6 +101,47 @@ namespace JSONAPI.Core
         public bool PropertyWasPresent(object deserialized, PropertyInfo prop)
         {
             return this.GetMetadataForProperty(deserialized, prop).PresentInJson;
+        }
+
+        /// <summary>
+        /// Set different serialization attributes at runtime than those that were declared on
+        /// a property at compile time. E.g., if you declared a relationship property with
+        /// [SerializeAs(SerializeAsOptions.Link)] but you want to change that to
+        /// SerializeAsOptions.Ids when you are transmitting only one object, you can do:
+        /// 
+        ///     MetadataManager.SetPropertyAttributeOverrides(
+        ///         theModelInstance, theProperty, 
+        ///         new SerializeAsAttribute(SerializeAsOptions.Ids)
+        ///     );
+        /// 
+        /// Further, if you want to also include the related objects in the serialized document:
+        /// 
+        ///     MetadataManager.SetPropertyAttributeOverrides(
+        ///         theModelInstance, theProperty, 
+        ///         new SerializeAs(SerializeAsOptions.Ids),
+        ///         new IncludeInPayload(true)
+        ///     );
+        /// 
+        /// Calling this function resets all overrides, so calling it twice will result in only
+        /// the second set of overrides being applied. At present, the order of the attributes
+        /// is not meaningful.
+        /// </summary>
+        /// <param name="model">The model object that is to be serialized, for which you want to change serialization behavior.</param>
+        /// <param name="prop">The property for which to override attributes.</param>
+        /// <param name="attrs">One or more attribute instances that will override the declared behavior.</param>
+        public void SetPropertyAttributeOverrides(object model, PropertyInfo prop, params System.Attribute[] attrs)
+        {
+            var aoverrides = this.GetMetadataForProperty(model, prop).AttributeOverrides.Value;
+            lock (aoverrides)
+            {
+                aoverrides.Clear();
+                aoverrides.UnionWith(attrs);
+            }
+        }
+
+        internal IEnumerable<System.Attribute> GetPropertyAttributeOverrides(object model, PropertyInfo prop)
+        {
+            return this.GetMetadataForProperty(model, prop).AttributeOverrides.Value;
         }
 
     }
