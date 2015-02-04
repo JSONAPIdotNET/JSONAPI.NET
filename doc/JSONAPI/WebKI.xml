@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpKI>
+  <HelpKINode Title="Add method" Url="html/dfd61606-4376-2a62-5a7d-86cc2380fc5a.htm" />
+  <HelpKINode Title="AddMapping method" Url="html/90778479-c952-e764-2fd3-c88a2cefb9a6.htm" />
+  <HelpKINode Title="AddPrimary method" Url="html/143a91c7-2455-e324-6205-a3c50e6f78ad.htm" />
+  <HelpKINode Title="ApiController(Of T) class">
+    <HelpKINode Title="ApiController(T) Class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+    <HelpKINode Title="about ApiController(Of T) class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+    <HelpKINode Title="constructor" Url="html/a7347c6f-1b7f-78c4-60d0-3137bd879a36.htm" />
+    <HelpKINode Title="methods" Url="html/9d5aaf87-472a-b346-f0f0-8e505b2a7367.htm" />
+    <HelpKINode Title="properties" Url="html/45eac7ea-ea4b-785f-d9f5-4e4da42abeb7.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ApiController(Of T).ApiController constructor" Url="html/a7347c6f-1b7f-78c4-60d0-3137bd879a36.htm" />
+  <HelpKINode Title="ApiController(Of T).Delete method" Url="html/b0c0c78f-68ff-36d9-4fc6-0745cad60e87.htm" />
+  <HelpKINode Title="ApiController(Of T).Get method" Url="html/bb8f4ded-0c04-f97c-4e52-73e05a7ed0c6.htm" />
+  <HelpKINode Title="ApiController(Of T).MaterializerFactory method" Url="html/ef1ec8ee-ed4c-2925-78bc-a9bc52bc2112.htm" />
+  <HelpKINode Title="ApiController(Of T).Post method" Url="html/91b9d807-e77f-6f8c-e6ed-129eb421df79.htm" />
+  <HelpKINode Title="ApiController(Of T).Put method" Url="html/edeae0cd-9a11-869f-d441-d74bf176f116.htm" />
+  <HelpKINode Title="ApiController(Of T).QueryableFactory method" Url="html/f6ca2456-6521-b129-cb9d-7b6a0cf33b3d.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt; class">
+    <HelpKINode Title="ApiController(T) Class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+    <HelpKINode Title="about ApiController&lt;T&gt; class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+    <HelpKINode Title="constructor" Url="html/a7347c6f-1b7f-78c4-60d0-3137bd879a36.htm" />
+    <HelpKINode Title="methods" Url="html/9d5aaf87-472a-b346-f0f0-8e505b2a7367.htm" />
+    <HelpKINode Title="properties" Url="html/45eac7ea-ea4b-785f-d9f5-4e4da42abeb7.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ApiController&lt;T&gt;.ApiController constructor" Url="html/a7347c6f-1b7f-78c4-60d0-3137bd879a36.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.Delete method" Url="html/b0c0c78f-68ff-36d9-4fc6-0745cad60e87.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.Get method" Url="html/bb8f4ded-0c04-f97c-4e52-73e05a7ed0c6.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.MaterializerFactory method" Url="html/ef1ec8ee-ed4c-2925-78bc-a9bc52bc2112.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.Post method" Url="html/91b9d807-e77f-6f8c-e6ed-129eb421df79.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.Put method" Url="html/edeae0cd-9a11-869f-d441-d74bf176f116.htm" />
+  <HelpKINode Title="ApiController&lt;T&gt;.QueryableFactory method" Url="html/f6ca2456-6521-b129-cb9d-7b6a0cf33b3d.htm" />
+  <HelpKINode Title="CanReadType method" Url="html/75495c2d-3018-71e7-7eba-2000f7859682.htm" />
+  <HelpKINode Title="CanWriteType method" Url="html/fcf32ac4-3705-d26a-f8d9-bed8410b0739.htm" />
+  <HelpKINode Title="CanWriteTypeAsPrimitive method" Url="html/5715efa3-f8e9-4e26-b2c1-18ca49f8eb30.htm" />
+  <HelpKINode Title="Delete method" Url="html/b0c0c78f-68ff-36d9-4fc6-0745cad60e87.htm" />
+  <HelpKINode Title="Deserialize method" Url="html/da099a52-7b0e-df7b-3d3e-414520dace9e.htm" />
+  <HelpKINode Title="Embedded enumeration member" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
+  <HelpKINode Title="EnableFilteringAttribute class">
+    <HelpKINode Title="EnableFilteringAttribute Class" Url="html/6f1a4b8e-3497-206b-c8c0-85b91d356b39.htm" />
+    <HelpKINode Title="about EnableFilteringAttribute class" Url="html/6f1a4b8e-3497-206b-c8c0-85b91d356b39.htm" />
+    <HelpKINode Title="constructor" Url="html/cd1acd9a-2380-446d-d6d5-265fe9de251b.htm" />
+    <HelpKINode Title="methods" Url="html/63449f45-77ad-e74c-5fb5-1697969b2b08.htm" />
+    <HelpKINode Title="properties" Url="html/23b53542-a34a-8897-f73f-6a39f4ac53b5.htm" />
+  </HelpKINode>
+  <HelpKINode Title="EnableFilteringAttribute.EnableFilteringAttribute constructor" Url="html/cd1acd9a-2380-446d-d6d5-265fe9de251b.htm" />
+  <HelpKINode Title="EnableFilteringAttribute.OnActionExecuted method" Url="html/91a9e4d8-7b94-f264-e2b3-4fdac58d0b75.htm" />
+  <HelpKINode Title="FormatPropertyName method" Url="html/f149620e-dfb8-2145-9b74-6bf5733dd6d4.htm" />
+  <HelpKINode Title="Get method" Url="html/bb8f4ded-0c04-f97c-4e52-73e05a7ed0c6.htm" />
+  <HelpKINode Title="GetById method">
+    <HelpKINode Title="IMaterializer.GetById Method " Url="html/2cf0ce32-2201-bdec-8f4c-55f395d5715b.htm" />
+    <HelpKINode Title="JsonApiFormatter.GetById Method " Url="html/463bdd14-011e-7ae6-bffa-73c2490addb8.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetByIdAsync method" Url="html/7b48d747-f19a-ad47-f04e-3735cdbe3967.htm" />
+  <HelpKINode Title="GetElementType method">
+    <HelpKINode Title="IModelManager.GetElementType Method " Url="html/92c49dfe-5db3-617a-1f77-3230a27713f8.htm" />
+    <HelpKINode Title="ModelManager.GetElementType Method " Url="html/481254e7-38d1-3fcc-07aa-4becd86508b9.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetIdFor method" Url="html/084fb889-bbb7-7320-b971-8298b4cf3d46.htm" />
+  <HelpKINode Title="GetIdProperty method">
+    <HelpKINode Title="IModelManager.GetIdProperty Method " Url="html/9d443a75-c85e-2321-1f8b-dfc9c2030981.htm" />
+    <HelpKINode Title="ModelManager.GetIdProperty Method " Url="html/bfe42ae6-e00d-5fbe-7f29-493d403d8d49.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetJsonKeyForProperty method">
+    <HelpKINode Title="IModelManager.GetJsonKeyForProperty Method " Url="html/eb69aa10-57dc-fdfa-71d4-ff2091420252.htm" />
+    <HelpKINode Title="ModelManager.GetJsonKeyForProperty Method " Url="html/f8ec8126-ed39-6ac8-e95e-dc3d48a9683d.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetJsonKeyForType method">
+    <HelpKINode Title="IModelManager.GetJsonKeyForType Method " Url="html/14489593-8932-be49-1b52-75c8db99cd2f.htm" />
+    <HelpKINode Title="ModelManager.GetJsonKeyForType Method " Url="html/1d20b8ea-4a79-a70e-ff20-4b2a101a1507.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetProperties method">
+    <HelpKINode Title="IModelManager.GetProperties Method " Url="html/19bb28e5-8bcf-aa8e-3fdf-ba5b6883edb8.htm" />
+    <HelpKINode Title="ModelManager.GetProperties Method " Url="html/1750a725-207e-e05b-0df2-03c0595394d3.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetPropertyForJsonKey method">
+    <HelpKINode Title="IModelManager.GetPropertyForJsonKey Method " Url="html/50b3c228-50cb-8fea-a1b9-3fb3eb95af0e.htm" />
+    <HelpKINode Title="ModelManager.GetPropertyForJsonKey Method " Url="html/5a71ce26-31fc-7ccd-14fe-de86ad276fc9.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetPropertyMap method" Url="html/c705eb13-b4b3-f16d-3688-afbeae2615d9.htm" />
+  <HelpKINode Title="GetValueForIdProperty method" Url="html/348f646c-1cca-5b9f-3b84-d01c0befbcea.htm" />
+  <HelpKINode Title="Ids enumeration member" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
+  <HelpKINode Title="IMaterializer interface">
+    <HelpKINode Title="IMaterializer Interface" Url="html/9e918feb-fdaa-f35f-5305-fa5496c1f520.htm" />
+    <HelpKINode Title="about IMaterializer interface" Url="html/9e918feb-fdaa-f35f-5305-fa5496c1f520.htm" />
+    <HelpKINode Title="methods" Url="html/f090c0ff-1511-0df9-8ff6-92bfb6fee1f6.htm" />
+  </HelpKINode>
+  <HelpKINode Title="IMaterializer.GetById method" Url="html/2cf0ce32-2201-bdec-8f4c-55f395d5715b.htm" />
+  <HelpKINode Title="IMaterializer.GetByIdAsync method" Url="html/7b48d747-f19a-ad47-f04e-3735cdbe3967.htm" />
+  <HelpKINode Title="IMaterializer.Materialize method" Url="html/bdb8fd54-2d2f-1f2e-1f3d-79c4ac1bf45f.htm" />
+  <HelpKINode Title="IMaterializer.MaterializeAsync method" Url="html/91a54aad-386c-fdfd-9573-4a4e19d98820.htm" />
+  <HelpKINode Title="IMaterializer.MaterializeUpdate method" Url="html/741e17fd-84ab-b59a-e97c-b9173de33dc3.htm" />
+  <HelpKINode Title="IMaterializer.MaterializeUpdateAsync method" Url="html/34e4c43c-5ef9-8449-1aff-21ba7bd46b2b.htm" />
+  <HelpKINode Title="IModelManager interface">
+    <HelpKINode Title="IModelManager Interface" Url="html/a3b1b40d-7969-e572-16b3-42051c1f3fdd.htm" />
+    <HelpKINode Title="about IModelManager interface" Url="html/a3b1b40d-7969-e572-16b3-42051c1f3fdd.htm" />
+    <HelpKINode Title="methods" Url="html/ab16265b-1806-0a0f-b1b1-6dfa480136ba.htm" />
+    <HelpKINode Title="properties" Url="html/a1988706-c090-be87-05fb-5f48cf5ee232.htm" />
+  </HelpKINode>
+  <HelpKINode Title="IModelManager.GetElementType method" Url="html/92c49dfe-5db3-617a-1f77-3230a27713f8.htm" />
+  <HelpKINode Title="IModelManager.GetIdProperty method" Url="html/9d443a75-c85e-2321-1f8b-dfc9c2030981.htm" />
+  <HelpKINode Title="IModelManager.GetJsonKeyForProperty method" Url="html/eb69aa10-57dc-fdfa-71d4-ff2091420252.htm" />
+  <HelpKINode Title="IModelManager.GetJsonKeyForType method" Url="html/14489593-8932-be49-1b52-75c8db99cd2f.htm" />
+  <HelpKINode Title="IModelManager.GetProperties method" Url="html/19bb28e5-8bcf-aa8e-3fdf-ba5b6883edb8.htm" />
+  <HelpKINode Title="IModelManager.GetPropertyForJsonKey method" Url="html/50b3c228-50cb-8fea-a1b9-3fb3eb95af0e.htm" />
+  <HelpKINode Title="IModelManager.IsSerializedAsMany method" Url="html/4259dbb9-a857-afca-ef2b-f318b08e7117.htm" />
+  <HelpKINode Title="IModelManager.PluralizationService property" Url="html/ed0a91ce-cfe5-5c60-d9ff-592f304b9a5a.htm" />
+  <HelpKINode Title="IncludeInPayload class">
+    <HelpKINode Title="IncludeInPayload Class" Url="html/24f2ba54-a31f-c3ed-029d-092025660e27.htm" />
+    <HelpKINode Title="about IncludeInPayload class" Url="html/24f2ba54-a31f-c3ed-029d-092025660e27.htm" />
+    <HelpKINode Title="constructor" Url="html/ec6324c8-c8ef-81d4-6ba6-cbde97cf3917.htm" />
+    <HelpKINode Title="methods" Url="html/512362fe-90c7-1849-0c31-7058fd4a8085.htm" />
+    <HelpKINode Title="properties" Url="html/9be11e26-fee4-c885-61f8-617e636918c0.htm" />
+  </HelpKINode>
+  <HelpKINode Title="IncludeInPayload.IncludeInPayload constructor" Url="html/ec6324c8-c8ef-81d4-6ba6-cbde97cf3917.htm" />
+  <HelpKINode Title="Instance property" Url="html/bc0c226a-d452-a116-4969-e547fefb489d.htm" />
+  <HelpKINode Title="IPluralizationService interface">
+    <HelpKINode Title="IPluralizationService Interface" Url="html/82178b5d-3152-0251-991d-09a567293d16.htm" />
+    <HelpKINode Title="about IPluralizationService interface" Url="html/82178b5d-3152-0251-991d-09a567293d16.htm" />
+    <HelpKINode Title="methods" Url="html/600da2f5-b11e-9dfa-74ab-dae283059662.htm" />
+  </HelpKINode>
+  <HelpKINode Title="IPluralizationService.Pluralize method" Url="html/0699ec6c-61bc-d6fb-d624-29741e48146c.htm" />
+  <HelpKINode Title="IPluralizationService.Singularize method" Url="html/a9b35a08-92cc-8f4e-89c1-82d5b29ffd44.htm" />
+  <HelpKINode Title="IsSerializedAsMany method">
+    <HelpKINode Title="IModelManager.IsSerializedAsMany Method " Url="html/4259dbb9-a857-afca-ef2b-f318b08e7117.htm" />
+    <HelpKINode Title="ModelManager.IsSerializedAsMany Method " Url="html/adbcd18f-929e-f0bf-8d2b-9109d1efe45e.htm" />
+  </HelpKINode>
+  <HelpKINode Title="JSONAPI.ActionFilters namespace" Url="html/9d02a056-a9b2-6295-631c-6cfdeed41d34.htm" />
+  <HelpKINode Title="JSONAPI.ActionFilters.EnableFilteringAttribute class" Url="html/6f1a4b8e-3497-206b-c8c0-85b91d356b39.htm" />
+  <HelpKINode Title="JSONAPI.Attributes namespace" Url="html/532da1e3-c5f3-84a6-fa34-c460f3a14ced.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.IncludeInPayload class" Url="html/24f2ba54-a31f-c3ed-029d-092025660e27.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.LinkTemplate class" Url="html/5b628aea-1e0a-3e4a-4960-06a814a3c2b5.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.SerializeAs class" Url="html/c56b3d73-683d-7971-6972-7f323241bc1b.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.SerializeAsOptions enumeration" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.SerializeStringAsRawJsonAttribute class" Url="html/ddc43c31-c621-647a-81b8-5dd0352ee1ff.htm" />
+  <HelpKINode Title="JSONAPI.Attributes.UseAsIdAttribute class" Url="html/be15d687-8926-72c4-0d1f-805e01186530.htm" />
+  <HelpKINode Title="JSONAPI.Core namespace" Url="html/7e3804f4-e523-c212-f98b-73ea2a4df195.htm" />
+  <HelpKINode Title="JSONAPI.Core.IMaterializer interface" Url="html/9e918feb-fdaa-f35f-5305-fa5496c1f520.htm" />
+  <HelpKINode Title="JSONAPI.Core.IModelManager interface" Url="html/a3b1b40d-7969-e572-16b3-42051c1f3fdd.htm" />
+  <HelpKINode Title="JSONAPI.Core.IPluralizationService interface" Url="html/82178b5d-3152-0251-991d-09a567293d16.htm" />
+  <HelpKINode Title="JSONAPI.Core.MetadataManager class" Url="html/71b35cb2-23bf-2029-28b2-005150b52e51.htm" />
+  <HelpKINode Title="JSONAPI.Core.ModelManager class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm" />
+  <HelpKINode Title="JSONAPI.Core.PluralizationService class" Url="html/d4e0a854-6834-d7df-d9e7-6cb0f2a5f726.htm" />
+  <HelpKINode Title="JSONAPI.Http namespace" Url="html/cda1a445-d6a3-b961-b73f-2de4854db8ca.htm" />
+  <HelpKINode Title="JSONAPI.Http.ApiController(Of T) class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+  <HelpKINode Title="JSONAPI.Http.ApiController&lt;T&gt; class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm" />
+  <HelpKINode Title="JSONAPI.Json namespace" Url="html/3b648a8d-0b36-23cf-67cb-a28f8b1149e1.htm" />
+  <HelpKINode Title="JSONAPI.Json.JsonApiFormatter class" Url="html/fdfdcae5-ce4c-ee2d-d813-f9fe1ed52274.htm" />
+  <HelpKINode Title="JSONAPI.Json.RelationAggregator class" Url="html/0206d060-f8a7-f32f-aa78-15f69d3b2654.htm" />
+  <HelpKINode Title="JsonApiFormatter class">
+    <HelpKINode Title="JsonApiFormatter Class" Url="html/fdfdcae5-ce4c-ee2d-d813-f9fe1ed52274.htm" />
+    <HelpKINode Title="about JsonApiFormatter class" Url="html/fdfdcae5-ce4c-ee2d-d813-f9fe1ed52274.htm" />
+    <HelpKINode Title="constructor" Url="html/597dd756-badc-f6cc-6582-aa901798cf51.htm" />
+    <HelpKINode Title="methods" Url="html/b1482f05-1fbc-f2ea-bddb-2348f552f127.htm" />
+    <HelpKINode Title="properties" Url="html/766bd2d5-937e-2eb3-c4e3-d0b97aa43cd4.htm" />
+  </HelpKINode>
+  <HelpKINode Title="JsonApiFormatter.CanReadType method" Url="html/75495c2d-3018-71e7-7eba-2000f7859682.htm" />
+  <HelpKINode Title="JsonApiFormatter.CanWriteType method" Url="html/fcf32ac4-3705-d26a-f8d9-bed8410b0739.htm" />
+  <HelpKINode Title="JsonApiFormatter.CanWriteTypeAsPrimitive method" Url="html/5715efa3-f8e9-4e26-b2c1-18ca49f8eb30.htm" />
+  <HelpKINode Title="JsonApiFormatter.Deserialize method" Url="html/da099a52-7b0e-df7b-3d3e-414520dace9e.htm" />
+  <HelpKINode Title="JsonApiFormatter.GetById method" Url="html/463bdd14-011e-7ae6-bffa-73c2490addb8.htm" />
+  <HelpKINode Title="JsonApiFormatter.GetIdFor method" Url="html/084fb889-bbb7-7320-b971-8298b4cf3d46.htm" />
+  <HelpKINode Title="JsonApiFormatter.GetValueForIdProperty method" Url="html/348f646c-1cca-5b9f-3b84-d01c0befbcea.htm" />
+  <HelpKINode Title="JsonApiFormatter.JsonApiFormatter constructor" Url="html/597dd756-badc-f6cc-6582-aa901798cf51.htm" />
+  <HelpKINode Title="JsonApiFormatter.ModelManager property" Url="html/987838dd-2d05-0b16-86d1-51fe5144fda2.htm" />
+  <HelpKINode Title="JsonApiFormatter.PluralizationService property" Url="html/2b5f07a6-7344-cf95-4686-e679217f0f30.htm" />
+  <HelpKINode Title="JsonApiFormatter.ReadFromStreamAsync method" Url="html/70e349f3-fa2f-5d1c-0675-f596743b759a.htm" />
+  <HelpKINode Title="JsonApiFormatter.RelationAggregators property" Url="html/15d7500b-cda6-b080-3092-023e17fcedb3.htm" />
+  <HelpKINode Title="JsonApiFormatter.Serialize method" Url="html/f5fa0141-0aa2-7ad3-cb26-c6add3652e90.htm" />
+  <HelpKINode Title="JsonApiFormatter.SerializeLinkedResources method" Url="html/265d2615-01d3-cc06-3aa8-1fb48195476f.htm" />
+  <HelpKINode Title="JsonApiFormatter.SerializeMany method" Url="html/a48b0da8-0f58-f05f-2740-caff0f6db081.htm" />
+  <HelpKINode Title="JsonApiFormatter.WriteToStreamAsync method" Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm" />
+  <HelpKINode Title="Link enumeration member" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
+  <HelpKINode Title="LinkTemplate class">
+    <HelpKINode Title="LinkTemplate Class" Url="html/5b628aea-1e0a-3e4a-4960-06a814a3c2b5.htm" />
+    <HelpKINode Title="about LinkTemplate class" Url="html/5b628aea-1e0a-3e4a-4960-06a814a3c2b5.htm" />
+    <HelpKINode Title="constructor" Url="html/d04d4dd1-092d-6e08-35ec-b734514ae7a3.htm" />
+    <HelpKINode Title="methods" Url="html/48869671-b104-8f54-a46d-0b57fc463841.htm" />
+    <HelpKINode Title="properties" Url="html/60b9b38c-cc5a-74e2-2400-dc8ff7faf6dd.htm" />
+  </HelpKINode>
+  <HelpKINode Title="LinkTemplate.LinkTemplate constructor" Url="html/d04d4dd1-092d-6e08-35ec-b734514ae7a3.htm" />
+  <HelpKINode Title="Materialize method" Url="html/bdb8fd54-2d2f-1f2e-1f3d-79c4ac1bf45f.htm" />
+  <HelpKINode Title="MaterializeAsync method" Url="html/91a54aad-386c-fdfd-9573-4a4e19d98820.htm" />
+  <HelpKINode Title="MaterializerFactory method" Url="html/ef1ec8ee-ed4c-2925-78bc-a9bc52bc2112.htm" />
+  <HelpKINode Title="MaterializeUpdate method" Url="html/741e17fd-84ab-b59a-e97c-b9173de33dc3.htm" />
+  <HelpKINode Title="MaterializeUpdateAsync method" Url="html/34e4c43c-5ef9-8449-1aff-21ba7bd46b2b.htm" />
+  <HelpKINode Title="MetadataManager class">
+    <HelpKINode Title="MetadataManager Class" Url="html/71b35cb2-23bf-2029-28b2-005150b52e51.htm" />
+    <HelpKINode Title="about MetadataManager class" Url="html/71b35cb2-23bf-2029-28b2-005150b52e51.htm" />
+    <HelpKINode Title="methods" Url="html/7faa6e7b-f343-85e7-d8f7-fea8141cc0a4.htm" />
+    <HelpKINode Title="properties" Url="html/006df392-e92b-b4c5-cf87-e838f84df095.htm" />
+  </HelpKINode>
+  <HelpKINode Title="MetadataManager.Instance property" Url="html/bc0c226a-d452-a116-4969-e547fefb489d.htm" />
+  <HelpKINode Title="MetadataManager.PropertyWasPresent method" Url="html/dd6a8cb3-049b-168e-f551-8a6656ab9cfb.htm" />
+  <HelpKINode Title="MetadataManager.SetPropertyAttributeOverrides method" Url="html/9101a0c5-78ea-6513-089c-2984b9fc2d84.htm" />
+  <HelpKINode Title="ModelManager class">
+    <HelpKINode Title="ModelManager Class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm" />
+    <HelpKINode Title="about ModelManager class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm" />
+    <HelpKINode Title="constructor" Url="html/1c418323-53bd-d80d-4e48-bc96b3a7d11d.htm" />
+    <HelpKINode Title="fields" Url="html/4a84711d-0dc8-8687-b55d-5e7d05eeced2.htm" />
+    <HelpKINode Title="methods" Url="html/87f794c5-644f-59e8-e8b8-f41e795dd213.htm" />
+    <HelpKINode Title="properties" Url="html/17d52b7f-cf10-6a34-4fae-2400952c6073.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ModelManager property" Url="html/987838dd-2d05-0b16-86d1-51fe5144fda2.htm" />
+  <HelpKINode Title="ModelManager.FormatPropertyName method" Url="html/f149620e-dfb8-2145-9b74-6bf5733dd6d4.htm" />
+  <HelpKINode Title="ModelManager.GetElementType method" Url="html/481254e7-38d1-3fcc-07aa-4becd86508b9.htm" />
+  <HelpKINode Title="ModelManager.GetIdProperty method" Url="html/bfe42ae6-e00d-5fbe-7f29-493d403d8d49.htm" />
+  <HelpKINode Title="ModelManager.GetJsonKeyForProperty method" Url="html/f8ec8126-ed39-6ac8-e95e-dc3d48a9683d.htm" />
+  <HelpKINode Title="ModelManager.GetJsonKeyForType method" Url="html/1d20b8ea-4a79-a70e-ff20-4b2a101a1507.htm" />
+  <HelpKINode Title="ModelManager.GetProperties method" Url="html/1750a725-207e-e05b-0df2-03c0595394d3.htm" />
+  <HelpKINode Title="ModelManager.GetPropertyForJsonKey method" Url="html/5a71ce26-31fc-7ccd-14fe-de86ad276fc9.htm" />
+  <HelpKINode Title="ModelManager.GetPropertyMap method" Url="html/c705eb13-b4b3-f16d-3688-afbeae2615d9.htm" />
+  <HelpKINode Title="ModelManager.IsSerializedAsMany method" Url="html/adbcd18f-929e-f0bf-8d2b-9109d1efe45e.htm" />
+  <HelpKINode Title="ModelManager.ModelManager constructor" Url="html/1c418323-53bd-d80d-4e48-bc96b3a7d11d.htm" />
+  <HelpKINode Title="ModelManager.PluralizationService property" Url="html/0adb3d3e-8df4-305f-c307-70a26177fe6c.htm" />
+  <HelpKINode Title="ModelManager._getElementType field" Url="html/f6208afb-5710-186b-91f4-b8ba6dd8872a.htm" />
+  <HelpKINode Title="ModelManager._idProperties field" Url="html/c6f296ca-3889-95d6-9fc4-d58a26053f53.htm" />
+  <HelpKINode Title="ModelManager._isSerializedAsMany field" Url="html/8966cf49-351a-5b5a-5573-c28ec035d807.htm" />
+  <HelpKINode Title="ModelManager._jsonKeysForType field" Url="html/c8e9c064-2cda-dc01-a682-1d63e31f754c.htm" />
+  <HelpKINode Title="ModelManager._pluralizationService field" Url="html/f8ebda25-1bce-c8a1-9155-2153435e6cb9.htm" />
+  <HelpKINode Title="ModelManager._propertyMaps field" Url="html/192fd175-e3e0-22f6-48dd-b5408717af88.htm" />
+  <HelpKINode Title="OnActionExecuted method" Url="html/91a9e4d8-7b94-f264-e2b3-4fdac58d0b75.htm" />
+  <HelpKINode Title="PluralizationService class">
+    <HelpKINode Title="PluralizationService Class" Url="html/d4e0a854-6834-d7df-d9e7-6cb0f2a5f726.htm" />
+    <HelpKINode Title="about PluralizationService class" Url="html/d4e0a854-6834-d7df-d9e7-6cb0f2a5f726.htm" />
+    <HelpKINode Title="constructor" Url="html/3aba3e8d-cee2-d75b-d582-930b5677eb51.htm" />
+    <HelpKINode Title="methods" Url="html/4e7bc9cc-e34b-4024-3cbd-237e285f824a.htm" />
+  </HelpKINode>
+  <HelpKINode Title="PluralizationService property">
+    <HelpKINode Title="IModelManager.PluralizationService Property " Url="html/ed0a91ce-cfe5-5c60-d9ff-592f304b9a5a.htm" />
+    <HelpKINode Title="JsonApiFormatter.PluralizationService Property " Url="html/2b5f07a6-7344-cf95-4686-e679217f0f30.htm" />
+    <HelpKINode Title="ModelManager.PluralizationService Property " Url="html/0adb3d3e-8df4-305f-c307-70a26177fe6c.htm" />
+  </HelpKINode>
+  <HelpKINode Title="PluralizationService.AddMapping method" Url="html/90778479-c952-e764-2fd3-c88a2cefb9a6.htm" />
+  <HelpKINode Title="PluralizationService.PluralizationService constructor" Url="html/3aba3e8d-cee2-d75b-d582-930b5677eb51.htm" />
+  <HelpKINode Title="PluralizationService.Pluralize method" Url="html/cd733e4c-a44e-e2ff-e7ba-11e827dcdbba.htm" />
+  <HelpKINode Title="PluralizationService.RemoveMapping method" Url="html/d333652c-79ad-1918-ae75-f9aa91a90f64.htm" />
+  <HelpKINode Title="PluralizationService.Singularize method" Url="html/980a525c-8993-1ed1-eeb3-102ed7eadd80.htm" />
+  <HelpKINode Title="Pluralize method">
+    <HelpKINode Title="IPluralizationService.Pluralize Method " Url="html/0699ec6c-61bc-d6fb-d624-29741e48146c.htm" />
+    <HelpKINode Title="PluralizationService.Pluralize Method " Url="html/cd733e4c-a44e-e2ff-e7ba-11e827dcdbba.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Post method" Url="html/91b9d807-e77f-6f8c-e6ed-129eb421df79.htm" />
+  <HelpKINode Title="PropertyWasPresent method" Url="html/dd6a8cb3-049b-168e-f551-8a6656ab9cfb.htm" />
+  <HelpKINode Title="Put method" Url="html/edeae0cd-9a11-869f-d441-d74bf176f116.htm" />
+  <HelpKINode Title="QueryableFactory method" Url="html/f6ca2456-6521-b129-cb9d-7b6a0cf33b3d.htm" />
+  <HelpKINode Title="ReadFromStreamAsync method" Url="html/70e349f3-fa2f-5d1c-0675-f596743b759a.htm" />
+  <HelpKINode Title="RelationAggregator class">
+    <HelpKINode Title="RelationAggregator Class" Url="html/0206d060-f8a7-f32f-aa78-15f69d3b2654.htm" />
+    <HelpKINode Title="about RelationAggregator class" Url="html/0206d060-f8a7-f32f-aa78-15f69d3b2654.htm" />
+    <HelpKINode Title="constructor" Url="html/b7473a26-bf83-86af-0e1e-5fd362344cf4.htm" />
+    <HelpKINode Title="methods" Url="html/3444908c-5875-7469-a93d-d3202914b74b.htm" />
+  </HelpKINode>
+  <HelpKINode Title="RelationAggregator.Add method" Url="html/dfd61606-4376-2a62-5a7d-86cc2380fc5a.htm" />
+  <HelpKINode Title="RelationAggregator.AddPrimary method" Url="html/143a91c7-2455-e324-6205-a3c50e6f78ad.htm" />
+  <HelpKINode Title="RelationAggregator.RelationAggregator constructor" Url="html/b7473a26-bf83-86af-0e1e-5fd362344cf4.htm" />
+  <HelpKINode Title="RelationAggregators property" Url="html/15d7500b-cda6-b080-3092-023e17fcedb3.htm" />
+  <HelpKINode Title="RemoveMapping method" Url="html/d333652c-79ad-1918-ae75-f9aa91a90f64.htm" />
+  <HelpKINode Title="Serialize method" Url="html/f5fa0141-0aa2-7ad3-cb26-c6add3652e90.htm" />
+  <HelpKINode Title="SerializeAs class">
+    <HelpKINode Title="SerializeAs Class" Url="html/c56b3d73-683d-7971-6972-7f323241bc1b.htm" />
+    <HelpKINode Title="about SerializeAs class" Url="html/c56b3d73-683d-7971-6972-7f323241bc1b.htm" />
+    <HelpKINode Title="constructor" Url="html/82535968-8f31-d0fb-33c7-09312053ab7c.htm" />
+    <HelpKINode Title="methods" Url="html/d853faf3-7d22-dda3-2dbc-ac51767e2c30.htm" />
+    <HelpKINode Title="properties" Url="html/2d247ad5-bcd8-4730-c359-ad3436a33da2.htm" />
+  </HelpKINode>
+  <HelpKINode Title="SerializeAs.SerializeAs constructor" Url="html/82535968-8f31-d0fb-33c7-09312053ab7c.htm" />
+  <HelpKINode Title="SerializeAsOptions enumeration" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
+  <HelpKINode Title="SerializeLinkedResources method" Url="html/265d2615-01d3-cc06-3aa8-1fb48195476f.htm" />
+  <HelpKINode Title="SerializeMany method" Url="html/a48b0da8-0f58-f05f-2740-caff0f6db081.htm" />
+  <HelpKINode Title="SerializeStringAsRawJsonAttribute class">
+    <HelpKINode Title="SerializeStringAsRawJsonAttribute Class" Url="html/ddc43c31-c621-647a-81b8-5dd0352ee1ff.htm" />
+    <HelpKINode Title="about SerializeStringAsRawJsonAttribute class" Url="html/ddc43c31-c621-647a-81b8-5dd0352ee1ff.htm" />
+    <HelpKINode Title="constructor" Url="html/f75776b4-0c6b-7ce8-d3b8-4731ff9c5924.htm" />
+    <HelpKINode Title="methods" Url="html/b5dce815-6f84-5e0b-b684-fc820a28ac05.htm" />
+    <HelpKINode Title="properties" Url="html/527a3956-c4b0-6ee9-db55-add5900bcf89.htm" />
+  </HelpKINode>
+  <HelpKINode Title="SerializeStringAsRawJsonAttribute.SerializeStringAsRawJsonAttribute constructor" Url="html/f75776b4-0c6b-7ce8-d3b8-4731ff9c5924.htm" />
+  <HelpKINode Title="SetPropertyAttributeOverrides method" Url="html/9101a0c5-78ea-6513-089c-2984b9fc2d84.htm" />
+  <HelpKINode Title="Singularize method">
+    <HelpKINode Title="IPluralizationService.Singularize Method " Url="html/a9b35a08-92cc-8f4e-89c1-82d5b29ffd44.htm" />
+    <HelpKINode Title="PluralizationService.Singularize Method " Url="html/980a525c-8993-1ed1-eeb3-102ed7eadd80.htm" />
+  </HelpKINode>
+  <HelpKINode Title="UseAsIdAttribute class">
+    <HelpKINode Title="UseAsIdAttribute Class" Url="html/be15d687-8926-72c4-0d1f-805e01186530.htm" />
+    <HelpKINode Title="about UseAsIdAttribute class" Url="html/be15d687-8926-72c4-0d1f-805e01186530.htm" />
+    <HelpKINode Title="constructor" Url="html/fe33429c-cd01-05ea-6aea-8742e59f35ab.htm" />
+    <HelpKINode Title="methods" Url="html/8ef091f1-4235-0d28-2c4f-b2cb1ac06b15.htm" />
+    <HelpKINode Title="properties" Url="html/f44af44f-60d8-7cf1-6b62-2ed030accefc.htm" />
+  </HelpKINode>
+  <HelpKINode Title="UseAsIdAttribute.UseAsIdAttribute constructor" Url="html/fe33429c-cd01-05ea-6aea-8742e59f35ab.htm" />
+  <HelpKINode Title="WriteToStreamAsync method" Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm" />
+  <HelpKINode Title="_getElementType field" Url="html/f6208afb-5710-186b-91f4-b8ba6dd8872a.htm" />
+  <HelpKINode Title="_idProperties field" Url="html/c6f296ca-3889-95d6-9fc4-d58a26053f53.htm" />
+  <HelpKINode Title="_isSerializedAsMany field" Url="html/8966cf49-351a-5b5a-5573-c28ec035d807.htm" />
+  <HelpKINode Title="_jsonKeysForType field" Url="html/c8e9c064-2cda-dc01-a682-1d63e31f754c.htm" />
+  <HelpKINode Title="_pluralizationService field" Url="html/f8ebda25-1bce-c8a1-9155-2153435e6cb9.htm" />
+  <HelpKINode Title="_propertyMaps field" Url="html/192fd175-e3e0-22f6-48dd-b5408717af88.htm" />
+</HelpKI>

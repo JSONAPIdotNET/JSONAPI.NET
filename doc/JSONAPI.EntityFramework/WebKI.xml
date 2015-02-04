@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpKI>
+  <HelpKINode Title="ApiController(Of T, TC) class">
+    <HelpKINode Title="ApiController(T, TC) Class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+    <HelpKINode Title="about ApiController(Of T, TC) class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+    <HelpKINode Title="constructor" Url="html/ed7c768c-e85e-6e1b-3779-02b3892de22d.htm" />
+    <HelpKINode Title="methods" Url="html/07da212f-e1b5-fd77-c9c3-6c2329846f20.htm" />
+    <HelpKINode Title="properties" Url="html/438fd8ba-cb72-fa6d-f960-75a50467c30c.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ApiController(Of T, TC).ApiController constructor" Url="html/ed7c768c-e85e-6e1b-3779-02b3892de22d.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).Delete method" Url="html/4a1f57cc-79c8-2c08-4d98-db4058273922.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).Dispose method" Url="html/d0d99559-192d-78b9-7f57-497ac23ab350.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).MaterializerFactory method" Url="html/88111ca7-4b46-b950-17c5-777051c25ecb.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).Post method" Url="html/8f2b95e5-015b-69a9-5c7b-34c7ab5780bb.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).Put method" Url="html/8e2a2452-49ad-090c-c928-842366f4c53a.htm" />
+  <HelpKINode Title="ApiController(Of T, TC).QueryableFactory method" Url="html/ade58a6f-ba3f-5310-da5f-039ca1abb647.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt; class">
+    <HelpKINode Title="ApiController(T, TC) Class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+    <HelpKINode Title="about ApiController&lt;T, TC&gt; class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+    <HelpKINode Title="constructor" Url="html/ed7c768c-e85e-6e1b-3779-02b3892de22d.htm" />
+    <HelpKINode Title="methods" Url="html/07da212f-e1b5-fd77-c9c3-6c2329846f20.htm" />
+    <HelpKINode Title="properties" Url="html/438fd8ba-cb72-fa6d-f960-75a50467c30c.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.ApiController constructor" Url="html/ed7c768c-e85e-6e1b-3779-02b3892de22d.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.Delete method" Url="html/4a1f57cc-79c8-2c08-4d98-db4058273922.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.Dispose method" Url="html/d0d99559-192d-78b9-7f57-497ac23ab350.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.MaterializerFactory method" Url="html/88111ca7-4b46-b950-17c5-777051c25ecb.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.Post method" Url="html/8f2b95e5-015b-69a9-5c7b-34c7ab5780bb.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.Put method" Url="html/8e2a2452-49ad-090c-c928-842366f4c53a.htm" />
+  <HelpKINode Title="ApiController&lt;T, TC&gt;.QueryableFactory method" Url="html/ade58a6f-ba3f-5310-da5f-039ca1abb647.htm" />
+  <HelpKINode Title="DbContext property" Url="html/91a91929-9b6b-2772-7635-804659c1f97d.htm" />
+  <HelpKINode Title="Delete method" Url="html/4a1f57cc-79c8-2c08-4d98-db4058273922.htm" />
+  <HelpKINode Title="Dispose method" Url="html/d0d99559-192d-78b9-7f57-497ac23ab350.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer class">
+    <HelpKINode Title="EntityFrameworkMaterializer Class" Url="html/6df37ffc-86f8-41a4-fd5a-a37d259bf0fa.htm" />
+    <HelpKINode Title="about EntityFrameworkMaterializer class" Url="html/6df37ffc-86f8-41a4-fd5a-a37d259bf0fa.htm" />
+    <HelpKINode Title="constructor" Url="html/98526291-7a55-a2c0-08e6-943d77516215.htm" />
+    <HelpKINode Title="methods" Url="html/abfc46dc-150f-d53a-cf6a-58943a14517e.htm" />
+    <HelpKINode Title="properties" Url="html/28b270ad-7692-7774-2d02-8acf0b8996f9.htm" />
+  </HelpKINode>
+  <HelpKINode Title="EntityFrameworkMaterializer.DbContext property" Url="html/91a91929-9b6b-2772-7635-804659c1f97d.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.EntityFrameworkMaterializer constructor" Url="html/98526291-7a55-a2c0-08e6-943d77516215.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetAssociationChanges(Of T1, T2) method" Url="html/6a5ca17e-e2db-755d-5e5b-b3e3be5b4e9b.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetAssociationChanges&lt;T1, T2&gt; method" Url="html/6a5ca17e-e2db-755d-5e5b-b3e3be5b4e9b.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetById method" Url="html/bc692047-23da-f896-c881-4a5f7dede626.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetByIdAsync method" Url="html/ad6a3345-5e74-d28d-9d00-0dc267e7f967.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetDetachedOriginal(Of T) method" Url="html/e18adb08-399a-103d-3070-99866de5dcff.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetDetachedOriginal&lt;T&gt; method" Url="html/e18adb08-399a-103d-3070-99866de5dcff.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetEntitySetName method" Url="html/bc79aaf3-58d1-3557-5470-b6a0c5c58497.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.GetKeyNames method" Url="html/d2f26545-8e12-f85b-ccd7-7d84e27b8cfc.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.IsModel method" Url="html/4d37bf36-e4d6-5c39-0c0d-947ed34acd4f.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.Materialize method" Url="html/3eed7f6b-390a-07c2-2921-be906828ba45.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.MaterializeAsync method" Url="html/43108f08-16a6-8a42-e39f-96bb74e8c1bf.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.MaterializeEntityKey method" Url="html/d4ad7991-3a8c-c2e0-fa99-04961986bf30.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.MaterializeUpdate method" Url="html/fff25c2a-79a5-4ef1-4b74-1e52466db7ea.htm" />
+  <HelpKINode Title="EntityFrameworkMaterializer.MaterializeUpdateAsync method" Url="html/edd56717-2deb-c819-27dd-1dc645330c3c.htm" />
+  <HelpKINode Title="EnumerateQueryableAsyncAttribute class">
+    <HelpKINode Title="EnumerateQueryableAsyncAttribute Class" Url="html/d95520ab-5500-139d-0c81-2d7bfb312544.htm" />
+    <HelpKINode Title="about EnumerateQueryableAsyncAttribute class" Url="html/d95520ab-5500-139d-0c81-2d7bfb312544.htm" />
+    <HelpKINode Title="constructor" Url="html/4c86ddaf-64ff-693a-9e2a-53d2cd076aa0.htm" />
+    <HelpKINode Title="methods" Url="html/2701266e-b6c0-dde2-8d11-7d73e812be45.htm" />
+    <HelpKINode Title="properties" Url="html/5ad1c883-7ac8-b992-5e03-b41b91a00d7d.htm" />
+  </HelpKINode>
+  <HelpKINode Title="EnumerateQueryableAsyncAttribute.EnumerateQueryableAsyncAttribute constructor" Url="html/4c86ddaf-64ff-693a-9e2a-53d2cd076aa0.htm" />
+  <HelpKINode Title="EnumerateQueryableAsyncAttribute.OnActionExecutedAsync method" Url="html/df676c29-93bb-a6c7-ae9c-89fc3d87a791.htm" />
+  <HelpKINode Title="GetAssociationChanges(Of T1, T2) method" Url="html/6a5ca17e-e2db-755d-5e5b-b3e3be5b4e9b.htm" />
+  <HelpKINode Title="GetAssociationChanges&lt;T1, T2&gt; method" Url="html/6a5ca17e-e2db-755d-5e5b-b3e3be5b4e9b.htm" />
+  <HelpKINode Title="GetById method" Url="html/bc692047-23da-f896-c881-4a5f7dede626.htm" />
+  <HelpKINode Title="GetByIdAsync method" Url="html/ad6a3345-5e74-d28d-9d00-0dc267e7f967.htm" />
+  <HelpKINode Title="GetDetachedOriginal(Of T) method" Url="html/e18adb08-399a-103d-3070-99866de5dcff.htm" />
+  <HelpKINode Title="GetDetachedOriginal&lt;T&gt; method" Url="html/e18adb08-399a-103d-3070-99866de5dcff.htm" />
+  <HelpKINode Title="GetEntitySetName method" Url="html/bc79aaf3-58d1-3557-5470-b6a0c5c58497.htm" />
+  <HelpKINode Title="GetKeyNames method" Url="html/d2f26545-8e12-f85b-ccd7-7d84e27b8cfc.htm" />
+  <HelpKINode Title="IsModel method" Url="html/4d37bf36-e4d6-5c39-0c0d-947ed34acd4f.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework namespace" Url="html/15e4280f-8e2f-a3f5-b650-78be00330729.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.ActionFilters namespace" Url="html/db674e66-d6db-87a6-42ed-c1b5283a41d9.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.ActionFilters.EnumerateQueryableAsyncAttribute class" Url="html/d95520ab-5500-139d-0c81-2d7bfb312544.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.EntityFrameworkMaterializer class" Url="html/6df37ffc-86f8-41a4-fd5a-a37d259bf0fa.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.Http namespace" Url="html/07bd4c44-795a-6b89-ff4d-ceceaa12276b.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.Http.ApiController(Of T, TC) class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.Http.ApiController&lt;T, TC&gt; class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm" />
+  <HelpKINode Title="JSONAPI.EntityFramework.PluralizationService class" Url="html/ed000be8-1c5d-2cca-5782-7bf3efb12355.htm" />
+  <HelpKINode Title="Materialize method" Url="html/3eed7f6b-390a-07c2-2921-be906828ba45.htm" />
+  <HelpKINode Title="MaterializeAsync method" Url="html/43108f08-16a6-8a42-e39f-96bb74e8c1bf.htm" />
+  <HelpKINode Title="MaterializeEntityKey method" Url="html/d4ad7991-3a8c-c2e0-fa99-04961986bf30.htm" />
+  <HelpKINode Title="MaterializerFactory method" Url="html/88111ca7-4b46-b950-17c5-777051c25ecb.htm" />
+  <HelpKINode Title="MaterializeUpdate method" Url="html/fff25c2a-79a5-4ef1-4b74-1e52466db7ea.htm" />
+  <HelpKINode Title="MaterializeUpdateAsync method" Url="html/edd56717-2deb-c819-27dd-1dc645330c3c.htm" />
+  <HelpKINode Title="OnActionExecutedAsync method" Url="html/df676c29-93bb-a6c7-ae9c-89fc3d87a791.htm" />
+  <HelpKINode Title="PluralizationService class">
+    <HelpKINode Title="PluralizationService Class" Url="html/ed000be8-1c5d-2cca-5782-7bf3efb12355.htm" />
+    <HelpKINode Title="about PluralizationService class" Url="html/ed000be8-1c5d-2cca-5782-7bf3efb12355.htm" />
+    <HelpKINode Title="constructor" Url="html/5670e8df-1898-855e-5d40-9f57710029df.htm" />
+    <HelpKINode Title="methods" Url="html/41929b61-5dad-106e-73e1-1a4d2cbcb698.htm" />
+  </HelpKINode>
+  <HelpKINode Title="PluralizationService.PluralizationService constructor" Url="html/5670e8df-1898-855e-5d40-9f57710029df.htm" />
+  <HelpKINode Title="PluralizationService.Pluralize method" Url="html/fd1d8e27-c123-5604-cbc4-e02e76638ffa.htm" />
+  <HelpKINode Title="PluralizationService.Singularize method" Url="html/5b27ee15-edc3-a55b-5b8b-67bb244c08ad.htm" />
+  <HelpKINode Title="Pluralize method" Url="html/fd1d8e27-c123-5604-cbc4-e02e76638ffa.htm" />
+  <HelpKINode Title="Post method" Url="html/8f2b95e5-015b-69a9-5c7b-34c7ab5780bb.htm" />
+  <HelpKINode Title="Put method" Url="html/8e2a2452-49ad-090c-c928-842366f4c53a.htm" />
+  <HelpKINode Title="QueryableFactory method" Url="html/ade58a6f-ba3f-5310-da5f-039ca1abb647.htm" />
+  <HelpKINode Title="Singularize method" Url="html/5b27ee15-edc3-a55b-5b8b-67bb244c08ad.htm" />
+</HelpKI>

@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpTOC>
+
+  <HelpTOCNode Id="8553eaa9-fd75-4c13-a7bc-978f2358ae73" Title="Namespaces" Url="html/e07fd430-ab76-0616-db59-1db2ad643280.htm">
+    <HelpTOCNode Id="fc12d67f-7357-49ad-b17b-8ff876262636" Title="JSONAPI.EntityFramework" Url="html/15e4280f-8e2f-a3f5-b650-78be00330729.htm">
+      <HelpTOCNode Id="281c9d2b-2da9-402c-a3db-39c4938b7aca" Title="EntityFrameworkMaterializer Class" Url="html/6df37ffc-86f8-41a4-fd5a-a37d259bf0fa.htm">
+        <HelpTOCNode Title="EntityFrameworkMaterializer Constructor " Url="html/98526291-7a55-a2c0-08e6-943d77516215.htm" />
+        <HelpTOCNode Id="62fdb197-172c-42ac-8eda-f12505bd6783" Title="EntityFrameworkMaterializer Methods" Url="html/abfc46dc-150f-d53a-cf6a-58943a14517e.htm">
+          <HelpTOCNode Title="GetAssociationChanges(T1, T2) Method " Url="html/6a5ca17e-e2db-755d-5e5b-b3e3be5b4e9b.htm" />
+          <HelpTOCNode Id="5323cbf9-3c55-4db3-b175-4fe1f5088d29" Title="GetById Method " Url="html/bc692047-23da-f896-c881-4a5f7dede626.htm">
+            <HelpTOCNode Title="GetById(T) Method (Object[])" Url="html/f4f4023a-231d-23f4-244c-b7dd1d662683.htm" />
+            <HelpTOCNode Title="GetById Method (Type, Object[])" Url="html/d0181d5a-e42c-c8eb-5009-a83afa9bd2c6.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Id="6498e768-94c4-4787-ad0e-001d793085ed" Title="GetByIdAsync Method " Url="html/ad6a3345-5e74-d28d-9d00-0dc267e7f967.htm">
+            <HelpTOCNode Title="GetByIdAsync(T) Method (Object[])" Url="html/2fc97a05-da4f-bade-fec4-6ce75c07e8bc.htm" />
+            <HelpTOCNode Title="GetByIdAsync Method (Type, Object[])" Url="html/d2bb875b-b24d-f596-c91b-5852f732618f.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Title="GetDetachedOriginal(T) Method " Url="html/e18adb08-399a-103d-3070-99866de5dcff.htm" />
+          <HelpTOCNode Title="GetEntitySetName Method " Url="html/bc79aaf3-58d1-3557-5470-b6a0c5c58497.htm" />
+          <HelpTOCNode Title="GetKeyNames Method " Url="html/d2f26545-8e12-f85b-ccd7-7d84e27b8cfc.htm" />
+          <HelpTOCNode Title="IsModel Method " Url="html/4d37bf36-e4d6-5c39-0c0d-947ed34acd4f.htm" />
+          <HelpTOCNode Id="ce61410f-1a3c-4388-9229-af5e11f487ba" Title="Materialize Method " Url="html/3eed7f6b-390a-07c2-2921-be906828ba45.htm">
+            <HelpTOCNode Title="Materialize(T) Method (T)" Url="html/bed5a4f4-9fd5-3c2f-1901-5956cb5b0373.htm" />
+            <HelpTOCNode Title="Materialize Method (Type, Object)" Url="html/1730c17e-c52e-360b-f949-2a4c24b1befb.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Id="f3b157e5-ddac-4a10-b82b-3985692d0301" Title="MaterializeAsync Method " Url="html/43108f08-16a6-8a42-e39f-96bb74e8c1bf.htm">
+            <HelpTOCNode Title="MaterializeAsync(T) Method (T)" Url="html/2ebac89b-16cc-4c8a-68b3-0490722f0e14.htm" />
+            <HelpTOCNode Title="MaterializeAsync Method (Type, Object)" Url="html/b2c4512b-5dac-60fb-0a52-70f8e9179b70.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Title="MaterializeEntityKey Method " Url="html/d4ad7991-3a8c-c2e0-fa99-04961986bf30.htm" />
+          <HelpTOCNode Id="e572a2c7-a89f-4113-b526-adafe6f6664c" Title="MaterializeUpdate Method " Url="html/fff25c2a-79a5-4ef1-4b74-1e52466db7ea.htm">
+            <HelpTOCNode Title="MaterializeUpdate(T) Method (T)" Url="html/89e2da30-a837-8a4e-6444-f0e311a53bc9.htm" />
+            <HelpTOCNode Title="MaterializeUpdate Method (Type, Object)" Url="html/2ff2095e-78a6-5e6c-c3c6-1595fdd48ac5.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Id="47825aec-bafc-4610-a010-23546b17da8d" Title="MaterializeUpdateAsync Method " Url="html/edd56717-2deb-c819-27dd-1dc645330c3c.htm">
+            <HelpTOCNode Title="MaterializeUpdateAsync(T) Method (T)" Url="html/c3f8cb7a-4cdc-5389-5713-9747afdc28f9.htm" />
+            <HelpTOCNode Title="MaterializeUpdateAsync Method (Type, Object)" Url="html/98d60769-47c4-18fb-c63a-7e62f37aae6e.htm" />
+          </HelpTOCNode>
+        </HelpTOCNode>
+        <HelpTOCNode Id="201265b2-dad8-4392-aed5-53a9cc52b1a8" Title="EntityFrameworkMaterializer Properties" Url="html/28b270ad-7692-7774-2d02-8acf0b8996f9.htm">
+          <HelpTOCNode Title="DbContext Property " Url="html/91a91929-9b6b-2772-7635-804659c1f97d.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Id="9f1e0b60-bbfd-4473-86c0-b69e5dd592a8" Title="PluralizationService Class" Url="html/ed000be8-1c5d-2cca-5782-7bf3efb12355.htm">
+        <HelpTOCNode Title="PluralizationService Constructor " Url="html/5670e8df-1898-855e-5d40-9f57710029df.htm" />
+        <HelpTOCNode Id="9c7ff59f-bc01-4ca8-9044-8e4339a338a0" Title="PluralizationService Methods" Url="html/41929b61-5dad-106e-73e1-1a4d2cbcb698.htm">
+          <HelpTOCNode Title="Pluralize Method " Url="html/fd1d8e27-c123-5604-cbc4-e02e76638ffa.htm" />
+          <HelpTOCNode Title="Singularize Method " Url="html/5b27ee15-edc3-a55b-5b8b-67bb244c08ad.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="e83bb23d-a317-4ba7-87fe-0a03f4759f78" Title="JSONAPI.EntityFramework.ActionFilters" Url="html/db674e66-d6db-87a6-42ed-c1b5283a41d9.htm">
+      <HelpTOCNode Id="8b03135d-c071-45f8-9da1-0a8e0172c328" Title="EnumerateQueryableAsyncAttribute Class" Url="html/d95520ab-5500-139d-0c81-2d7bfb312544.htm">
+        <HelpTOCNode Title="EnumerateQueryableAsyncAttribute Constructor " Url="html/4c86ddaf-64ff-693a-9e2a-53d2cd076aa0.htm" />
+        <HelpTOCNode Id="a586a05a-265a-452c-83c5-93adfbcb5d38" Title="EnumerateQueryableAsyncAttribute Methods" Url="html/2701266e-b6c0-dde2-8d11-7d73e812be45.htm">
+          <HelpTOCNode Title="OnActionExecutedAsync Method " Url="html/df676c29-93bb-a6c7-ae9c-89fc3d87a791.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="EnumerateQueryableAsyncAttribute Properties" Url="html/5ad1c883-7ac8-b992-5e03-b41b91a00d7d.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="1a7eeeb8-c020-47ae-a0fb-5b2f302c2768" Title="JSONAPI.EntityFramework.Http" Url="html/07bd4c44-795a-6b89-ff4d-ceceaa12276b.htm">
+      <HelpTOCNode Id="8f9d7f71-7698-4e18-ba73-4a49c23983db" Title="ApiController(T, TC) Class" Url="html/8efec7ac-68f7-ad41-a00d-be1e2e872e66.htm">
+        <HelpTOCNode Title="ApiController(T, TC) Constructor " Url="html/ed7c768c-e85e-6e1b-3779-02b3892de22d.htm" />
+        <HelpTOCNode Id="0a64caae-5f02-41e6-a8a7-6446642a2270" Title="ApiController(T, TC) Methods" Url="html/07da212f-e1b5-fd77-c9c3-6c2329846f20.htm">
+          <HelpTOCNode Title="Delete Method " Url="html/4a1f57cc-79c8-2c08-4d98-db4058273922.htm" />
+          <HelpTOCNode Id="ed8b23fe-0465-4aea-afa3-f1dfe048eca3" Title="Dispose Method " Url="html/d0d99559-192d-78b9-7f57-497ac23ab350.htm">
+            <HelpTOCNode Title="Dispose Method (Boolean)" Url="html/6c23b2a8-b994-4536-6fc3-afade0f91a33.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Id="c57db0fa-591a-4dce-b57b-7a21c825d882" Title="MaterializerFactory Method " Url="html/88111ca7-4b46-b950-17c5-777051c25ecb.htm">
+            <HelpTOCNode Title="MaterializerFactory Method " Url="html/2c0f4db2-85cf-e8cc-19f1-35fb5fdb4786.htm" />
+            <HelpTOCNode Title="MaterializerFactory(TM) Method " Url="html/371aba5b-c59f-5ae2-fe25-c28b6a791d7b.htm" />
+          </HelpTOCNode>
+          <HelpTOCNode Title="Post Method " Url="html/8f2b95e5-015b-69a9-5c7b-34c7ab5780bb.htm" />
+          <HelpTOCNode Title="Put Method " Url="html/8e2a2452-49ad-090c-c928-842366f4c53a.htm" />
+          <HelpTOCNode Title="QueryableFactory Method " Url="html/ade58a6f-ba3f-5310-da5f-039ca1abb647.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="ApiController(T, TC) Properties" Url="html/438fd8ba-cb72-fa6d-f960-75a50467c30c.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+  </HelpTOCNode>
+</HelpTOC>
