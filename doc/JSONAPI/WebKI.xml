@@ -33,7 +33,6 @@
   <HelpKINode Title="ApiController&lt;T&gt;.QueryableFactory method" Url="html/f6ca2456-6521-b129-cb9d-7b6a0cf33b3d.htm" />
   <HelpKINode Title="CanReadType method" Url="html/75495c2d-3018-71e7-7eba-2000f7859682.htm" />
   <HelpKINode Title="CanWriteType method" Url="html/fcf32ac4-3705-d26a-f8d9-bed8410b0739.htm" />
-  <HelpKINode Title="CanWriteTypeAsPrimitive method" Url="html/5715efa3-f8e9-4e26-b2c1-18ca49f8eb30.htm" />
   <HelpKINode Title="Delete method" Url="html/b0c0c78f-68ff-36d9-4fc6-0745cad60e87.htm" />
   <HelpKINode Title="Deserialize method" Url="html/da099a52-7b0e-df7b-3d3e-414520dace9e.htm" />
   <HelpKINode Title="Embedded enumeration member" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
@@ -157,7 +156,6 @@
   </HelpKINode>
   <HelpKINode Title="JsonApiFormatter.CanReadType method" Url="html/75495c2d-3018-71e7-7eba-2000f7859682.htm" />
   <HelpKINode Title="JsonApiFormatter.CanWriteType method" Url="html/fcf32ac4-3705-d26a-f8d9-bed8410b0739.htm" />
-  <HelpKINode Title="JsonApiFormatter.CanWriteTypeAsPrimitive method" Url="html/5715efa3-f8e9-4e26-b2c1-18ca49f8eb30.htm" />
   <HelpKINode Title="JsonApiFormatter.Deserialize method" Url="html/da099a52-7b0e-df7b-3d3e-414520dace9e.htm" />
   <HelpKINode Title="JsonApiFormatter.GetById method" Url="html/463bdd14-011e-7ae6-bffa-73c2490addb8.htm" />
   <HelpKINode Title="JsonApiFormatter.GetIdFor method" Url="html/084fb889-bbb7-7320-b971-8298b4cf3d46.htm" />
@@ -170,6 +168,7 @@
   <HelpKINode Title="JsonApiFormatter.Serialize method" Url="html/f5fa0141-0aa2-7ad3-cb26-c6add3652e90.htm" />
   <HelpKINode Title="JsonApiFormatter.SerializeLinkedResources method" Url="html/265d2615-01d3-cc06-3aa8-1fb48195476f.htm" />
   <HelpKINode Title="JsonApiFormatter.SerializeMany method" Url="html/a48b0da8-0f58-f05f-2740-caff0f6db081.htm" />
+  <HelpKINode Title="JsonApiFormatter.ValidateRawJsonStrings property" Url="html/b36dc2b7-c324-09c7-15ff-4ddc594fe105.htm" />
   <HelpKINode Title="JsonApiFormatter.WriteToStreamAsync method" Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm" />
   <HelpKINode Title="Link enumeration member" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
   <HelpKINode Title="LinkTemplate class">
@@ -193,7 +192,6 @@
   </HelpKINode>
   <HelpKINode Title="MetadataManager.Instance property" Url="html/bc0c226a-d452-a116-4969-e547fefb489d.htm" />
   <HelpKINode Title="MetadataManager.PropertyWasPresent method" Url="html/dd6a8cb3-049b-168e-f551-8a6656ab9cfb.htm" />
-  <HelpKINode Title="MetadataManager.SetPropertyAttributeOverrides method" Url="html/9101a0c5-78ea-6513-089c-2984b9fc2d84.htm" />
   <HelpKINode Title="ModelManager class">
     <HelpKINode Title="ModelManager Class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm" />
     <HelpKINode Title="about ModelManager class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm" />
@@ -277,7 +275,6 @@
     <HelpKINode Title="properties" Url="html/527a3956-c4b0-6ee9-db55-add5900bcf89.htm" />
   </HelpKINode>
   <HelpKINode Title="SerializeStringAsRawJsonAttribute.SerializeStringAsRawJsonAttribute constructor" Url="html/f75776b4-0c6b-7ce8-d3b8-4731ff9c5924.htm" />
-  <HelpKINode Title="SetPropertyAttributeOverrides method" Url="html/9101a0c5-78ea-6513-089c-2984b9fc2d84.htm" />
   <HelpKINode Title="Singularize method">
     <HelpKINode Title="IPluralizationService.Singularize Method " Url="html/a9b35a08-92cc-8f4e-89c1-82d5b29ffd44.htm" />
     <HelpKINode Title="PluralizationService.Singularize Method " Url="html/980a525c-8993-1ed1-eeb3-102ed7eadd80.htm" />
@@ -290,6 +287,7 @@
     <HelpKINode Title="properties" Url="html/f44af44f-60d8-7cf1-6b62-2ed030accefc.htm" />
   </HelpKINode>
   <HelpKINode Title="UseAsIdAttribute.UseAsIdAttribute constructor" Url="html/fe33429c-cd01-05ea-6aea-8742e59f35ab.htm" />
+  <HelpKINode Title="ValidateRawJsonStrings property" Url="html/b36dc2b7-c324-09c7-15ff-4ddc594fe105.htm" />
   <HelpKINode Title="WriteToStreamAsync method" Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm" />
   <HelpKINode Title="_getElementType field" Url="html/f6208afb-5710-186b-91f4-b8ba6dd8872a.htm" />
   <HelpKINode Title="_idProperties field" Url="html/c6f296ca-3889-95d6-9fc4-d58a26053f53.htm" />

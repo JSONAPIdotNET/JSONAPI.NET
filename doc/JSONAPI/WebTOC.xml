@@ -1,74 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <HelpTOC>
 
-  <HelpTOCNode Id="4efd6c5f-59c8-4daf-96df-d9d97282484c" Title="JSONAPI.ActionFilters" Url="html/9d02a056-a9b2-6295-631c-6cfdeed41d34.htm">
-    <HelpTOCNode Id="cc049d72-7840-496a-8f0e-156c962c8685" Title="EnableFilteringAttribute Class" Url="html/6f1a4b8e-3497-206b-c8c0-85b91d356b39.htm">
+  <HelpTOCNode Id="1ef65b9e-486b-4967-afc3-6b533a293c16" Title="JSONAPI.ActionFilters" Url="html/9d02a056-a9b2-6295-631c-6cfdeed41d34.htm">
+    <HelpTOCNode Id="562d87b9-d880-44ea-bc44-a85d5fd3ec8b" Title="EnableFilteringAttribute Class" Url="html/6f1a4b8e-3497-206b-c8c0-85b91d356b39.htm">
       <HelpTOCNode Title="EnableFilteringAttribute Constructor " Url="html/cd1acd9a-2380-446d-d6d5-265fe9de251b.htm" />
-      <HelpTOCNode Id="3bdaf0d4-35fd-4e2b-acf1-a53de24cc39d" Title="EnableFilteringAttribute Methods" Url="html/63449f45-77ad-e74c-5fb5-1697969b2b08.htm">
+      <HelpTOCNode Id="d2c6177b-e301-457b-8557-e7c1c1a83079" Title="EnableFilteringAttribute Methods" Url="html/63449f45-77ad-e74c-5fb5-1697969b2b08.htm">
         <HelpTOCNode Title="OnActionExecuted Method " Url="html/91a9e4d8-7b94-f264-e2b3-4fdac58d0b75.htm" />
       </HelpTOCNode>
       <HelpTOCNode Title="EnableFilteringAttribute Properties" Url="html/23b53542-a34a-8897-f73f-6a39f4ac53b5.htm" />
     </HelpTOCNode>
   </HelpTOCNode>
-  <HelpTOCNode Id="ff6f06fa-d2c0-475e-943d-f1dec0f42733" Title="JSONAPI.Attributes" Url="html/532da1e3-c5f3-84a6-fa34-c460f3a14ced.htm">
-    <HelpTOCNode Id="e90fc0c1-01b6-46a2-a7f1-36b7a089b7fe" Title="IncludeInPayload Class" Url="html/24f2ba54-a31f-c3ed-029d-092025660e27.htm">
+  <HelpTOCNode Id="3711f364-3082-437b-9ab4-9d5af7511263" Title="JSONAPI.Attributes" Url="html/532da1e3-c5f3-84a6-fa34-c460f3a14ced.htm">
+    <HelpTOCNode Id="f67083dc-51f5-46aa-8c6c-90f6c7137546" Title="IncludeInPayload Class" Url="html/24f2ba54-a31f-c3ed-029d-092025660e27.htm">
       <HelpTOCNode Title="IncludeInPayload Constructor " Url="html/ec6324c8-c8ef-81d4-6ba6-cbde97cf3917.htm" />
       <HelpTOCNode Title="IncludeInPayload Methods" Url="html/512362fe-90c7-1849-0c31-7058fd4a8085.htm" />
       <HelpTOCNode Title="IncludeInPayload Properties" Url="html/9be11e26-fee4-c885-61f8-617e636918c0.htm" />
     </HelpTOCNode>
-    <HelpTOCNode Id="34df7638-b18a-4eaf-826a-79190fdadb07" Title="LinkTemplate Class" Url="html/5b628aea-1e0a-3e4a-4960-06a814a3c2b5.htm">
+    <HelpTOCNode Id="82ffdeba-e94c-4335-a752-d17ef4068444" Title="LinkTemplate Class" Url="html/5b628aea-1e0a-3e4a-4960-06a814a3c2b5.htm">
       <HelpTOCNode Title="LinkTemplate Constructor " Url="html/d04d4dd1-092d-6e08-35ec-b734514ae7a3.htm" />
       <HelpTOCNode Title="LinkTemplate Methods" Url="html/48869671-b104-8f54-a46d-0b57fc463841.htm" />
       <HelpTOCNode Title="LinkTemplate Properties" Url="html/60b9b38c-cc5a-74e2-2400-dc8ff7faf6dd.htm" />
     </HelpTOCNode>
-    <HelpTOCNode Id="63239b07-3a77-4051-85e5-b8198a0531df" Title="SerializeAs Class" Url="html/c56b3d73-683d-7971-6972-7f323241bc1b.htm">
+    <HelpTOCNode Id="5608f72f-4196-48ed-9031-acad43776a0b" Title="SerializeAs Class" Url="html/c56b3d73-683d-7971-6972-7f323241bc1b.htm">
       <HelpTOCNode Title="SerializeAs Constructor " Url="html/82535968-8f31-d0fb-33c7-09312053ab7c.htm" />
       <HelpTOCNode Title="SerializeAs Methods" Url="html/d853faf3-7d22-dda3-2dbc-ac51767e2c30.htm" />
       <HelpTOCNode Title="SerializeAs Properties" Url="html/2d247ad5-bcd8-4730-c359-ad3436a33da2.htm" />
     </HelpTOCNode>
     <HelpTOCNode Title="SerializeAsOptions Enumeration" Url="html/69de0509-a1d9-4bd2-2008-b9976c701b83.htm" />
-    <HelpTOCNode Id="6d52878e-f618-4639-adfe-749e63a8d94c" Title="SerializeStringAsRawJsonAttribute Class" Url="html/ddc43c31-c621-647a-81b8-5dd0352ee1ff.htm">
+    <HelpTOCNode Id="25169e52-7ea3-4c3c-a726-64eb1fe641d4" Title="SerializeStringAsRawJsonAttribute Class" Url="html/ddc43c31-c621-647a-81b8-5dd0352ee1ff.htm">
       <HelpTOCNode Title="SerializeStringAsRawJsonAttribute Constructor " Url="html/f75776b4-0c6b-7ce8-d3b8-4731ff9c5924.htm" />
       <HelpTOCNode Title="SerializeStringAsRawJsonAttribute Methods" Url="html/b5dce815-6f84-5e0b-b684-fc820a28ac05.htm" />
       <HelpTOCNode Title="SerializeStringAsRawJsonAttribute Properties" Url="html/527a3956-c4b0-6ee9-db55-add5900bcf89.htm" />
     </HelpTOCNode>
-    <HelpTOCNode Id="51f42973-9097-4a03-8162-82252e0bee5d" Title="UseAsIdAttribute Class" Url="html/be15d687-8926-72c4-0d1f-805e01186530.htm">
+    <HelpTOCNode Id="641ad78b-11bc-4999-afac-0076fd7cef6a" Title="UseAsIdAttribute Class" Url="html/be15d687-8926-72c4-0d1f-805e01186530.htm">
       <HelpTOCNode Title="UseAsIdAttribute Constructor " Url="html/fe33429c-cd01-05ea-6aea-8742e59f35ab.htm" />
       <HelpTOCNode Title="UseAsIdAttribute Methods" Url="html/8ef091f1-4235-0d28-2c4f-b2cb1ac06b15.htm" />
       <HelpTOCNode Title="UseAsIdAttribute Properties" Url="html/f44af44f-60d8-7cf1-6b62-2ed030accefc.htm" />
     </HelpTOCNode>
   </HelpTOCNode>
-  <HelpTOCNode Id="2d9c355d-4397-40a5-a416-a50ddc3a3d68" Title="JSONAPI.Core" Url="html/7e3804f4-e523-c212-f98b-73ea2a4df195.htm">
-    <HelpTOCNode Id="553bf39c-1fce-476f-8a3e-27f7be768c5f" Title="IMaterializer Interface" Url="html/9e918feb-fdaa-f35f-5305-fa5496c1f520.htm">
-      <HelpTOCNode Id="cca862d0-d15d-4654-9430-e15faac1875a" Title="IMaterializer Methods" Url="html/f090c0ff-1511-0df9-8ff6-92bfb6fee1f6.htm">
-        <HelpTOCNode Id="e31d5ce2-1762-4578-a830-b67f29511865" Title="GetById Method " Url="html/2cf0ce32-2201-bdec-8f4c-55f395d5715b.htm">
+  <HelpTOCNode Id="7076ad40-ed97-4adb-8e05-a3479b987160" Title="JSONAPI.Core" Url="html/7e3804f4-e523-c212-f98b-73ea2a4df195.htm">
+    <HelpTOCNode Id="e9f4cd17-b7aa-478d-a85c-1ce8e8b3c57c" Title="IMaterializer Interface" Url="html/9e918feb-fdaa-f35f-5305-fa5496c1f520.htm">
+      <HelpTOCNode Id="94c38f11-f865-4c03-a33b-85811364e1ff" Title="IMaterializer Methods" Url="html/f090c0ff-1511-0df9-8ff6-92bfb6fee1f6.htm">
+        <HelpTOCNode Id="42a11416-39bb-4c81-98b3-ce1e0ce545b3" Title="GetById Method " Url="html/2cf0ce32-2201-bdec-8f4c-55f395d5715b.htm">
           <HelpTOCNode Title="GetById(T) Method (Object[])" Url="html/171a436d-2b5c-7325-ea5c-c304ea6a56e9.htm" />
           <HelpTOCNode Title="GetById Method (Type, Object[])" Url="html/75622a5a-b223-63a6-f29c-79d2bbffa9a5.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="dc449356-cf8a-4fe1-bcfe-a88042e95e40" Title="GetByIdAsync Method " Url="html/7b48d747-f19a-ad47-f04e-3735cdbe3967.htm">
+        <HelpTOCNode Id="72962428-fa66-4341-9dce-f377a0dadcd8" Title="GetByIdAsync Method " Url="html/7b48d747-f19a-ad47-f04e-3735cdbe3967.htm">
           <HelpTOCNode Title="GetByIdAsync(T) Method (Object[])" Url="html/572091ab-8e56-f4b1-58d9-ac1a713f021e.htm" />
           <HelpTOCNode Title="GetByIdAsync Method (Type, Object[])" Url="html/c4c6dd10-8a79-ea9a-78dc-520ec5ff08a3.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="f5b4408e-9362-4f5c-9aca-99cc8b3da3f4" Title="Materialize Method " Url="html/bdb8fd54-2d2f-1f2e-1f3d-79c4ac1bf45f.htm">
+        <HelpTOCNode Id="1a7857f0-5b8a-4449-8504-49fd428351b3" Title="Materialize Method " Url="html/bdb8fd54-2d2f-1f2e-1f3d-79c4ac1bf45f.htm">
           <HelpTOCNode Title="Materialize(T) Method (T)" Url="html/595b44e6-a209-4c5f-30da-051fde23082d.htm" />
           <HelpTOCNode Title="Materialize Method (Type, Object)" Url="html/7145b736-08e6-1003-a938-e7635c330ed2.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="30038cb8-981a-4dfe-8f63-88a08e10163d" Title="MaterializeAsync Method " Url="html/91a54aad-386c-fdfd-9573-4a4e19d98820.htm">
+        <HelpTOCNode Id="302553d3-0897-4f1a-8916-af5bcc843a34" Title="MaterializeAsync Method " Url="html/91a54aad-386c-fdfd-9573-4a4e19d98820.htm">
           <HelpTOCNode Title="MaterializeAsync(T) Method (T)" Url="html/1c7a7947-46f1-904b-9ec7-30be86a7e9dd.htm" />
           <HelpTOCNode Title="MaterializeAsync Method (Type, Object)" Url="html/84f25e0d-d9ee-ac8c-1189-8c974b11d4e5.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="29d51a00-0467-4815-a84f-1d6c751fd685" Title="MaterializeUpdate Method " Url="html/741e17fd-84ab-b59a-e97c-b9173de33dc3.htm">
+        <HelpTOCNode Id="958df05b-7dae-4365-acb4-a736b05e980e" Title="MaterializeUpdate Method " Url="html/741e17fd-84ab-b59a-e97c-b9173de33dc3.htm">
           <HelpTOCNode Title="MaterializeUpdate(T) Method (T)" Url="html/12bd34ce-8f78-cc63-c393-22667e3756ed.htm" />
           <HelpTOCNode Title="MaterializeUpdate Method (Type, Object)" Url="html/bbbef3c1-e5af-4bf0-1760-8a8f161fe669.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="343210dd-3a1a-4f5c-8cc9-8e1221fc50c7" Title="MaterializeUpdateAsync Method " Url="html/34e4c43c-5ef9-8449-1aff-21ba7bd46b2b.htm">
+        <HelpTOCNode Id="c1de8035-d2af-46d5-aa3c-a4b70e318924" Title="MaterializeUpdateAsync Method " Url="html/34e4c43c-5ef9-8449-1aff-21ba7bd46b2b.htm">
           <HelpTOCNode Title="MaterializeUpdateAsync(T) Method (T)" Url="html/381288fd-5330-a608-e503-8ee9842dc054.htm" />
           <HelpTOCNode Title="MaterializeUpdateAsync Method (Type, Object)" Url="html/b0ee4401-cad1-ae5f-e8cd-e01907ab3d91.htm" />
         </HelpTOCNode>
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="b9050774-f258-4944-afa7-bf9f4e2a32a7" Title="IModelManager Interface" Url="html/a3b1b40d-7969-e572-16b3-42051c1f3fdd.htm">
-      <HelpTOCNode Id="0e487fd5-0c05-4c51-b852-fe03a373d96d" Title="IModelManager Methods" Url="html/ab16265b-1806-0a0f-b1b1-6dfa480136ba.htm">
+    <HelpTOCNode Id="2b8231e6-3da6-4e7c-9f01-317388777891" Title="IModelManager Interface" Url="html/a3b1b40d-7969-e572-16b3-42051c1f3fdd.htm">
+      <HelpTOCNode Id="05fc725d-77ac-480d-a468-10c45573ff76" Title="IModelManager Methods" Url="html/ab16265b-1806-0a0f-b1b1-6dfa480136ba.htm">
         <HelpTOCNode Title="GetElementType Method " Url="html/92c49dfe-5db3-617a-1f77-3230a27713f8.htm" />
         <HelpTOCNode Title="GetIdProperty Method " Url="html/9d443a75-c85e-2321-1f8b-dfc9c2030981.htm" />
         <HelpTOCNode Title="GetJsonKeyForProperty Method " Url="html/eb69aa10-57dc-fdfa-71d4-ff2091420252.htm" />
@@ -77,28 +77,27 @@
         <HelpTOCNode Title="GetPropertyForJsonKey Method " Url="html/50b3c228-50cb-8fea-a1b9-3fb3eb95af0e.htm" />
         <HelpTOCNode Title="IsSerializedAsMany Method " Url="html/4259dbb9-a857-afca-ef2b-f318b08e7117.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="f10a5f52-9d33-4270-b4b8-280b0e1b08ad" Title="IModelManager Properties" Url="html/a1988706-c090-be87-05fb-5f48cf5ee232.htm">
+      <HelpTOCNode Id="1b3ddefe-2c6c-4ac7-86e4-384fc4258098" Title="IModelManager Properties" Url="html/a1988706-c090-be87-05fb-5f48cf5ee232.htm">
         <HelpTOCNode Title="PluralizationService Property " Url="html/ed0a91ce-cfe5-5c60-d9ff-592f304b9a5a.htm" />
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="40d25a99-ef13-45af-ac9a-38e0d81fee7c" Title="IPluralizationService Interface" Url="html/82178b5d-3152-0251-991d-09a567293d16.htm">
-      <HelpTOCNode Id="dde79828-822e-46b4-85a8-663339357267" Title="IPluralizationService Methods" Url="html/600da2f5-b11e-9dfa-74ab-dae283059662.htm">
+    <HelpTOCNode Id="43aa6dfa-5ed6-4401-b897-901542254b8c" Title="IPluralizationService Interface" Url="html/82178b5d-3152-0251-991d-09a567293d16.htm">
+      <HelpTOCNode Id="e34c7627-a3c7-4ce3-b84e-a298e32bfe3d" Title="IPluralizationService Methods" Url="html/600da2f5-b11e-9dfa-74ab-dae283059662.htm">
         <HelpTOCNode Title="Pluralize Method " Url="html/0699ec6c-61bc-d6fb-d624-29741e48146c.htm" />
         <HelpTOCNode Title="Singularize Method " Url="html/a9b35a08-92cc-8f4e-89c1-82d5b29ffd44.htm" />
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="d56e09b3-e3a8-489f-9379-c63517eef7b1" Title="MetadataManager Class" Url="html/71b35cb2-23bf-2029-28b2-005150b52e51.htm">
-      <HelpTOCNode Id="4479c264-b25c-43a8-ae02-cb8087500c75" Title="MetadataManager Methods" Url="html/7faa6e7b-f343-85e7-d8f7-fea8141cc0a4.htm">
+    <HelpTOCNode Id="99da46f3-0526-49bc-9715-dd33e9a5de7e" Title="MetadataManager Class" Url="html/71b35cb2-23bf-2029-28b2-005150b52e51.htm">
+      <HelpTOCNode Id="77c4c34d-6569-43be-9ef4-acb0492a2d99" Title="MetadataManager Methods" Url="html/7faa6e7b-f343-85e7-d8f7-fea8141cc0a4.htm">
         <HelpTOCNode Title="PropertyWasPresent Method " Url="html/dd6a8cb3-049b-168e-f551-8a6656ab9cfb.htm" />
-        <HelpTOCNode Title="SetPropertyAttributeOverrides Method " Url="html/9101a0c5-78ea-6513-089c-2984b9fc2d84.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="d80bc307-88bc-48e7-9415-bdd74aa0d1b9" Title="MetadataManager Properties" Url="html/006df392-e92b-b4c5-cf87-e838f84df095.htm">
+      <HelpTOCNode Id="5582b55b-d353-4d31-9bc7-92c141dcc876" Title="MetadataManager Properties" Url="html/006df392-e92b-b4c5-cf87-e838f84df095.htm">
         <HelpTOCNode Title="Instance Property " Url="html/bc0c226a-d452-a116-4969-e547fefb489d.htm" />
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="12c8b0c0-0e8a-47c6-9e97-0fba8fbf1356" Title="ModelManager Class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm">
+    <HelpTOCNode Id="6aa2184e-fbbf-4fe4-9abd-3cf66de159b8" Title="ModelManager Class" Url="html/9b052938-fa7c-a063-65ad-42e8da86a4d1.htm">
       <HelpTOCNode Title="ModelManager Constructor " Url="html/1c418323-53bd-d80d-4e48-bc96b3a7d11d.htm" />
-      <HelpTOCNode Id="6bf11bfb-cfe8-4360-8862-fe084cf66f32" Title="ModelManager Fields" Url="html/4a84711d-0dc8-8687-b55d-5e7d05eeced2.htm">
+      <HelpTOCNode Id="7c194ffb-10e1-4b52-8925-cb4ea7f046dd" Title="ModelManager Fields" Url="html/4a84711d-0dc8-8687-b55d-5e7d05eeced2.htm">
         <HelpTOCNode Title="_getElementType Field" Url="html/f6208afb-5710-186b-91f4-b8ba6dd8872a.htm" />
         <HelpTOCNode Title="_idProperties Field" Url="html/c6f296ca-3889-95d6-9fc4-d58a26053f53.htm" />
         <HelpTOCNode Title="_isSerializedAsMany Field" Url="html/8966cf49-351a-5b5a-5573-c28ec035d807.htm" />
@@ -106,7 +105,7 @@
         <HelpTOCNode Title="_pluralizationService Field" Url="html/f8ebda25-1bce-c8a1-9155-2153435e6cb9.htm" />
         <HelpTOCNode Title="_propertyMaps Field" Url="html/192fd175-e3e0-22f6-48dd-b5408717af88.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="89500b02-8392-4570-b186-6fceb497a3dd" Title="ModelManager Methods" Url="html/87f794c5-644f-59e8-e8b8-f41e795dd213.htm">
+      <HelpTOCNode Id="074a3c68-06d5-43db-be07-072c2a0badad" Title="ModelManager Methods" Url="html/87f794c5-644f-59e8-e8b8-f41e795dd213.htm">
         <HelpTOCNode Title="FormatPropertyName Method " Url="html/f149620e-dfb8-2145-9b74-6bf5733dd6d4.htm" />
         <HelpTOCNode Title="GetElementType Method " Url="html/481254e7-38d1-3fcc-07aa-4becd86508b9.htm" />
         <HelpTOCNode Title="GetIdProperty Method " Url="html/bfe42ae6-e00d-5fbe-7f29-493d403d8d49.htm" />
@@ -117,16 +116,16 @@
         <HelpTOCNode Title="GetPropertyMap Method " Url="html/c705eb13-b4b3-f16d-3688-afbeae2615d9.htm" />
         <HelpTOCNode Title="IsSerializedAsMany Method " Url="html/adbcd18f-929e-f0bf-8d2b-9109d1efe45e.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="33bd1155-5826-413a-81fd-f7d455d77bb0" Title="ModelManager Properties" Url="html/17d52b7f-cf10-6a34-4fae-2400952c6073.htm">
+      <HelpTOCNode Id="421ea49c-0811-4ef7-806c-aee53d352157" Title="ModelManager Properties" Url="html/17d52b7f-cf10-6a34-4fae-2400952c6073.htm">
         <HelpTOCNode Title="PluralizationService Property " Url="html/0adb3d3e-8df4-305f-c307-70a26177fe6c.htm" />
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="d0b4f095-fe71-4976-912c-d5414da3ccb7" Title="PluralizationService Class" Url="html/d4e0a854-6834-d7df-d9e7-6cb0f2a5f726.htm">
-      <HelpTOCNode Id="2c5faea9-1b87-4219-a91a-e27a027463b2" Title="PluralizationService Constructor " Url="html/3aba3e8d-cee2-d75b-d582-930b5677eb51.htm">
+    <HelpTOCNode Id="5befc51b-9719-4886-8bbf-7eb50f945fce" Title="PluralizationService Class" Url="html/d4e0a854-6834-d7df-d9e7-6cb0f2a5f726.htm">
+      <HelpTOCNode Id="bfc137a8-e844-4aed-9d81-4d41422c3117" Title="PluralizationService Constructor " Url="html/3aba3e8d-cee2-d75b-d582-930b5677eb51.htm">
         <HelpTOCNode Title="PluralizationService Constructor " Url="html/22d2db2e-6bd8-4286-d6ff-ad00abe837d4.htm" />
         <HelpTOCNode Title="PluralizationService Constructor (Dictionary(String, String))" Url="html/8e47ac54-789e-bf1c-db3d-9e52a6f55254.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="172a6851-cbd4-4a8a-af7d-a5cffd857d45" Title="PluralizationService Methods" Url="html/4e7bc9cc-e34b-4024-3cbd-237e285f824a.htm">
+      <HelpTOCNode Id="5fdae12f-5a40-40a1-8899-3a8edf77b1e3" Title="PluralizationService Methods" Url="html/4e7bc9cc-e34b-4024-3cbd-237e285f824a.htm">
         <HelpTOCNode Title="AddMapping Method " Url="html/90778479-c952-e764-2fd3-c88a2cefb9a6.htm" />
         <HelpTOCNode Title="Pluralize Method " Url="html/cd733e4c-a44e-e2ff-e7ba-11e827dcdbba.htm" />
         <HelpTOCNode Title="RemoveMapping Method " Url="html/d333652c-79ad-1918-ae75-f9aa91a90f64.htm" />
@@ -134,16 +133,16 @@
       </HelpTOCNode>
     </HelpTOCNode>
   </HelpTOCNode>
-  <HelpTOCNode Id="53831bfa-43c6-426a-8ebc-64030cb106a6" Title="JSONAPI.Http" Url="html/cda1a445-d6a3-b961-b73f-2de4854db8ca.htm">
-    <HelpTOCNode Id="d3bdb8a8-5e66-46e7-bba6-f2842fe30632" Title="ApiController(T) Class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm">
+  <HelpTOCNode Id="f769c5f5-6714-431f-9055-85665b7f31e7" Title="JSONAPI.Http" Url="html/cda1a445-d6a3-b961-b73f-2de4854db8ca.htm">
+    <HelpTOCNode Id="07d8bbf2-4292-429f-8339-d691287fbcb1" Title="ApiController(T) Class" Url="html/7c5ce617-75cf-d9eb-057a-f3577b9d2365.htm">
       <HelpTOCNode Title="ApiController(T) Constructor " Url="html/a7347c6f-1b7f-78c4-60d0-3137bd879a36.htm" />
-      <HelpTOCNode Id="dab8c54b-d49a-4683-9c8f-fc6ab555dd10" Title="ApiController(T) Methods" Url="html/9d5aaf87-472a-b346-f0f0-8e505b2a7367.htm">
+      <HelpTOCNode Id="ea9973f9-b96e-48d5-9fc6-24bfff7fa96e" Title="ApiController(T) Methods" Url="html/9d5aaf87-472a-b346-f0f0-8e505b2a7367.htm">
         <HelpTOCNode Title="Delete Method " Url="html/b0c0c78f-68ff-36d9-4fc6-0745cad60e87.htm" />
-        <HelpTOCNode Id="dee35f91-c83d-4078-8104-d8c89a66469f" Title="Get Method " Url="html/bb8f4ded-0c04-f97c-4e52-73e05a7ed0c6.htm">
+        <HelpTOCNode Id="3ea47f70-3b57-438b-acad-1b80be3e51dc" Title="Get Method " Url="html/bb8f4ded-0c04-f97c-4e52-73e05a7ed0c6.htm">
           <HelpTOCNode Title="Get Method " Url="html/d94263fd-1960-0c40-e973-596a84535a9d.htm" />
           <HelpTOCNode Title="Get Method (String)" Url="html/0117c495-624e-ab76-d3da-a659684706b8.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="695cec19-46bb-4ee9-8168-79b3da5a2788" Title="MaterializerFactory Method " Url="html/ef1ec8ee-ed4c-2925-78bc-a9bc52bc2112.htm">
+        <HelpTOCNode Id="9ab88990-9e57-42ba-88fe-c57a13127a4f" Title="MaterializerFactory Method " Url="html/ef1ec8ee-ed4c-2925-78bc-a9bc52bc2112.htm">
           <HelpTOCNode Title="MaterializerFactory Method " Url="html/5dbcbb8b-f96c-564c-7d24-88aafd666911.htm" />
           <HelpTOCNode Title="MaterializerFactory(TM) Method " Url="html/76135306-4c00-bd99-ff5e-8898d3dc7f92.htm" />
         </HelpTOCNode>
@@ -154,44 +153,44 @@
       <HelpTOCNode Title="ApiController(T) Properties" Url="html/45eac7ea-ea4b-785f-d9f5-4e4da42abeb7.htm" />
     </HelpTOCNode>
   </HelpTOCNode>
-  <HelpTOCNode Id="dc026a69-0485-4d51-931b-e53047f02935" Title="JSONAPI.Json" Url="html/3b648a8d-0b36-23cf-67cb-a28f8b1149e1.htm">
-    <HelpTOCNode Id="eea919b0-d60d-4576-9e31-2dc4b16d7999" Title="JsonApiFormatter Class" Url="html/fdfdcae5-ce4c-ee2d-d813-f9fe1ed52274.htm">
-      <HelpTOCNode Id="6e80388a-e01e-4c5f-ad2b-4b0fcfba5c2a" Title="JsonApiFormatter Constructor " Url="html/597dd756-badc-f6cc-6582-aa901798cf51.htm">
+  <HelpTOCNode Id="8883f32b-a9dd-444f-be19-94db17cc3278" Title="JSONAPI.Json" Url="html/3b648a8d-0b36-23cf-67cb-a28f8b1149e1.htm">
+    <HelpTOCNode Id="a8a67d2c-7407-45b0-8458-50399d54fbb9" Title="JsonApiFormatter Class" Url="html/fdfdcae5-ce4c-ee2d-d813-f9fe1ed52274.htm">
+      <HelpTOCNode Id="970231ea-aa47-49ec-8e02-fe798e4f172a" Title="JsonApiFormatter Constructor " Url="html/597dd756-badc-f6cc-6582-aa901798cf51.htm">
         <HelpTOCNode Title="JsonApiFormatter Constructor (IModelManager)" Url="html/733d93da-7b6d-2a60-a83a-afc6355f0f1d.htm" />
         <HelpTOCNode Title="JsonApiFormatter Constructor (IPluralizationService)" Url="html/79fe33ff-749e-7acf-43eb-c9286a026404.htm" />
       </HelpTOCNode>
-      <HelpTOCNode Id="e6680ffb-ccea-42fd-8cd2-f0507a5b9d6f" Title="JsonApiFormatter Methods" Url="html/b1482f05-1fbc-f2ea-bddb-2348f552f127.htm">
+      <HelpTOCNode Id="cb4cdeda-6e55-4e00-907d-9b35102e1a88" Title="JsonApiFormatter Methods" Url="html/b1482f05-1fbc-f2ea-bddb-2348f552f127.htm">
         <HelpTOCNode Title="CanReadType Method " Url="html/75495c2d-3018-71e7-7eba-2000f7859682.htm" />
         <HelpTOCNode Title="CanWriteType Method " Url="html/fcf32ac4-3705-d26a-f8d9-bed8410b0739.htm" />
-        <HelpTOCNode Title="CanWriteTypeAsPrimitive Method " Url="html/5715efa3-f8e9-4e26-b2c1-18ca49f8eb30.htm" />
         <HelpTOCNode Title="Deserialize Method " Url="html/da099a52-7b0e-df7b-3d3e-414520dace9e.htm" />
         <HelpTOCNode Title="GetById Method " Url="html/463bdd14-011e-7ae6-bffa-73c2490addb8.htm" />
         <HelpTOCNode Title="GetIdFor Method " Url="html/084fb889-bbb7-7320-b971-8298b4cf3d46.htm" />
         <HelpTOCNode Title="GetValueForIdProperty Method " Url="html/348f646c-1cca-5b9f-3b84-d01c0befbcea.htm" />
-        <HelpTOCNode Id="ce509770-d5ef-4fa5-8f23-37aef3620439" Title="ReadFromStreamAsync Method " Url="html/70e349f3-fa2f-5d1c-0675-f596743b759a.htm">
+        <HelpTOCNode Id="60b3cd0b-b188-4cbf-9447-54dc602e9975" Title="ReadFromStreamAsync Method " Url="html/70e349f3-fa2f-5d1c-0675-f596743b759a.htm">
           <HelpTOCNode Title="ReadFromStreamAsync Method (Type, Stream, HttpContent, IFormatterLogger)" Url="html/553e98d8-1d06-12a8-085a-c07554c3d191.htm" />
         </HelpTOCNode>
         <HelpTOCNode Title="Serialize Method " Url="html/f5fa0141-0aa2-7ad3-cb26-c6add3652e90.htm" />
         <HelpTOCNode Title="SerializeLinkedResources Method " Url="html/265d2615-01d3-cc06-3aa8-1fb48195476f.htm" />
         <HelpTOCNode Title="SerializeMany Method " Url="html/a48b0da8-0f58-f05f-2740-caff0f6db081.htm" />
-        <HelpTOCNode Id="c4e95c79-5d6c-4647-9c8e-e4bc05bbe4ec" Title="WriteToStreamAsync Method " Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm">
+        <HelpTOCNode Id="8f98dada-9bb1-473e-88d0-93bf20e6ade2" Title="WriteToStreamAsync Method " Url="html/46c65f00-2af4-8f80-2894-9b9813ed8571.htm">
           <HelpTOCNode Title="WriteToStreamAsync Method (Type, Object, Stream, HttpContent, TransportContext)" Url="html/70ba6dd6-b68f-bdaf-ee81-28a61401a65c.htm" />
         </HelpTOCNode>
       </HelpTOCNode>
-      <HelpTOCNode Id="45d07999-96fd-4779-acb5-dc869330ad87" Title="JsonApiFormatter Properties" Url="html/766bd2d5-937e-2eb3-c4e3-d0b97aa43cd4.htm">
+      <HelpTOCNode Id="24180df9-a45a-486d-bf30-8882e6c64002" Title="JsonApiFormatter Properties" Url="html/766bd2d5-937e-2eb3-c4e3-d0b97aa43cd4.htm">
         <HelpTOCNode Title="ModelManager Property " Url="html/987838dd-2d05-0b16-86d1-51fe5144fda2.htm" />
         <HelpTOCNode Title="PluralizationService Property " Url="html/2b5f07a6-7344-cf95-4686-e679217f0f30.htm" />
         <HelpTOCNode Title="RelationAggregators Property " Url="html/15d7500b-cda6-b080-3092-023e17fcedb3.htm" />
+        <HelpTOCNode Title="ValidateRawJsonStrings Property " Url="html/b36dc2b7-c324-09c7-15ff-4ddc594fe105.htm" />
       </HelpTOCNode>
     </HelpTOCNode>
-    <HelpTOCNode Id="eb46cf80-e739-45a5-a2cb-70fe7f5e750f" Title="RelationAggregator Class" Url="html/0206d060-f8a7-f32f-aa78-15f69d3b2654.htm">
+    <HelpTOCNode Id="4649649f-2fcf-4dd5-91dd-4bc0b84e923a" Title="RelationAggregator Class" Url="html/0206d060-f8a7-f32f-aa78-15f69d3b2654.htm">
       <HelpTOCNode Title="RelationAggregator Constructor " Url="html/b7473a26-bf83-86af-0e1e-5fd362344cf4.htm" />
-      <HelpTOCNode Id="48dd5690-3899-4998-a893-986f11d48ff8" Title="RelationAggregator Methods" Url="html/3444908c-5875-7469-a93d-d3202914b74b.htm">
-        <HelpTOCNode Id="21f2fad7-5d86-42ac-90f0-233e980fddd1" Title="Add Method " Url="html/dfd61606-4376-2a62-5a7d-86cc2380fc5a.htm">
+      <HelpTOCNode Id="0ab20a04-6602-4671-ab70-c1b739dc5023" Title="RelationAggregator Methods" Url="html/3444908c-5875-7469-a93d-d3202914b74b.htm">
+        <HelpTOCNode Id="384608d4-fc79-40f5-9dda-16c4c666a3aa" Title="Add Method " Url="html/dfd61606-4376-2a62-5a7d-86cc2380fc5a.htm">
           <HelpTOCNode Title="Add Method (Type, IEnumerable(Object))" Url="html/42d51e37-3ea4-adc5-5580-b4aa4c035aa7.htm" />
           <HelpTOCNode Title="Add Method (Type, Object)" Url="html/f459c196-c8ff-cd7b-ff01-c57562e7d359.htm" />
         </HelpTOCNode>
-        <HelpTOCNode Id="f1235501-26d1-4bc6-8263-e14a584d8b2e" Title="AddPrimary Method " Url="html/143a91c7-2455-e324-6205-a3c50e6f78ad.htm">
+        <HelpTOCNode Id="b7804c01-0e93-474c-a27c-a8a67ed3c279" Title="AddPrimary Method " Url="html/143a91c7-2455-e324-6205-a3c50e6f78ad.htm">
           <HelpTOCNode Title="AddPrimary Method (Type, IEnumerable(Object))" Url="html/aaf307df-ba0c-1d5b-7c64-72c5e8c92f9b.htm" />
           <HelpTOCNode Title="AddPrimary Method (Type, Object)" Url="html/48eb27fa-915c-0c34-c681-2ee942a9a851.htm" />
         </HelpTOCNode>
