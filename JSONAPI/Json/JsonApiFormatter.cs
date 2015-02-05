@@ -53,6 +53,11 @@ namespace JSONAPI.Json
             return true;
         }
 
+        public bool CanWriteTypeAsPrimitive(Type objectType)
+        {
+            return objectType.CanWriteAsJsonApiAttribute();
+        }
+
         #region Serialization
 
         public override Task WriteToStreamAsync(System.Type type, object value, Stream writeStream, System.Net.Http.HttpContent content, System.Net.TransportContext transportContext)
