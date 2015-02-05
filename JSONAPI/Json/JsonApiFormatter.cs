@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using JSONAPI.Extensions;
 
 namespace JSONAPI.Json
 {
@@ -50,25 +51,6 @@ namespace JSONAPI.Json
         public override bool CanWriteType(Type type)
         {
             return true;
-        }
-
-        public bool CanWriteTypeAsPrimitive(Type objectType)
-        {
-            if (objectType.IsPrimitive
-                || typeof(System.Guid).IsAssignableFrom(objectType)
-                || typeof(System.DateTime).IsAssignableFrom(objectType)
-                || typeof(System.DateTimeOffset).IsAssignableFrom(objectType)
-                || typeof(System.Guid?).IsAssignableFrom(objectType)
-                || typeof(System.DateTime?).IsAssignableFrom(objectType)
-                || typeof(System.DateTimeOffset?).IsAssignableFrom(objectType)
-                || typeof(String).IsAssignableFrom(objectType)
-                || objectType.IsEnum
-                || (objectType.IsGenericType &&
-                    objectType.GetGenericTypeDefinition() == typeof(Nullable<>) &&
-                    objectType.GetGenericArguments()[0].IsEnum)
-                )
-                return true;
-            else return false;
         }
 
         #region Serialization
@@ -164,14 +146,27 @@ namespace JSONAPI.Json
                 //FIXME: The "id" property might not be named "Id"!
                 if (FormatPropertyName(prop.Name) == "id") continue; // We did the Id above, don't do it twice!
 
-                if (this.CanWriteTypeAsPrimitive(prop.PropertyType))
+                if (prop.PropertyType.CanWriteAsJsonApiAttribute())
                 {
                     if (prop.GetCustomAttributes().Any(attr => attr is JsonIgnoreAttribute))
                         continue;
 
                     // numbers, strings, dates...
                     writer.WritePropertyName(FormatPropertyName(prop.Name));
-                    serializer.Serialize(writer, prop.GetValue(value, null));
+
+                    var propertyValue = prop.GetValue(value, null);
+
+                    if (prop.PropertyType == typeof (Decimal) || prop.PropertyType == typeof (Decimal?))
+                    {
+                        if (propertyValue == null)
+                            writer.WriteNull();
+                        else
+                            writer.WriteValue(propertyValue.ToString());
+                    }
+                    else
+                    {
+                        serializer.Serialize(writer, propertyValue);
+                    }
                 }
                 else
                 {
@@ -571,11 +566,42 @@ namespace JSONAPI.Json
                     }
                     else if (propMap.TryGetValue(value, out prop))
                     {
-                        reader.Read(); // burn the PropertyName token
-                        //TODO: Embedded would be dropped here!
-                        if (!CanWriteTypeAsPrimitive(prop.PropertyType)) continue; // These aren't supposed to be here, they're supposed to be in "links"!
+                        if (!prop.PropertyType.CanWriteAsJsonApiAttribute())
+                        {
+                            reader.Read(); // burn the PropertyName token
+                            //TODO: Embedded would be dropped here!
+                            continue; // These aren't supposed to be here, they're supposed to be in "links"!
+                        }
 
-                        prop.SetValue(retval, DeserializePrimitive(prop.PropertyType, reader), null);
+                        object propVal;
+                        Type enumType;
+                        if (prop.PropertyType.IsGenericType &&
+                            prop.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                            (enumType = prop.PropertyType.GetGenericArguments()[0]).IsEnum)
+                        {
+                            // Nullable enums need special handling
+                            reader.Read();
+                            propVal = reader.TokenType == JsonToken.Null
+                                ? null
+                                : Enum.Parse(enumType, reader.Value.ToString());
+                        }
+                        else if (prop.PropertyType == typeof(DateTimeOffset) ||
+                                 prop.PropertyType == typeof(DateTimeOffset?))
+                        {
+                            // For some reason 
+                            reader.ReadAsString();
+                            propVal = reader.TokenType == JsonToken.Null
+                                ? (object) null
+                                : DateTimeOffset.Parse(reader.Value.ToString());
+                        }
+                        else
+                        {
+                            reader.Read();
+                            propVal = DeserializeAttribute(prop.PropertyType, reader);
+                        }
+
+
+                        prop.SetValue(retval, propVal, null);
 
                         // Tell the MetadataManager that we deserialized this property
                         MetadataManager.Instance.SetMetaForProperty(retval, prop, true);
@@ -599,7 +625,7 @@ namespace JSONAPI.Json
             // Suss out all the relationship members, and which ones have what cardinality...
             IEnumerable<PropertyInfo> relations = (
                 from prop in objectType.GetProperties()
-                where !CanWriteTypeAsPrimitive(prop.PropertyType)
+                where !CanWriteTypeAsJsonApiAttribute(prop.PropertyType)
                 && prop.GetCustomAttributes(true).Any(attribute => attribute is System.Runtime.Serialization.DataMemberAttribute)
                 select prop
                 );
@@ -651,8 +677,9 @@ namespace JSONAPI.Json
                 {
                     string value = (string)reader.Value;
                     reader.Read(); // burn the PropertyName token
+
                     PropertyInfo prop;
-                    if (propMap.TryGetValue(value, out prop) && !CanWriteTypeAsPrimitive(prop.PropertyType))
+                    if (propMap.TryGetValue(value, out prop) && !prop.PropertyType.CanWriteAsJsonApiAttribute())
                     {
                         //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
                         if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
@@ -749,10 +776,12 @@ namespace JSONAPI.Json
             }
         }
 
-        private object DeserializePrimitive(Type type, JsonReader reader)
+        private object DeserializeAttribute(Type type, JsonReader reader)
         {
-            //TODO: This may be cheating a little bit...
-            JToken token = JToken.Load(reader);
+            if (reader.TokenType == JsonToken.Null)
+                return null;
+
+            var token = JToken.Load(reader);
             return token.ToObject(type);
         }
 
