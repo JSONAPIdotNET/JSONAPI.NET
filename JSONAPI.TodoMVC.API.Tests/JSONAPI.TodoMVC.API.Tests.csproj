@@ -127,6 +127,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\PostResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\PutRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\PutResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\GetWithFilterResponse.json" />
     <None Include="app.config" />
     <None Include="Data\Todo.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

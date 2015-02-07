@@ -1,0 +1,9 @@
+﻿{
+    "todos": [
+        {
+            "id": "2",
+            "text": "Do the laundry",
+            "isCompleted": true
+        }
+    ]
+}

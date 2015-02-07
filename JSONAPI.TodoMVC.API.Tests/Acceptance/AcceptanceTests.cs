@@ -40,6 +40,30 @@ namespace JSONAPI.TodoMVC.API.Tests.Acceptance
 
         [TestMethod]
         [DeploymentItem(@"Data\Todo.csv", "Data")]
+        public async Task GetWithFilter()
+        {
+            using (var effortConnection = TestHelpers.GetEffortConnection("Data"))
+            {
+                using (var server = TestServer.Create(app =>
+                {
+                    var startup = new Startup(context => new TodoMvcContext(effortConnection, false));
+                    startup.Configuration(app);
+                }))
+                {
+                    var response = await server.CreateRequest("http://localhost/todos?isCompleted=true").GetAsync();
+                    response.StatusCode.Should().Be(HttpStatusCode.OK);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    var expected =
+                        JsonHelpers.MinifyJson(
+                            TestHelpers.ReadEmbeddedFile(@"Acceptance\Fixtures\GetWithFilterResponse.json"));
+                    responseContent.Should().Be(expected);
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\Todo.csv", "Data")]
         public async Task GetById()
         {
             using (var effortConnection = TestHelpers.GetEffortConnection("Data"))
