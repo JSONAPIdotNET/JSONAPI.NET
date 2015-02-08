@@ -25,8 +25,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{021B87
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.TodoMVC.API", "JSONAPI.TodoMVC.API\JSONAPI.TodoMVC.API.csproj", "{ECFA3EC5-47B8-4060-925E-9205146D6562}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.TodoMVC.API.Tests", "JSONAPI.TodoMVC.API.Tests\JSONAPI.TodoMVC.API.Tests.csproj", "{9D166942-1FA7-40B3-9A58-6FD6CBDC9163}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,17 +51,9 @@ Global
 		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9D166942-1FA7-40B3-9A58-6FD6CBDC9163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9D166942-1FA7-40B3-9A58-6FD6CBDC9163}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9D166942-1FA7-40B3-9A58-6FD6CBDC9163}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9D166942-1FA7-40B3-9A58-6FD6CBDC9163}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{ECFA3EC5-47B8-4060-925E-9205146D6562} = {07E05EB8-D67D-449B-AF6B-694574D91874}
-		{9D166942-1FA7-40B3-9A58-6FD6CBDC9163} = {07E05EB8-D67D-449B-AF6B-694574D91874}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = JSONAPI.vsmdi
