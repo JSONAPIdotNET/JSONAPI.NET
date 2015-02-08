@@ -20,7 +20,7 @@
             "id": "3",
             "title": "Polemic in E-flat minor #824",
             "links": {
-                "comments": null,
+                "comments": [ ],
                 "author": "1"
             }
         },
@@ -28,7 +28,7 @@
             "id": "4",
             "title": "This post has no author.",
             "links": {
-                "comments": null,
+                "comments": [ ],
                 "author": null
             }
         }
