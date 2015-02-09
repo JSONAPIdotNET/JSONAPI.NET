@@ -91,11 +91,13 @@
   <ItemGroup>
     <Compile Include="ActionFilters\EnumerateQueryableAsyncAttributeTests.cs" />
     <Compile Include="EntityConverterTests.cs" />
+    <Compile Include="EntityFrameworkMaterializerTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
     <Compile Include="Helpers\WaitsUntilCancellationDbAsyncEnumerator.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerator.cs" />
     <Compile Include="Helpers\TestDbAsyncQueryProvider.cs" />
     <Compile Include="Models\Author.cs" />
+    <Compile Include="Models\Backlink.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\TestEntities.cs" />
     <Compile Include="Models\Post.cs" />

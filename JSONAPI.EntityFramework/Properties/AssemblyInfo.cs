@@ -22,6 +22,8 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("cdabab0c-3332-4b93-8cb6-ad521265a701")]
 
+[assembly: InternalsVisibleTo("JSONAPI.EntityFramework.Tests")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version

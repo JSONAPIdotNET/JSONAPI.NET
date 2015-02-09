@@ -184,25 +184,28 @@ namespace JSONAPI.EntityFramework
                 return type;
         }
 
-        protected virtual IEnumerable<string> GetKeyNames(Type type)
+        protected internal virtual IEnumerable<string> GetKeyNames(Type type)
         {
-            try
-            {
-                // If this fails, type must not be in the context!!!
-                ObjectContext objectContext = ((IObjectContextAdapter)this.context).ObjectContext;
-                IEnumerable<string> retval = (IEnumerable<string>)objectContext.MetadataWorkspace
-                    .GetType(type.Name, type.Namespace, System.Data.Entity.Core.Metadata.Edm.DataSpace.CSpace)
-                    .MetadataProperties
-                    .Where(mp => mp.Name == "KeyMembers")
-                    .First()
-                    .Value;
-                return retval;
+            ObjectContext objectContext = ((IObjectContextAdapter)this.context).ObjectContext;
+            System.Data.Entity.Core.Metadata.Edm.EdmType meta;
+            try {
+                meta = objectContext.MetadataWorkspace
+                    .GetType(type.Name, type.Namespace, System.Data.Entity.Core.Metadata.Edm.DataSpace.CSpace);
             }
-            catch (Exception e)
+            catch (System.ArgumentException e)
             {
-                // Type is not an entity type in the context. Um...now what? Either override this in a subclass, or we'll assume it's "Id"!
-                return new string[] { "Id" };
+                throw new ArgumentException(
+                    String.Format("The Type {0} was not found in the DbContext with Type {1}", type.Name, this.context.GetType().Name),
+                    e
+                    );
             }
+            var members = (IEnumerable<System.Data.Entity.Core.Metadata.Edm.EdmMember>)meta
+                .MetadataProperties
+                .Where(mp => mp.Name == "KeyMembers")
+                .First()
+                .Value;
+            IEnumerable<string> retval = members.Select(m => m.Name);
+            return retval;
         }
 
         /// <summary>
