@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{021B87
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.TodoMVC.API", "JSONAPI.TodoMVC.API\JSONAPI.TodoMVC.API.csproj", "{ECFA3EC5-47B8-4060-925E-9205146D6562}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{00655E05-F1BB-425D-92F3-659EFB581439}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00655E05-F1BB-425D-92F3-659EFB581439}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00655E05-F1BB-425D-92F3-659EFB581439}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECFA3EC5-47B8-4060-925E-9205146D6562}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
