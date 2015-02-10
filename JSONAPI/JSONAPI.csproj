@@ -77,8 +77,10 @@
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Core\ModelManager.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
+    <Compile Include="Http\PascalizedControllerSelector.cs" />
     <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
     <Compile Include="Json\IErrorIdProvider.cs" />
