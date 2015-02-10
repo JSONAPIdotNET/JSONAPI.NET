@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using JSONAPI.Extensions;
 
 namespace JSONAPI.Core
 {
@@ -148,7 +149,7 @@ namespace JSONAPI.Core
                     if (titles.Any()) title = titles.First();
                 }
 
-                key = FormatPropertyName(PluralizationService.Pluralize(title));
+                key = FormatPropertyName(PluralizationService.Pluralize(title)).Dasherize();
 
                 keyCache.Add(type, key);
             }
