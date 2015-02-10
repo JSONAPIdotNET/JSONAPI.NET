@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CommentsController.cs" />
+    <Compile Include="Controllers\UserGroupsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="Controllers\PostsController.cs" />
@@ -124,6 +125,7 @@
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\TestDbContext.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
