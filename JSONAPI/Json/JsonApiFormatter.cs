@@ -277,17 +277,18 @@ namespace JSONAPI.Json
 
                 writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
 
-                // Look out! If we want to SerializeAs a link, computing the property is probably 
-                // expensive...so don't force it just to check for null early!
-                if (sa != SerializeAsOptions.Link && prop.GetValue(value, null) == null)
-                {
-                    writer.WriteNull();
-                    continue;
-                }
-
                 // Now look for enumerable-ness:
                 if (typeof(IEnumerable<Object>).IsAssignableFrom(prop.PropertyType))
                 {
+                    // Look out! If we want to SerializeAs a link, computing the property is probably 
+                    // expensive...so don't force it just to check for null early!
+                    if (sa != SerializeAsOptions.Link && prop.GetValue(value, null) == null)
+                    {
+                        writer.WriteStartArray();
+                        writer.WriteEndArray();
+                        continue;
+                    }
+
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
@@ -336,43 +337,45 @@ namespace JSONAPI.Json
                 else
                 {
                     var propertyValue = prop.GetValue(value, null);
-                    if (propertyValue == null)
+
+                    // Look out! If we want to SerializeAs a link, computing the property is probably 
+                    // expensive...so don't force it just to check for null early!
+                    if (sa != SerializeAsOptions.Link && propertyValue == null)
                     {
                         writer.WriteNull();
+                        continue;
                     }
-                    else
-                    {
-                        string objId = GetIdFor(propertyValue);
 
-                        switch (sa)
-                        {
-                            case SerializeAsOptions.Ids:
-                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                                serializer.Serialize(writer, objId);
-                                if (iip)
-                                    if (aggregator != null)
-                                        aggregator.Add(prop.PropertyType, prop.GetValue(value, null));
-                                break;
-                            case SerializeAsOptions.Link:
-                                if (lt == null)
-                                    throw new JsonSerializationException(
-                                        "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                                string link = String.Format(lt, objId,  
-                                    GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
+                    string objId = GetIdFor(propertyValue);
+
+                    switch (sa)
+                    {
+                        case SerializeAsOptions.Ids:
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
+                            serializer.Serialize(writer, objId);
+                            if (iip)
+                                if (aggregator != null)
+                                    aggregator.Add(prop.PropertyType, propertyValue);
+                            break;
+                        case SerializeAsOptions.Link:
+                            if (lt == null)
+                                throw new JsonSerializationException(
+                                    "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
+                            string link = String.Format(lt, objId,  
+                                GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
                                     
-                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                                writer.WriteStartObject();
-                                writer.WritePropertyName("href");
-                                writer.WriteValue(link);
-                                writer.WriteEndObject();
-                                break;
-                            case SerializeAsOptions.Embedded:
-                                // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                                //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                                //serializer.Serialize(writer, prop.GetValue(value, null));
-                                this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
-                                break;
-                        }
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
+                            writer.WriteStartObject();
+                            writer.WritePropertyName("href");
+                            writer.WriteValue(link);
+                            writer.WriteEndObject();
+                            break;
+                        case SerializeAsOptions.Embedded:
+                            // Not really supported by Ember Data yet, incidentally...but easy to implement here.
+                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
+                            //serializer.Serialize(writer, prop.GetValue(value, null));
+                            this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
+                            break;
                     }
                 }
 
