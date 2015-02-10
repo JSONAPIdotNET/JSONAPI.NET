@@ -1,7 +1,9 @@
 ﻿using System.Web.Http;
+using System.Web.Http.Dispatcher;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.ActionFilters;
+using JSONAPI.Http;
 using JSONAPI.Json;
 using Owin;
 
@@ -30,6 +32,9 @@ namespace JSONAPI.TodoMVC.API
             // Global filters
             config.Filters.Add(new EnumerateQueryableAsyncAttribute());
             config.Filters.Add(new EnableFilteringAttribute(modelManager));
+
+            // Override controller selector
+            config.Services.Replace(typeof(IHttpControllerSelector), new PascalizedControllerSelector(config));
 
             // Web API routes
             config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
