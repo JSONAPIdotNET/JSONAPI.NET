@@ -38,7 +38,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Effort">
+    <Reference Include="Effort, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Effort.EF6.1.1.4\lib\net45\Effort.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -75,7 +76,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NMemory">
+    <Reference Include="NMemory, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6a46696d54971e6d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NMemory.1.0.1\lib\net45\NMemory.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
@@ -111,6 +113,7 @@
     <Compile Include="Acceptance\UserGroupsTests.cs" />
     <Compile Include="Acceptance\PostsTests.cs" />
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
+    <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\EnumerateQueryableAsyncAttributeTests.cs" />
     <Compile Include="EntityConverterTests.cs" />
     <Compile Include="EntityFrameworkMaterializerTests.cs" />
@@ -128,9 +131,14 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Acceptance\Fixtures\UserGroups_GetResponse.json" />
-    <None Include="Acceptance\Data\UserGroup.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedAscendingResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedDescendingResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedByMultipleAscendingResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedByMultipleDescendingResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedByMixedDirectionResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedByUnknownColumnResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedBySameColumnTwiceResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Users_GetSortedByColumnMissingDirectionResponse.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
@@ -154,6 +162,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Acceptance\Data\Post.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Acceptance\Data\UserGroup.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Data\Comment.json">

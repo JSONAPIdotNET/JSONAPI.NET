@@ -79,6 +79,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionFilters\EnableSortingAttributeTests.cs" />
     <Compile Include="ActionFilters\EnableFilteringAttributeTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
     <Compile Include="Core\ModelManagerTests.cs" />

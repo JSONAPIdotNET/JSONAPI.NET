@@ -31,6 +31,7 @@ namespace JSONAPI.TodoMVC.API
 
             // Global filters
             config.Filters.Add(new EnumerateQueryableAsyncAttribute());
+            config.Filters.Add(new EnableSortingAttribute(modelManager));
             config.Filters.Add(new EnableFilteringAttribute(modelManager));
 
             // Override controller selector
