@@ -108,6 +108,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceptance\UserGroupsTests.cs" />
     <Compile Include="Acceptance\PostsTests.cs" />
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
     <Compile Include="ActionFilters\EnumerateQueryableAsyncAttributeTests.cs" />
@@ -126,6 +127,10 @@
     <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Acceptance\Fixtures\UserGroups_GetResponse.json" />
+    <None Include="Acceptance\Data\UserGroup.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
