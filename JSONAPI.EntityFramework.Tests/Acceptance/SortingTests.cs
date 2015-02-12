@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using FluentAssertions;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+﻿using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.EntityFramework.Tests.Acceptance
 {
     [TestClass]
-    public class PostsTests : AcceptanceTestsBase
+    public class SortingTests : AcceptanceTestsBase
     {
         [TestMethod]
         [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
@@ -16,11 +12,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Get()
+        public async Task GetSortedAscending()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "posts", @"Acceptance\Fixtures\Posts_GetResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedAscendingResponse.json");
             }
         }
 
@@ -30,11 +26,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task GetWithFilter()
+        public async Task GetSortedDesending()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetWithFilter(effortConnection, "posts?title=Post 4", @"Acceptance\Fixtures\Posts_GetWithFilterResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=-firstName", @"Acceptance\Fixtures\Users_GetSortedDescendingResponse.json");
             }
         }
 
@@ -44,11 +40,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task GetById()
+        public async Task GetSortedByMultipleAscending()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetById(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts_GetByIdResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedByMultipleAscendingResponse.json");
             }
         }
 
@@ -58,23 +54,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Post()
+        public async Task GetSortedByMultipleDescending()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts_PostRequest.json", @"Acceptance\Fixtures\Posts_PostResponse.json");
-
-                using (var dbContext = new TestDbContext(effortConnection, false))
-                {
-                    var allPosts = dbContext.Posts.ToArray();
-                    allPosts.Length.Should().Be(5);
-                    var actualPost = allPosts.First(t => t.Id == "205");
-                    actualPost.Id.Should().Be("205");
-                    actualPost.Title.Should().Be("Added post");
-                    actualPost.Content.Should().Be("Added post content");
-                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 03, 11, 04, 31, 0, new TimeSpan(0)));
-                    actualPost.AuthorId.Should().Be("401");
-                }
+                await ExpectGetToSucceed(effortConnection, "users?sort=-lastName,-firstName", @"Acceptance\Fixtures\Users_GetSortedByMultipleDescendingResponse.json");
             }
         }
 
@@ -84,23 +68,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Put()
+        public async Task GetSortedByMixedDirection()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts_PutRequest.json", @"Acceptance\Fixtures\Posts_PutResponse.json");
-
-                using (var dbContext = new TestDbContext(effortConnection, false))
-                {
-                    var allPosts = dbContext.Posts.ToArray();
-                    allPosts.Length.Should().Be(4);
-                    var actualPost = allPosts.First(t => t.Id == "202");
-                    actualPost.Id.Should().Be("202");
-                    actualPost.Title.Should().Be("New post title");
-                    actualPost.Content.Should().Be("Post 2 content");
-                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
-                    actualPost.AuthorId.Should().Be("401");
-                }
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,-firstName", @"Acceptance\Fixtures\Users_GetSortedByMixedDirectionResponse.json");
             }
         }
 
@@ -110,19 +82,39 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Delete()
+        public async Task GetSortedByUnknownColumn()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestDelete(effortConnection, "posts/203");
+                await ExpectGetToFail(effortConnection, "users?sort=%2Bfoobar", @"Acceptance\Fixtures\Users_GetSortedByUnknownColumnResponse.json");
+            }
+        }
 
-                using (var dbContext = new TestDbContext(effortConnection, false))
-                {
-                    var allTodos = dbContext.Posts.ToArray();
-                    allTodos.Length.Should().Be(3);
-                    var actualTodo = allTodos.FirstOrDefault(t => t.Id == "203");
-                    actualTodo.Should().BeNull();
-                }
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task GetSortedBySameColumnTwice()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                await ExpectGetToFail(effortConnection, "users?sort=%2BfirstName,%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedBySameColumnTwiceResponse.json");
+            }
+        }
+        
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task GetSortedByColumnMissingDirection()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                await ExpectGetToFail(effortConnection, "users?sort=firstName", @"Acceptance\Fixtures\Users_GetSortedByColumnMissingDirectionResponse.json");
             }
         }
     }

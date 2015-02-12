@@ -73,6 +73,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             // Global filters
             config.Filters.Add(new EnumerateQueryableAsyncAttribute());
+            config.Filters.Add(new EnableSortingAttribute(modelManager));
             config.Filters.Add(new EnableFilteringAttribute(modelManager));
 
             // Override controller selector
