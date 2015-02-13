@@ -12,6 +12,7 @@ using JSONAPI.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using Moq;
 
 namespace JSONAPI.Tests.Json
 {
@@ -315,20 +316,29 @@ namespace JSONAPI.Tests.Json
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
-            // Act
-            var payload = new HttpError(new Exception("This is the exception message!"), true)
+            var mockInnerException = new Mock<Exception>(MockBehavior.Strict);
+            mockInnerException.Setup(m => m.Message).Returns("Inner exception message");
+            mockInnerException.Setup(m => m.StackTrace).Returns("Inner stack trace");
+
+            var outerException = new Exception("Outer exception message", mockInnerException.Object);
+
+            var payload = new HttpError(outerException, true)
             {
-                StackTrace = "Stack trace would go here"
+                StackTrace = "Outer stack trace"
             };
+
+            // Act
             formatter.WriteToStreamAsync(typeof(HttpError), payload, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
             var expectedJson = File.ReadAllText("ErrorSerializerTest.json");
             var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
             var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
-            output = Regex.Replace(output,
-                @"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}",
-                "TEST-ERROR-ID"); // We don't know what the GUID will be, so replace it
+
+            // We don't know what the GUIDs will be, so replace them
+            var regex = new Regex(@"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}");
+            output = regex.Replace(output, "OUTER-ID", 1); 
+            output = regex.Replace(output, "INNER-ID", 1);
             output.Should().Be(minifiedExpectedJson);
         }
 

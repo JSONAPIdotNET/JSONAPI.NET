@@ -4,6 +4,7 @@ using System.Web.Http;
 using FluentAssertions;
 using JSONAPI.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using Newtonsoft.Json;
 
 namespace JSONAPI.Tests.Json
@@ -11,14 +12,6 @@ namespace JSONAPI.Tests.Json
     [TestClass]
     public class ErrorSerializerTests
     {
-        private class TestErrorIdProvider : IErrorIdProvider
-        {
-            public string GenerateId(HttpError error)
-            {
-                return "TEST-ERROR-ID";
-            }
-        }
-
         [TestMethod]
         public void CanSerialize_returns_true_for_HttpError()
         {
@@ -43,13 +36,23 @@ namespace JSONAPI.Tests.Json
             {
                 var textWriter = new StreamWriter(stream);
                 var writer = new JsonTextWriter(textWriter);
-                var error = new HttpError(new Exception("This is the exception message!"), true)
+
+                var mockInnerException = new Mock<Exception>(MockBehavior.Strict);
+                mockInnerException.Setup(m => m.Message).Returns("Inner exception message");
+                mockInnerException.Setup(m => m.StackTrace).Returns("Inner stack trace");
+
+                var outerException = new Exception("Outer exception message", mockInnerException.Object);
+
+                var error = new HttpError(outerException, true)
                 {
-                    StackTrace = "Stack trace would go here"
+                    StackTrace = "Outer stack trace"
                 };
                 var jsonSerializer = new JsonSerializer();
 
-                var serializer = new ErrorSerializer(new TestErrorIdProvider());
+                var mockIdProvider = new Mock<IErrorIdProvider>(MockBehavior.Strict);
+                mockIdProvider.SetupSequence(p => p.GenerateId(It.IsAny<HttpError>())).Returns("OUTER-ID").Returns("INNER-ID");
+
+                var serializer = new ErrorSerializer(mockIdProvider.Object);
                 serializer.SerializeError(error, stream, writer, jsonSerializer);
 
                 writer.Flush();

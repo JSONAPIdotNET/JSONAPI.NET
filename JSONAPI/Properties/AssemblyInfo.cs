@@ -25,6 +25,10 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("JSONAPI.Tests")]
 [assembly: InternalsVisibleTo("JSONAPI.EntityFramework.Tests")]
 
+// This assembly is the default dynamic assembly generated Castle DynamicProxy, 
+// used by Moq. Paste in a single line.   
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
