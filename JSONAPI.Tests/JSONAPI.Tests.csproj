@@ -84,6 +84,7 @@
     <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -96,6 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\ByteIdSerializationTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\ReformatsRawJsonStringWithUnquotedKeys.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

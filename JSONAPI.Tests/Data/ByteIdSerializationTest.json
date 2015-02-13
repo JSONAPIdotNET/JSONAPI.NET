@@ -1,0 +1,14 @@
+{
+    "tags": [
+        {
+            "id": "1",
+            "text":  "Ember"
+        }, {
+            "id": "2",
+            "text":  "React"
+        }, {
+            "id": "3",
+            "text":  "Angular"
+        }
+    ]
+}

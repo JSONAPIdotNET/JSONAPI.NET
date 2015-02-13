@@ -21,6 +21,7 @@ namespace JSONAPI.Tests.Json
         Author a;
         Post p, p2, p3, p4;
         Sample s1, s2;
+        Tag t1, t2, t3;
 
         private class MockErrorSerializer : IErrorSerializer
         {
@@ -52,6 +53,19 @@ namespace JSONAPI.Tests.Json
             {
                 Id = 1,
                 Name = "Jason Hater",
+            };
+
+            t1 = new Tag {
+                Id = 1,
+                Text = "Ember"
+            };
+            t2 = new Tag {
+                Id = 2,
+                Text = "React"
+            };
+            t3 = new Tag {
+                Id = 3,
+                Text = "Angular"
             };
 
             p = new Post()
@@ -234,8 +248,7 @@ namespace JSONAPI.Tests.Json
 
         [TestMethod]
         [DeploymentItem(@"Data\AttributeSerializationTest.json")]
-        public void Serializes_attributes_properly()
-        {
+        public void Serializes_attributes_properly() {
             // Arrang
             JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
             MemoryStream stream = new MemoryStream();
@@ -247,6 +260,23 @@ namespace JSONAPI.Tests.Json
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
             Trace.WriteLine(output);
             var expected = JsonHelpers.MinifyJson(File.ReadAllText("AttributeSerializationTest.json"));
+            Assert.AreEqual(expected, output.Trim());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\ByteIdSerializationTest.json")]
+        public void Serializes_byte_ids_properly() {
+            // Arrang
+            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(Tag), new[] { t1, t2, t3 }, stream, null, null);
+
+            // Assert
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            var expected = JsonHelpers.MinifyJson(File.ReadAllText("ByteIdSerializationTest.json"));
             Assert.AreEqual(expected, output.Trim());
         }
 
