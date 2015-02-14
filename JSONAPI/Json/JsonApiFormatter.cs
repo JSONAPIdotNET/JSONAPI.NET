@@ -890,6 +890,8 @@ namespace JSONAPI.Json
                     return idprop.GetValue(obj).ToString();
                 if (idprop.PropertyType == typeof(int))
                     return ((int)idprop.GetValue(obj, null)).ToString();
+                if (idprop.PropertyType == typeof(byte))
+                    return ((byte)idprop.GetValue(obj, null)).ToString();
             }
             return "NOIDCOMPUTABLE!";
         }
