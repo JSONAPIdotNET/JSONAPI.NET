@@ -10,32 +10,33 @@ namespace JSONAPI.Json
         private class JsonApiError
         {
             [JsonProperty(PropertyName = "id")]
-            public string Id { get; set; }
+            public string Id { get; private set; }
 
             [JsonProperty(PropertyName = "status")]
-            public string Status { get; set; }
+            public string Status { get; private set; }
 
             [JsonProperty(PropertyName = "title")]
-            public string Title { get; set; }
+            public string Title { get; private set; }
 
             [JsonProperty(PropertyName = "detail")]
-            public string Detail { get; set; }
-
-            [JsonProperty(PropertyName = "inner")]
-            public JsonApiError Inner { get; set; }
+            public string Detail { get; private set; }
 
             [JsonProperty(PropertyName = "stackTrace")]
-            public string StackTrace { get; set; }
+            public string StackTrace { get; private set; }
 
-            public JsonApiError(HttpError error)
+            [JsonProperty(PropertyName = "inner")]
+            public JsonApiError Inner { get; private set; }
+
+            public JsonApiError(HttpError error, IErrorIdProvider idProvider)
             {
+                Id = idProvider.GenerateId(error);
                 Title = error.ExceptionType ?? error.Message;
                 Status = "500";
                 Detail = error.ExceptionMessage ?? error.MessageDetail;
                 StackTrace = error.StackTrace;
 
                 if (error.InnerException != null)
-                    Inner = new JsonApiError(error.InnerException);
+                    Inner = new JsonApiError(error.InnerException, idProvider);
             }
         }
 
@@ -65,10 +66,7 @@ namespace JSONAPI.Json
             writer.WriteStartObject();
             writer.WritePropertyName("errors");
 
-            var jsonApiError = new JsonApiError(httpError)
-            {
-                Id = _errorIdProvider.GenerateId(httpError)
-            };
+            var jsonApiError = new JsonApiError(httpError, _errorIdProvider);
             serializer.Serialize(writer, new[] { jsonApiError });
 
             writer.WriteEndObject();
