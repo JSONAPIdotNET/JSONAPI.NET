@@ -55,15 +55,18 @@ namespace JSONAPI.Tests.Json
                 Name = "Jason Hater",
             };
 
-            t1 = new Tag {
+            t1 = new Tag 
+            {
                 Id = 1,
                 Text = "Ember"
             };
-            t2 = new Tag {
+            t2 = new Tag 
+            {
                 Id = 2,
                 Text = "React"
             };
-            t3 = new Tag {
+            t3 = new Tag 
+            {
                 Id = 3,
                 Text = "Angular"
             };
@@ -248,7 +251,8 @@ namespace JSONAPI.Tests.Json
 
         [TestMethod]
         [DeploymentItem(@"Data\AttributeSerializationTest.json")]
-        public void Serializes_attributes_properly() {
+        public void Serializes_attributes_properly() 
+        {
             // Arrang
             JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
             MemoryStream stream = new MemoryStream();
@@ -265,7 +269,8 @@ namespace JSONAPI.Tests.Json
 
         [TestMethod]
         [DeploymentItem(@"Data\ByteIdSerializationTest.json")]
-        public void Serializes_byte_ids_properly() {
+        public void Serializes_byte_ids_properly() 
+        {
             // Arrang
             JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
             MemoryStream stream = new MemoryStream();
