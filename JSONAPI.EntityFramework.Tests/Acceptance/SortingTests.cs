@@ -16,7 +16,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "users?sort=%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedAscendingResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BfirstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedAscendingResponse.json");
             }
         }
 
@@ -30,7 +30,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "users?sort=-firstName", @"Acceptance\Fixtures\Users_GetSortedDescendingResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=-firstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedDescendingResponse.json");
             }
         }
 
@@ -44,7 +44,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedByMultipleAscendingResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,%2BfirstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleAscendingResponse.json");
             }
         }
 
@@ -58,7 +58,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "users?sort=-lastName,-firstName", @"Acceptance\Fixtures\Users_GetSortedByMultipleDescendingResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=-lastName,-firstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleDescendingResponse.json");
             }
         }
 
@@ -72,7 +72,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,-firstName", @"Acceptance\Fixtures\Users_GetSortedByMixedDirectionResponse.json");
+                await ExpectGetToSucceed(effortConnection, "users?sort=%2BlastName,-firstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMixedDirectionResponse.json");
             }
         }
 
@@ -86,7 +86,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToFail(effortConnection, "users?sort=%2Bfoobar", @"Acceptance\Fixtures\Users_GetSortedByUnknownColumnResponse.json");
+                await ExpectGetToFail(effortConnection, "users?sort=%2Bfoobar", @"Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json");
             }
         }
 
@@ -100,7 +100,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToFail(effortConnection, "users?sort=%2BfirstName,%2BfirstName", @"Acceptance\Fixtures\Users_GetSortedBySameColumnTwiceResponse.json");
+                await ExpectGetToFail(effortConnection, "users?sort=%2BfirstName,%2BfirstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json");
             }
         }
         
@@ -114,7 +114,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToFail(effortConnection, "users?sort=firstName", @"Acceptance\Fixtures\Users_GetSortedByColumnMissingDirectionResponse.json");
+                await ExpectGetToFail(effortConnection, "users?sort=firstName", @"Acceptance\Fixtures\Sorting\Responses\GetSortedByColumnMissingDirectionResponse.json");
             }
         }
     }

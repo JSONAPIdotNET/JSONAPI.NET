@@ -16,11 +16,11 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Get()
+        public async Task GetAll()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "posts", @"Acceptance\Fixtures\Posts_GetResponse.json");
+                await ExpectGetToSucceed(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Responses\GetAllResponse.json");
             }
         }
 
@@ -34,7 +34,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetWithFilter(effortConnection, "posts?title=Post 4", @"Acceptance\Fixtures\Posts_GetWithFilterResponse.json");
+                await TestGetWithFilter(effortConnection, "posts?title=Post 4", @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json");
             }
         }
 
@@ -48,7 +48,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetById(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts_GetByIdResponse.json");
+                await TestGetById(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Responses\GetByIdResponse.json");
             }
         }
 
@@ -62,7 +62,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts_PostRequest.json", @"Acceptance\Fixtures\Posts_PostResponse.json");
+                await TestPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Requests\PostRequest.json", @"Acceptance\Fixtures\Posts\Responses\PostResponse.json");
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -88,7 +88,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts_PutRequest.json", @"Acceptance\Fixtures\Posts_PutResponse.json");
+                await TestPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutRequest.json", @"Acceptance\Fixtures\Posts\Responses\PutResponse.json");
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
