@@ -107,6 +107,12 @@
     <None Include="Data\ByteIdSerializationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\DeserializeAttributeRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\DeserializeCollectionRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\ReformatsRawJsonStringWithUnquotedKeys.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

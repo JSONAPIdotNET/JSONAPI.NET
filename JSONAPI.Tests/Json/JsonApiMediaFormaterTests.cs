@@ -378,40 +378,45 @@ namespace JSONAPI.Tests.Json
         }
 
         [TestMethod]
-        public void DeserializeCollectionIntegrationTest()
+        [DeploymentItem(@"Data\DeserializeCollectionRequest.json")]
+        public void Deserializes_collections_properly()
         {
-            // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
-            MemoryStream stream = new MemoryStream();
+            using (var inputStream = File.OpenRead("DeserializeCollectionRequest.json"))
+            {
+                // Arrange
+                JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
 
-            formatter.WriteToStreamAsync(typeof(Post), new List<Post> {p, p2}, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
-            stream.Seek(0, SeekOrigin.Begin);
+                // Act
+                var posts = (IList<Post>)formatter.ReadFromStreamAsync(typeof(Post), inputStream, null, null).Result;
 
-            // Act
-            IList<Post> posts;
-            posts = (IList<Post>)formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
-
-            // Assert
-            Assert.AreEqual(2, posts.Count);
-            Assert.AreEqual(p.Id, posts[0].Id); // Order matters, right?
+                // Assert
+                posts.Count.Should().Be(2);
+                posts[0].Id.Should().Be(p.Id);
+                posts[0].Title.Should().Be(p.Title);
+                posts[0].Author.Id.Should().Be(a.Id);
+                posts[1].Id.Should().Be(p2.Id);
+                posts[1].Title.Should().Be(p2.Title);
+                posts[1].Author.Id.Should().Be(a.Id);
+            }
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\DeserializeAttributeRequest.json")]
         public async Task Deserializes_attributes_properly()
         {
-            // Arrange
-            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
-            MemoryStream stream = new MemoryStream();
+            using (var inputStream = File.OpenRead("DeserializeAttributeRequest.json"))
+            {
+                // Arrange
+                JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
 
-            await formatter.WriteToStreamAsync(typeof(Sample), new List<Sample> { s1, s2 }, stream, null, null);
-            stream.Seek(0, SeekOrigin.Begin);
+                // Act
+                var deserialized = (IList<Sample>)await formatter.ReadFromStreamAsync(typeof(Sample), inputStream, null, null);
 
-            var deserialized = (IList<Sample>)await formatter.ReadFromStreamAsync(typeof(Sample), stream, null, null);
-
-            // Assert
-            deserialized.Count.Should().Be(2);
-            deserialized[0].ShouldBeEquivalentTo(s1);
-            deserialized[1].ShouldBeEquivalentTo(s2);
+                // Assert
+                deserialized.Count.Should().Be(2);
+                deserialized[0].ShouldBeEquivalentTo(s1);
+                deserialized[1].ShouldBeEquivalentTo(s2);
+            }
         }
 
         [TestMethod]
