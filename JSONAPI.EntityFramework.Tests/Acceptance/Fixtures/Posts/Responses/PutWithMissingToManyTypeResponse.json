@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
+            "detail": "Nothing was specified for the `type` property.",
+            "stackTrace": "{{STACK_TRACE}}",
+            "inner": null
+        }
+    ]
+}

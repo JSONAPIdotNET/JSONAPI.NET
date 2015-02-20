@@ -139,6 +139,23 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByColumnMissingDirectionResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithAttributeUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyIdsRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyTypeRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneIdRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneTypeRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithToManyUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithToOneUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToManyUpdateResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToOneUpdateResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneTypeResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyTypeResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyIdsResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneIdResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithStringRelationshipValueRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
@@ -147,8 +164,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PostRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PostResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithAttributeUpdateResponse.json" />
     <None Include="Acceptance\Data\PostTagLink.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

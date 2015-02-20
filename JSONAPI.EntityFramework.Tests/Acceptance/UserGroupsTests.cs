@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.EntityFramework.Tests.Acceptance
@@ -12,7 +14,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "user-groups", @"Acceptance\Fixtures\UserGroups\Responses\GetAllResponse.json");
+                var response = await SubmitGet(effortConnection, "user-groups");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\UserGroups\Responses\GetAllResponse.json");
             }
         }
     }

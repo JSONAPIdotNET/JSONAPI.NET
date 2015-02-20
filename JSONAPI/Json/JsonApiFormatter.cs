@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using JSONAPI.Extensions;
 
 namespace JSONAPI.Json
@@ -481,6 +483,15 @@ namespace JSONAPI.Json
 
         #region Deserialization
 
+        private class BadRequestException : Exception
+        {
+            public BadRequestException(string message)
+                : base(message)
+            {
+                
+            }
+        }
+
         public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
             return Task.FromResult(ReadFromStream(type, readStream, content, formatterLogger)); ;
@@ -502,17 +513,19 @@ namespace JSONAPI.Json
             {
 
                 var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
-                JsonReader reader = this.CreateJsonReader(typeof(IDictionary<string, object>), readStream, effectiveEncoding);
+                JsonReader reader = this.CreateJsonReader(typeof (IDictionary<string, object>), readStream,
+                    effectiveEncoding);
                 JsonSerializer serializer = this.CreateJsonSerializer();
 
                 reader.Read();
-                if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("Document root is not an object!");
+                if (reader.TokenType != JsonToken.StartObject)
+                    throw new JsonSerializationException("Document root is not an object!");
 
                 while (reader.Read())
                 {
                     if (reader.TokenType == JsonToken.PropertyName)
                     {
-                        string value = (string)reader.Value;
+                        string value = (string) reader.Value;
                         reader.Read(); // burn the PropertyName token
                         switch (value)
                         {
@@ -530,15 +543,18 @@ namespace JSONAPI.Json
                                     // Could be a single resource or multiple, according to spec!
                                     if (reader.TokenType == JsonToken.StartArray)
                                     {
-                                        Type listType = (typeof(List<>)).MakeGenericType(singleType);
-                                        retval = (IList)Activator.CreateInstance(listType);
+                                        Type listType = (typeof (List<>)).MakeGenericType(singleType);
+                                        retval = (IList) Activator.CreateInstance(listType);
                                         reader.Read(); // Burn off StartArray token
                                         while (reader.TokenType == JsonToken.StartObject)
                                         {
-                                            ((IList)retval).Add(Deserialize(singleType, readStream, reader, serializer));
+                                            ((IList) retval).Add(Deserialize(singleType, readStream, reader, serializer));
                                         }
                                         // burn EndArray token...
-                                        if (reader.TokenType != JsonToken.EndArray) throw new JsonReaderException(String.Format("Expected JsonToken.EndArray but got {0}", reader.TokenType));
+                                        if (reader.TokenType != JsonToken.EndArray)
+                                            throw new JsonReaderException(
+                                                String.Format("Expected JsonToken.EndArray but got {0}",
+                                                    reader.TokenType));
                                         reader.Read();
                                     }
                                     else
@@ -569,7 +585,7 @@ namespace JSONAPI.Json
                 {
                     if (!type.IsAssignableFrom(retval.GetType()) && _modelManager.IsSerializedAsMany(type))
                     {
-                        IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(singleType));
+                        IList list = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(singleType));
                         list.Add(retval);
                         return list;
                     }
@@ -579,6 +595,28 @@ namespace JSONAPI.Json
                     }
                 }
 
+            }
+            catch (BadRequestException ex)
+            {
+                // We have to perform our own serialization of the error response here.
+                var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+                var writeStream = new MemoryStream();
+                response.Content = new StreamContent(writeStream);
+
+                var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
+
+                JsonWriter writer = CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
+                JsonSerializer serializer = CreateJsonSerializer();
+
+                var httpError = new HttpError(ex, true); // TODO: allow consumer to choose whether to include error detail
+                _errorSerializer.SerializeError(httpError, writeStream, writer, serializer);
+
+                writer.Flush();
+                writeStream.Flush();
+                writeStream.Seek(0, SeekOrigin.Begin);
+
+                throw new HttpResponseException(response);
             }
             catch (Exception e)
             {
@@ -760,13 +798,47 @@ namespace JSONAPI.Json
                     PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
                     if (prop != null && !prop.PropertyType.CanWriteAsJsonApiAttribute())
                     {
+                        if (reader.TokenType != JsonToken.StartObject)
+                            throw new BadRequestException("The value of the relationship must be an object.");
+
                         //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
                         if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
                         {
                             // Is a hasMany
 
-                            //TODO: At present only supports an array of string IDs!
-                            JArray ids = JArray.Load(reader);
+                            JArray ids = null;
+                            string resourceType = null;
+
+                            while (reader.Read())
+                            {
+                                if (reader.TokenType == JsonToken.EndObject)
+                                    break;
+
+                                // Not sure what else could even go here, but if it's not a property name, throw an error.
+                                if (reader.TokenType != JsonToken.PropertyName)
+                                    throw new BadRequestException("Unexpected token: " + reader.TokenType);
+
+                                var propName = (string) reader.Value;
+                                reader.Read();
+
+                                if (propName == "ids")
+                                {
+                                    ids = JArray.Load(reader);
+                                }
+                                else if (propName == "type")
+                                {
+                                    resourceType = (string)reader.Value;
+                                }
+                            }
+
+                            // According to the spec, the ids must be specified
+                            if (ids == null)
+                                throw new BadRequestException("Nothing was specified for the `ids` property.");
+
+                            // We aren't doing anything with this value for now, but it needs to be present in the request payload.
+                            // We will need to reference it to properly support polymorphism.
+                            if (resourceType == null)
+                                throw new BadRequestException("Nothing was specified for the `type` property.");
 
                             Type relType;
                             if (prop.PropertyType.IsGenericType)
@@ -824,18 +896,59 @@ namespace JSONAPI.Json
                             foreach (JToken token in ids)
                             {
                                 //((ICollection<object>)prop.GetValue(obj, null)).Add(Activator.CreateInstance(relType));
-                                object dummyobj = Activator.CreateInstance(relType);
                                 add.Invoke(hmrel, new object[] { this.GetById(relType, token.ToObject<string>()) });
                             }
+
+                            prop.SetValue(obj, hmrel);
                         }
                         else
                         {
                             // Is a belongsTo
 
-                            //TODO: At present only supports a string ID!
+                            string id = null;
+                            string resourceType = null;
+
+                            while (reader.Read())
+                            {
+                                if (reader.TokenType == JsonToken.EndObject)
+                                    break;
+
+                                // Not sure what else could even go here, but if it's not a property name, throw an error.
+                                if (reader.TokenType != JsonToken.PropertyName)
+                                    throw new BadRequestException("Unexpected token: " + reader.TokenType);
+
+                                var propName = (string)reader.Value;
+                                reader.Read();
+
+                                if (propName == "id")
+                                {
+                                    var idValue = reader.Value;
+
+                                    // The id must be a string.
+                                    if (!(idValue is string))
+                                        throw new BadRequestException("The value of the `id` property must be a string.");
+
+                                    id = (string)idValue;
+                                }
+                                else if (propName == "type")
+                                {
+                                    // TODO: we don't do anything with this value yet, but we will need to in order to
+                                    // support polymorphic endpoints
+                                    resourceType = (string)reader.Value;
+                                }
+                            }
+
+                            // The id must be specified.
+                            if (id == null)
+                                throw new BadRequestException("Nothing was specified for the `id` property.");
+
+                            // The type must be specified.
+                            if (resourceType == null)
+                                throw new BadRequestException("Nothing was specified for the `type` property.");
+
                             Type relType = prop.PropertyType;
 
-                            prop.SetValue(obj, GetById(relType, (string)reader.Value));
+                            prop.SetValue(obj, GetById(relType, id));
                         }
 
                         // Tell the MetadataManager that we deserialized this property
