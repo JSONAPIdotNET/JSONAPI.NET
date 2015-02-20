@@ -5,8 +5,8 @@
             "status": "500",
             "title": "The attribute \"firstName\" was specified more than once.",
             "detail": null,
-            "inner": null,
-            "stackTrace":null
+            "stackTrace": null,
+            "inner": null
         }
     ]
 }

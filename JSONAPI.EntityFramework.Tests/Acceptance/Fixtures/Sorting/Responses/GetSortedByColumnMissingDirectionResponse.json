@@ -5,8 +5,8 @@
             "status": "500",
             "title": "The sort expression \"firstName\" does not begin with a direction indicator (+ or -).",
             "detail": null,
-            "inner": null,
-            "stackTrace":null
+            "stackTrace": null,
+            "inner": null
         }
     ]
 }
