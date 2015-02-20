@@ -12,6 +12,7 @@ using JSONAPI.Core;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using Moq;
 
 namespace JSONAPI.Tests.Json
 {
@@ -21,6 +22,7 @@ namespace JSONAPI.Tests.Json
         Author a;
         Post p, p2, p3, p4;
         Sample s1, s2;
+        Tag t1, t2, t3;
 
         private class MockErrorSerializer : IErrorSerializer
         {
@@ -52,6 +54,22 @@ namespace JSONAPI.Tests.Json
             {
                 Id = 1,
                 Name = "Jason Hater",
+            };
+
+            t1 = new Tag 
+            {
+                Id = 1,
+                Text = "Ember"
+            };
+            t2 = new Tag 
+            {
+                Id = 2,
+                Text = "React"
+            };
+            t3 = new Tag 
+            {
+                Id = 3,
+                Text = "Angular"
             };
 
             p = new Post()
@@ -234,7 +252,7 @@ namespace JSONAPI.Tests.Json
 
         [TestMethod]
         [DeploymentItem(@"Data\AttributeSerializationTest.json")]
-        public void Serializes_attributes_properly()
+        public void Serializes_attributes_properly() 
         {
             // Arrang
             JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
@@ -247,6 +265,24 @@ namespace JSONAPI.Tests.Json
             string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
             Trace.WriteLine(output);
             var expected = JsonHelpers.MinifyJson(File.ReadAllText("AttributeSerializationTest.json"));
+            Assert.AreEqual(expected, output.Trim());
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\ByteIdSerializationTest.json")]
+        public void Serializes_byte_ids_properly() 
+        {
+            // Arrang
+            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(Tag), new[] { t1, t2, t3 }, stream, null, null);
+
+            // Assert
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            var expected = JsonHelpers.MinifyJson(File.ReadAllText("ByteIdSerializationTest.json"));
             Assert.AreEqual(expected, output.Trim());
         }
 
@@ -315,20 +351,29 @@ namespace JSONAPI.Tests.Json
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
-            // Act
-            var payload = new HttpError(new Exception("This is the exception message!"), true)
+            var mockInnerException = new Mock<Exception>(MockBehavior.Strict);
+            mockInnerException.Setup(m => m.Message).Returns("Inner exception message");
+            mockInnerException.Setup(m => m.StackTrace).Returns("Inner stack trace");
+
+            var outerException = new Exception("Outer exception message", mockInnerException.Object);
+
+            var payload = new HttpError(outerException, true)
             {
-                StackTrace = "Stack trace would go here"
+                StackTrace = "Outer stack trace"
             };
+
+            // Act
             formatter.WriteToStreamAsync(typeof(HttpError), payload, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
             var expectedJson = File.ReadAllText("ErrorSerializerTest.json");
             var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
             var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
-            output = Regex.Replace(output,
-                @"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}",
-                "TEST-ERROR-ID"); // We don't know what the GUID will be, so replace it
+
+            // We don't know what the GUIDs will be, so replace them
+            var regex = new Regex(@"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}");
+            output = regex.Replace(output, "OUTER-ID", 1); 
+            output = regex.Replace(output, "INNER-ID", 1);
             output.Should().Be(minifiedExpectedJson);
         }
 
