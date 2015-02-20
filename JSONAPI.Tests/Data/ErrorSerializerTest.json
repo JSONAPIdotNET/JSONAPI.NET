@@ -1,12 +1,19 @@
 {
     "errors": [
         {
-            "id": "TEST-ERROR-ID",
+            "id": "OUTER-ID",
             "status": "500",
             "title": "System.Exception",
-            "detail": "This is the exception message!",
-            "inner": null,
-            "stackTrace": "Stack trace would go here"
+            "detail": "Outer exception message",
+            "stackTrace": "Outer stack trace",
+            "inner": { 
+                "id": "INNER-ID",
+                "status": "500",
+                "title": "Castle.Proxies.ExceptionProxy",
+                "detail": "Inner exception message",
+                "stackTrace": "Inner stack trace",
+                "inner": null
+            }
         }
     ]
 }

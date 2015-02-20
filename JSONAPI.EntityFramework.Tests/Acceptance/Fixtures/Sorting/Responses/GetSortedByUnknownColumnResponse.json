@@ -5,8 +5,8 @@
             "status": "500",
             "title": "The attribute \"foobar\" does not exist on type \"users\".",
             "detail": null,
-            "inner": null,
-            "stackTrace":null
+            "stackTrace": null,
+            "inner": null
         }
     ]
 }
