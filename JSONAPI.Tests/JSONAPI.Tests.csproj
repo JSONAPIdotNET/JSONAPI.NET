@@ -104,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\MetadataManagerPropertyWasPresentRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\ByteIdSerializationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
