@@ -12,7 +12,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "user-groups", @"Acceptance\Fixtures\UserGroups_GetResponse.json");
+                await ExpectGetToSucceed(effortConnection, "user-groups", @"Acceptance\Fixtures\UserGroups\Responses\GetAllResponse.json");
             }
         }
     }
