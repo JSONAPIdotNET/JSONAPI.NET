@@ -86,7 +86,7 @@
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
-    <Compile Include="Json\JsonApiMediaFormaterTests.cs" />
+    <Compile Include="Json\JsonApiMediaFormatterTests.cs" />
     <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
