@@ -156,6 +156,8 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithNullToOneUpdateRequest.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

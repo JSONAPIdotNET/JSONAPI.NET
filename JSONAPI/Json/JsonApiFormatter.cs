@@ -798,13 +798,13 @@ namespace JSONAPI.Json
                     PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
                     if (prop != null && !prop.PropertyType.CanWriteAsJsonApiAttribute())
                     {
-                        if (reader.TokenType != JsonToken.StartObject)
-                            throw new BadRequestException("The value of the relationship must be an object.");
-
                         //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
                         if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
                         {
                             // Is a hasMany
+
+                            if (reader.TokenType != JsonToken.StartObject)
+                                throw new BadRequestException("The value of a to-many relationship must be an object.");
 
                             JArray ids = null;
                             string resourceType = null;
@@ -905,50 +905,61 @@ namespace JSONAPI.Json
                         {
                             // Is a belongsTo
 
-                            string id = null;
-                            string resourceType = null;
-
-                            while (reader.Read())
+                            if (reader.TokenType == JsonToken.StartObject)
                             {
-                                if (reader.TokenType == JsonToken.EndObject)
-                                    break;
+                                string id = null;
+                                string resourceType = null;
 
-                                // Not sure what else could even go here, but if it's not a property name, throw an error.
-                                if (reader.TokenType != JsonToken.PropertyName)
-                                    throw new BadRequestException("Unexpected token: " + reader.TokenType);
-
-                                var propName = (string)reader.Value;
-                                reader.Read();
-
-                                if (propName == "id")
+                                while (reader.Read())
                                 {
-                                    var idValue = reader.Value;
+                                    if (reader.TokenType == JsonToken.EndObject)
+                                        break;
 
-                                    // The id must be a string.
-                                    if (!(idValue is string))
-                                        throw new BadRequestException("The value of the `id` property must be a string.");
+                                    // Not sure what else could even go here, but if it's not a property name, throw an error.
+                                    if (reader.TokenType != JsonToken.PropertyName)
+                                        throw new BadRequestException("Unexpected token: " + reader.TokenType);
 
-                                    id = (string)idValue;
+                                    var propName = (string)reader.Value;
+                                    reader.Read();
+
+                                    if (propName == "id")
+                                    {
+                                        var idValue = reader.Value;
+
+                                        // The id must be a string.
+                                        if (!(idValue is string))
+                                            throw new BadRequestException("The value of the `id` property must be a string.");
+
+                                        id = (string)idValue;
+                                    }
+                                    else if (propName == "type")
+                                    {
+                                        // TODO: we don't do anything with this value yet, but we will need to in order to
+                                        // support polymorphic endpoints
+                                        resourceType = (string)reader.Value;
+                                    }
                                 }
-                                else if (propName == "type")
-                                {
-                                    // TODO: we don't do anything with this value yet, but we will need to in order to
-                                    // support polymorphic endpoints
-                                    resourceType = (string)reader.Value;
-                                }
+
+                                // The id must be specified.
+                                if (id == null)
+                                    throw new BadRequestException("Nothing was specified for the `id` property.");
+
+                                // The type must be specified.
+                                if (resourceType == null)
+                                    throw new BadRequestException("Nothing was specified for the `type` property.");
+
+                                Type relType = prop.PropertyType;
+
+                                prop.SetValue(obj, GetById(relType, id));
                             }
-
-                            // The id must be specified.
-                            if (id == null)
-                                throw new BadRequestException("Nothing was specified for the `id` property.");
-
-                            // The type must be specified.
-                            if (resourceType == null)
-                                throw new BadRequestException("Nothing was specified for the `type` property.");
-
-                            Type relType = prop.PropertyType;
-
-                            prop.SetValue(obj, GetById(relType, id));
+                            else if (reader.TokenType == JsonToken.Null)
+                            {
+                                prop.SetValue(obj, null);
+                            }
+                            else
+                            {
+                                throw new BadRequestException("The value of a to-one relationship must be an object or null.");
+                            }
                         }
 
                         // Tell the MetadataManager that we deserialized this property
