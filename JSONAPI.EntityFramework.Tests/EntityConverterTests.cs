@@ -120,41 +120,6 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         [TestMethod]
-        [DeploymentItem(@"Data\Post.json")]
-        public async Task DeserializePostIntegrationTest()
-        {
-            // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
-            MemoryStream stream = new MemoryStream();
-
-            EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context);
-
-            // Serialize a post and change the JSON... Not "unit" at all, I know, but a good integration test I think...
-            formatter.WriteToStreamAsync(typeof(Post), p, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
-            string serializedPost = System.Text.Encoding.ASCII.GetString(stream.ToArray());
-            // Change the post title (a scalar value)
-            serializedPost = serializedPost.Replace("Linkbait!", "Not at all linkbait!");
-            // Remove a comment (Note that order is undefined/not deterministic!)
-            serializedPost = Regex.Replace(serializedPost, String.Format(@"(""comments""\s*:\s*\[[^]]*)(,""{0}""|""{0}"",)", c3.Id), @"$1");
-
-            // Reread the serialized JSON...
-            stream.Dispose();
-            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(serializedPost));
-
-            // Act
-            Post pUpdated;
-            pUpdated = (Post)await formatter.ReadFromStreamAsync(typeof(Post), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null);
-            pUpdated = await materializer.MaterializeUpdateAsync<Post>(pUpdated);
-
-            // Assert
-            Assert.AreEqual(a, pUpdated.Author);
-            Assert.AreEqual("Not at all linkbait!", pUpdated.Title);
-            Assert.AreEqual(2, pUpdated.Comments.Count());
-            Assert.IsFalse(pUpdated.Comments.Contains(c3));
-            //Debug.WriteLine(sw.ToString());
-        }
-
-        [TestMethod]
         public async Task UnderpostingTest()
         {
             // Arrange

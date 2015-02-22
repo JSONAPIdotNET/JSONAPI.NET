@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
@@ -20,7 +22,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await ExpectGetToSucceed(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Responses\GetAllResponse.json");
+                var response = await SubmitGet(effortConnection, "posts");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetAllResponse.json");
             }
         }
 
@@ -34,7 +39,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetWithFilter(effortConnection, "posts?title=Post 4", @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json");
+                var response = await SubmitGet(effortConnection, "posts?title=Post 4");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json");
             }
         }
 
@@ -48,7 +56,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestGetById(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Responses\GetByIdResponse.json");
+                var response = await SubmitGet(effortConnection, "posts/202");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetByIdResponse.json");
             }
         }
 
@@ -62,7 +73,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Requests\PostRequest.json", @"Acceptance\Fixtures\Posts\Responses\PostResponse.json");
+                var response = await SubmitPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Requests\PostRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PostResponse.json");
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -84,15 +98,18 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task Put()
+        public async Task PutWithAttributeUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutRequest.json", @"Acceptance\Fixtures\Posts\Responses\PutResponse.json");
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithAttributeUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithAttributeUpdateResponse.json");
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
-                    var allPosts = dbContext.Posts.ToArray();
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
                     allPosts.Length.Should().Be(4);
                     var actualPost = allPosts.First(t => t.Id == "202");
                     actualPost.Id.Should().Be("202");
@@ -100,6 +117,337 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                     actualPost.Content.Should().Be("Post 2 content");
                     actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
                     actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToManyUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("301");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToManyHomogeneousDataUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyHomogeneousDataUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("301", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToManyEmptyDataUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Should().BeEmpty();
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToOneUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToOneUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToOneUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("403");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithNullToOneUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithNullToOneUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().BeNull();
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithMissingToOneId()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneIdRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneIdResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithMissingToOneType()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneTypeRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneTypeResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithMissingToManyIds()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyIdsRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyIdsResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithMissingToManyType()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyTypeRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyTypeResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithArrayRelationshipValue()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithStringRelationshipValue()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithStringRelationshipValueRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
                 }
             }
         }
@@ -114,7 +462,9 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                await TestDelete(effortConnection, "posts/203");
+                var response = await SubmitDelete(effortConnection, "posts/203");
+
+                response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {

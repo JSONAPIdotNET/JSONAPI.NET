@@ -6,7 +6,10 @@
             "content": "Added post content",
             "created": "2015-03-11T04:31:00+00:00",
             "links": {
-                "author": "401"
+                "author": {
+                    "type": "users",
+                    "id": "401"
+                }
             }
         }
     ]

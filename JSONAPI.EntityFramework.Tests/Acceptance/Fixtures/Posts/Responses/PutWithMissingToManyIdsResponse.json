@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
+            "detail": "If `data` is not specified, then `ids` must be specified.",
+            "stackTrace": "{{STACK_TRACE}}",
+            "inner": null
+        }
+    ]
+}

@@ -348,10 +348,16 @@ namespace JSONAPI.EntityFramework
 
                     if (materialKey != ephemeralKey)
                     {
-                        object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                        prop.SetValue(material, await GetByIdAsync(prop.PropertyType, idParams), null);
+                        if (ephemeralKey == null)
+                        {
+                            prop.SetValue(material, null, null);
+                        }
+                        else
+                        {
+                            object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
+                            prop.SetValue(material, await GetByIdAsync(prop.PropertyType, idParams), null);
+                        }
                     }
-                    // else, 
                 }
                 else
                 {

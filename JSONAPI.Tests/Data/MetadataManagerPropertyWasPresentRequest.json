@@ -2,7 +2,10 @@
     "posts": {
         "id": "42",
         "links": {
-            "author": "18"
+            "author": {
+                "id": "18",
+                "type": "authors"
+            }
         }
     }
 }

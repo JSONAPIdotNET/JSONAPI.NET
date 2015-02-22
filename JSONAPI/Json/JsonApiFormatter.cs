@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using JSONAPI.Extensions;
 
 namespace JSONAPI.Json
@@ -481,6 +483,15 @@ namespace JSONAPI.Json
 
         #region Deserialization
 
+        private class BadRequestException : Exception
+        {
+            public BadRequestException(string message)
+                : base(message)
+            {
+                
+            }
+        }
+
         public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
             return Task.FromResult(ReadFromStream(type, readStream, content, formatterLogger)); ;
@@ -502,17 +513,19 @@ namespace JSONAPI.Json
             {
 
                 var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
-                JsonReader reader = this.CreateJsonReader(typeof(IDictionary<string, object>), readStream, effectiveEncoding);
+                JsonReader reader = this.CreateJsonReader(typeof (IDictionary<string, object>), readStream,
+                    effectiveEncoding);
                 JsonSerializer serializer = this.CreateJsonSerializer();
 
                 reader.Read();
-                if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("Document root is not an object!");
+                if (reader.TokenType != JsonToken.StartObject)
+                    throw new JsonSerializationException("Document root is not an object!");
 
                 while (reader.Read())
                 {
                     if (reader.TokenType == JsonToken.PropertyName)
                     {
-                        string value = (string)reader.Value;
+                        string value = (string) reader.Value;
                         reader.Read(); // burn the PropertyName token
                         switch (value)
                         {
@@ -530,15 +543,18 @@ namespace JSONAPI.Json
                                     // Could be a single resource or multiple, according to spec!
                                     if (reader.TokenType == JsonToken.StartArray)
                                     {
-                                        Type listType = (typeof(List<>)).MakeGenericType(singleType);
-                                        retval = (IList)Activator.CreateInstance(listType);
+                                        Type listType = (typeof (List<>)).MakeGenericType(singleType);
+                                        retval = (IList) Activator.CreateInstance(listType);
                                         reader.Read(); // Burn off StartArray token
                                         while (reader.TokenType == JsonToken.StartObject)
                                         {
-                                            ((IList)retval).Add(Deserialize(singleType, readStream, reader, serializer));
+                                            ((IList) retval).Add(Deserialize(singleType, readStream, reader, serializer));
                                         }
                                         // burn EndArray token...
-                                        if (reader.TokenType != JsonToken.EndArray) throw new JsonReaderException(String.Format("Expected JsonToken.EndArray but got {0}", reader.TokenType));
+                                        if (reader.TokenType != JsonToken.EndArray)
+                                            throw new JsonReaderException(
+                                                String.Format("Expected JsonToken.EndArray but got {0}",
+                                                    reader.TokenType));
                                         reader.Read();
                                     }
                                     else
@@ -569,7 +585,7 @@ namespace JSONAPI.Json
                 {
                     if (!type.IsAssignableFrom(retval.GetType()) && _modelManager.IsSerializedAsMany(type))
                     {
-                        IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(singleType));
+                        IList list = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(singleType));
                         list.Add(retval);
                         return list;
                     }
@@ -579,6 +595,28 @@ namespace JSONAPI.Json
                     }
                 }
 
+            }
+            catch (BadRequestException ex)
+            {
+                // We have to perform our own serialization of the error response here.
+                var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+                var writeStream = new MemoryStream();
+                response.Content = new StreamContent(writeStream);
+
+                var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
+
+                JsonWriter writer = CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
+                JsonSerializer serializer = CreateJsonSerializer();
+
+                var httpError = new HttpError(ex, true); // TODO: allow consumer to choose whether to include error detail
+                _errorSerializer.SerializeError(httpError, writeStream, writer, serializer);
+
+                writer.Flush();
+                writeStream.Flush();
+                writeStream.Seek(0, SeekOrigin.Begin);
+
+                throw new HttpResponseException(response);
             }
             catch (Exception e)
             {
@@ -765,8 +803,53 @@ namespace JSONAPI.Json
                         {
                             // Is a hasMany
 
-                            //TODO: At present only supports an array of string IDs!
-                            JArray ids = JArray.Load(reader);
+                            if (reader.TokenType != JsonToken.StartObject)
+                                throw new BadRequestException("The value of a to-many relationship must be an object.");
+
+                            JArray ids = null;
+                            string resourceType = null;
+                            JArray relatedObjects = null;
+
+                            while (reader.Read())
+                            {
+                                if (reader.TokenType == JsonToken.EndObject)
+                                    break;
+
+                                // Not sure what else could even go here, but if it's not a property name, throw an error.
+                                if (reader.TokenType != JsonToken.PropertyName)
+                                    throw new BadRequestException("Unexpected token: " + reader.TokenType);
+
+                                var propName = (string) reader.Value;
+                                reader.Read();
+
+                                if (propName == "ids")
+                                {
+                                    if (reader.TokenType != JsonToken.StartArray)
+                                        throw new BadRequestException("The value of `ids` must be an array.");
+
+                                    ids = JArray.Load(reader);
+                                }
+                                else if (propName == "type")
+                                {
+                                    if (reader.TokenType != JsonToken.String)
+                                        throw new BadRequestException("Unexpected value for `type`: " + reader.TokenType);
+
+                                    resourceType = (string)reader.Value;
+                                }
+                                else if (propName == "data")
+                                {
+                                    if (reader.TokenType != JsonToken.StartArray)
+                                        throw new BadRequestException("Unexpected value for `data`: " + reader.TokenType);
+                                    
+                                    relatedObjects = JArray.Load(reader);
+                                }
+                                else
+                                {
+                                    throw new BadRequestException("Unexpected property name: " + propName);
+                                }
+                            }
+
+                            var relatedStubs = new List<object>();
 
                             Type relType;
                             if (prop.PropertyType.IsGenericType)
@@ -777,6 +860,51 @@ namespace JSONAPI.Json
                             {
                                 // Must be an array at this point, right??
                                 relType = prop.PropertyType.GetElementType();
+                            }
+
+                            // According to the spec, either the type and ids or data must be specified
+                            if (relatedObjects != null)
+                            {
+                                if (ids != null)
+                                    throw new BadRequestException("If `data` is specified, then `ids` may not be.");
+
+                                if (resourceType != null)
+                                    throw new BadRequestException("If `data` is specified, then `type` may not be.");
+
+                                foreach (var relatedObject in relatedObjects)
+                                {
+                                    if (!(relatedObject is JObject))
+                                        throw new BadRequestException("Each element in the `data` array must be an object.");
+
+                                    var relatedObjectType = relatedObject["type"] as JValue;
+                                    if (relatedObjectType == null || relatedObjectType.Type != JTokenType.String)
+                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `type`.");
+
+                                    var relatedObjectId = relatedObject["id"] as JValue;
+                                    if (relatedObjectId == null || relatedObjectId.Type != JTokenType.String)
+                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `id`.");
+
+                                    var relatedObjectIdValue = relatedObjectId.Value<string>();
+                                    if (string.IsNullOrWhiteSpace(relatedObjectIdValue))
+                                        throw new BadRequestException("The value for `id` must be specified.");
+
+                                    var stub = GetById(relType, relatedObjectIdValue);
+                                    relatedStubs.Add(stub);
+                                }
+                            }
+                            else if (ids == null)
+                            {
+                                throw new BadRequestException("If `data` is not specified, then `ids` must be specified.");
+                            }
+                            else if (resourceType == null)
+                            {
+                                // We aren't doing anything with this value for now, but it needs to be present in the request payload.
+                                // We will need to reference it to properly support polymorphism.
+                                throw new BadRequestException("If `data` is not specified, then `type` must be specified.");
+                            }
+                            else
+                            {
+                                relatedStubs.AddRange(ids.Select(token => GetById(relType, token.ToObject<string>())));
                             }
 
                             IEnumerable<Object> hmrel = (IEnumerable<Object>)prop.GetValue(obj, null);
@@ -821,21 +949,72 @@ namespace JSONAPI.Json
                             Type hmtype = hmrel.GetType();
                             MethodInfo add = hmtype.GetMethod("Add");
 
-                            foreach (JToken token in ids)
+                            foreach (var stub in relatedStubs)
                             {
-                                //((ICollection<object>)prop.GetValue(obj, null)).Add(Activator.CreateInstance(relType));
-                                object dummyobj = Activator.CreateInstance(relType);
-                                add.Invoke(hmrel, new object[] { this.GetById(relType, token.ToObject<string>()) });
+                                add.Invoke(hmrel, new [] { stub });
                             }
+
+                            prop.SetValue(obj, hmrel);
                         }
                         else
                         {
                             // Is a belongsTo
 
-                            //TODO: At present only supports a string ID!
-                            Type relType = prop.PropertyType;
+                            if (reader.TokenType == JsonToken.StartObject)
+                            {
+                                string id = null;
+                                string resourceType = null;
 
-                            prop.SetValue(obj, GetById(relType, (string)reader.Value));
+                                while (reader.Read())
+                                {
+                                    if (reader.TokenType == JsonToken.EndObject)
+                                        break;
+
+                                    // Not sure what else could even go here, but if it's not a property name, throw an error.
+                                    if (reader.TokenType != JsonToken.PropertyName)
+                                        throw new BadRequestException("Unexpected token: " + reader.TokenType);
+
+                                    var propName = (string)reader.Value;
+                                    reader.Read();
+
+                                    if (propName == "id")
+                                    {
+                                        var idValue = reader.Value;
+
+                                        // The id must be a string.
+                                        if (!(idValue is string))
+                                            throw new BadRequestException("The value of the `id` property must be a string.");
+
+                                        id = (string)idValue;
+                                    }
+                                    else if (propName == "type")
+                                    {
+                                        // TODO: we don't do anything with this value yet, but we will need to in order to
+                                        // support polymorphic endpoints
+                                        resourceType = (string)reader.Value;
+                                    }
+                                }
+
+                                // The id must be specified.
+                                if (id == null)
+                                    throw new BadRequestException("Nothing was specified for the `id` property.");
+
+                                // The type must be specified.
+                                if (resourceType == null)
+                                    throw new BadRequestException("Nothing was specified for the `type` property.");
+
+                                Type relType = prop.PropertyType;
+
+                                prop.SetValue(obj, GetById(relType, id));
+                            }
+                            else if (reader.TokenType == JsonToken.Null)
+                            {
+                                prop.SetValue(obj, null);
+                            }
+                            else
+                            {
+                                throw new BadRequestException("The value of a to-one relationship must be an object or null.");
+                            }
                         }
 
                         // Tell the MetadataManager that we deserialized this property
