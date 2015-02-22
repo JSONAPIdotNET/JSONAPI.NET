@@ -3,15 +3,21 @@
         {
             "id": "1",
             "title": "Linkbait!",
-            "links": { 
-                "author": "1"
+            "links": {
+                "author": {
+                    "type": "authors",
+                    "id": "1"
+                }
             }
         },
         {
             "id": "2",
             "title": "Rant #1023",
-            "links": { 
-                "author": "1"
+            "links": {
+                "author": {
+                    "type": "authors",
+                    "id": "1"
+                }
             }
         }
     ]
