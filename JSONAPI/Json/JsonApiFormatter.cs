@@ -1062,14 +1062,7 @@ namespace JSONAPI.Json
         {
             if (idprop != null)
             {
-                if (idprop.PropertyType == typeof(string))
-                    return (string)idprop.GetValue(obj, null);
-                if (idprop.PropertyType == typeof(Guid))
-                    return idprop.GetValue(obj).ToString();
-                if (idprop.PropertyType == typeof(int))
-                    return ((int)idprop.GetValue(obj, null)).ToString();
-                if (idprop.PropertyType == typeof(byte))
-                    return ((byte)idprop.GetValue(obj, null)).ToString();
+                return idprop.GetValue(obj).ToString();
             }
             return "NOIDCOMPUTABLE!";
         }
