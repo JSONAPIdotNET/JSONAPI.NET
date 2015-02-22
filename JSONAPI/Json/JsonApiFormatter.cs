@@ -515,7 +515,6 @@ namespace JSONAPI.Json
                 var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
                 JsonReader reader = this.CreateJsonReader(typeof (IDictionary<string, object>), readStream,
                     effectiveEncoding);
-                JsonSerializer serializer = this.CreateJsonSerializer();
 
                 reader.Read();
                 if (reader.TokenType != JsonToken.StartObject)
@@ -548,7 +547,7 @@ namespace JSONAPI.Json
                                         reader.Read(); // Burn off StartArray token
                                         while (reader.TokenType == JsonToken.StartObject)
                                         {
-                                            ((IList) retval).Add(Deserialize(singleType, readStream, reader, serializer));
+                                            ((IList) retval).Add(Deserialize(singleType, reader));
                                         }
                                         // burn EndArray token...
                                         if (reader.TokenType != JsonToken.EndArray)
@@ -562,7 +561,7 @@ namespace JSONAPI.Json
                                         // Because we choose what to deserialize based on the ApiController method signature
                                         // (not choose the method signature based on what we're deserializing), the `type`
                                         // parameter will always be `IList<Model>` even if a single model is sent!
-                                        retval = Deserialize(singleType, readStream, reader, serializer);
+                                        retval = Deserialize(singleType, reader);
                                     }
                                 }
                                 else
@@ -652,7 +651,7 @@ namespace JSONAPI.Json
             return GetDefaultValueForType(type);
         }
 
-        public object Deserialize(Type objectType, Stream readStream, JsonReader reader, JsonSerializer serializer)
+        private object Deserialize(Type objectType, JsonReader reader)
         {
             object retval = Activator.CreateInstance(objectType);
 
@@ -671,7 +670,7 @@ namespace JSONAPI.Json
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
-                        DeserializeLinkedResources(retval, readStream, reader, serializer);
+                        DeserializeLinkedResources(retval, reader);
                     }
                     else if (prop != null)
                     {
@@ -782,7 +781,7 @@ namespace JSONAPI.Json
             return retval;
         }
 
-        private void DeserializeLinkedResources(object obj, Stream readStream, JsonReader reader, JsonSerializer serializer)
+        private void DeserializeLinkedResources(object obj, JsonReader reader)
         {
             //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
