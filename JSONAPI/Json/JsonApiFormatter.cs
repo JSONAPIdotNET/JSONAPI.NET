@@ -797,8 +797,7 @@ namespace JSONAPI.Json
                     PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
                     if (prop != null && !prop.PropertyType.CanWriteAsJsonApiAttribute())
                     {
-                        //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
-                        if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
+                        if (_modelManager.IsSerializedAsMany(prop.PropertyType))
                         {
                             // Is a hasMany
 
