@@ -158,6 +158,66 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToManyHomogeneousDataUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyHomogeneousDataUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("301", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PutWithToManyEmptyDataUpdate()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json");
+
+                response.StatusCode.Should().Be(HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json");
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Should().BeEmpty();
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
         public async Task PutWithToOneUpdate()
         {
             using (var effortConnection = GetEffortConnection())

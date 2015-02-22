@@ -808,6 +808,7 @@ namespace JSONAPI.Json
 
                             JArray ids = null;
                             string resourceType = null;
+                            JArray relatedObjects = null;
 
                             while (reader.Read())
                             {
@@ -823,22 +824,32 @@ namespace JSONAPI.Json
 
                                 if (propName == "ids")
                                 {
+                                    if (reader.TokenType != JsonToken.StartArray)
+                                        throw new BadRequestException("The value of `ids` must be an array.");
+
                                     ids = JArray.Load(reader);
                                 }
                                 else if (propName == "type")
                                 {
+                                    if (reader.TokenType != JsonToken.String)
+                                        throw new BadRequestException("Unexpected value for `type`: " + reader.TokenType);
+
                                     resourceType = (string)reader.Value;
+                                }
+                                else if (propName == "data")
+                                {
+                                    if (reader.TokenType != JsonToken.StartArray)
+                                        throw new BadRequestException("Unexpected value for `data`: " + reader.TokenType);
+                                    
+                                    relatedObjects = JArray.Load(reader);
+                                }
+                                else
+                                {
+                                    throw new BadRequestException("Unexpected property name: " + propName);
                                 }
                             }
 
-                            // According to the spec, the ids must be specified
-                            if (ids == null)
-                                throw new BadRequestException("Nothing was specified for the `ids` property.");
-
-                            // We aren't doing anything with this value for now, but it needs to be present in the request payload.
-                            // We will need to reference it to properly support polymorphism.
-                            if (resourceType == null)
-                                throw new BadRequestException("Nothing was specified for the `type` property.");
+                            var relatedStubs = new List<object>();
 
                             Type relType;
                             if (prop.PropertyType.IsGenericType)
@@ -849,6 +860,51 @@ namespace JSONAPI.Json
                             {
                                 // Must be an array at this point, right??
                                 relType = prop.PropertyType.GetElementType();
+                            }
+
+                            // According to the spec, either the type and ids or data must be specified
+                            if (relatedObjects != null)
+                            {
+                                if (ids != null)
+                                    throw new BadRequestException("If `data` is specified, then `ids` may not be.");
+
+                                if (resourceType != null)
+                                    throw new BadRequestException("If `data` is specified, then `type` may not be.");
+
+                                foreach (var relatedObject in relatedObjects)
+                                {
+                                    if (!(relatedObject is JObject))
+                                        throw new BadRequestException("Each element in the `data` array must be an object.");
+
+                                    var relatedObjectType = relatedObject["type"] as JValue;
+                                    if (relatedObjectType == null || relatedObjectType.Type != JTokenType.String)
+                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `type`.");
+
+                                    var relatedObjectId = relatedObject["id"] as JValue;
+                                    if (relatedObjectId == null || relatedObjectId.Type != JTokenType.String)
+                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `id`.");
+
+                                    var relatedObjectIdValue = relatedObjectId.Value<string>();
+                                    if (string.IsNullOrWhiteSpace(relatedObjectIdValue))
+                                        throw new BadRequestException("The value for `id` must be specified.");
+
+                                    var stub = GetById(relType, relatedObjectIdValue);
+                                    relatedStubs.Add(stub);
+                                }
+                            }
+                            else if (ids == null)
+                            {
+                                throw new BadRequestException("If `data` is not specified, then `ids` must be specified.");
+                            }
+                            else if (resourceType == null)
+                            {
+                                // We aren't doing anything with this value for now, but it needs to be present in the request payload.
+                                // We will need to reference it to properly support polymorphism.
+                                throw new BadRequestException("If `data` is not specified, then `type` must be specified.");
+                            }
+                            else
+                            {
+                                relatedStubs.AddRange(ids.Select(token => GetById(relType, token.ToObject<string>())));
                             }
 
                             IEnumerable<Object> hmrel = (IEnumerable<Object>)prop.GetValue(obj, null);
@@ -893,10 +949,9 @@ namespace JSONAPI.Json
                             Type hmtype = hmrel.GetType();
                             MethodInfo add = hmtype.GetMethod("Add");
 
-                            foreach (JToken token in ids)
+                            foreach (var stub in relatedStubs)
                             {
-                                //((ICollection<object>)prop.GetValue(obj, null)).Add(Activator.CreateInstance(relType));
-                                add.Invoke(hmrel, new object[] { this.GetById(relType, token.ToObject<string>()) });
+                                add.Invoke(hmrel, new [] { stub });
                             }
 
                             prop.SetValue(obj, hmrel);

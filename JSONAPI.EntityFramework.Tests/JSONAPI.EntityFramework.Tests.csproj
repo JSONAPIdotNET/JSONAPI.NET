@@ -158,6 +158,10 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithNullToOneUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithToManyHomogeneousDataUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
