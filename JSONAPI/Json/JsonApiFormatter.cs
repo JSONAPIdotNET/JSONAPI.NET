@@ -43,7 +43,7 @@ namespace JSONAPI.Json
         {
             _modelManager = modelManager;
             _errorSerializer = errorSerializer;
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
+            SupportedMediaTypes.Insert(0, new MediaTypeHeaderValue("application/vnd.api+json"));
             ValidateRawJsonStrings = true;
         }
 
@@ -600,20 +600,26 @@ namespace JSONAPI.Json
                 // We have to perform our own serialization of the error response here.
                 var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
 
-                var writeStream = new MemoryStream();
-                response.Content = new StreamContent(writeStream);
+                using (var writeStream = new MemoryStream())
+                {
+                    var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
+                    JsonWriter writer = CreateJsonWriter(typeof (object), writeStream, effectiveEncoding);
+                    JsonSerializer serializer = CreateJsonSerializer();
 
-                var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
+                    var httpError = new HttpError(ex, true);
+                        // TODO: allow consumer to choose whether to include error detail
+                    _errorSerializer.SerializeError(httpError, writeStream, writer, serializer);
 
-                JsonWriter writer = CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
-                JsonSerializer serializer = CreateJsonSerializer();
+                    writer.Flush();
+                    writeStream.Flush();
+                    writeStream.Seek(0, SeekOrigin.Begin);
 
-                var httpError = new HttpError(ex, true); // TODO: allow consumer to choose whether to include error detail
-                _errorSerializer.SerializeError(httpError, writeStream, writer, serializer);
-
-                writer.Flush();
-                writeStream.Flush();
-                writeStream.Seek(0, SeekOrigin.Begin);
+                    using (var stringReader = new StreamReader(writeStream))
+                    {
+                        var stringContent = stringReader.ReadToEnd(); // TODO: use async version
+                        response.Content = new StringContent(stringContent, Encoding.UTF8, "application/vnd.api+json");
+                    }
+                }
 
                 throw new HttpResponseException(response);
             }
