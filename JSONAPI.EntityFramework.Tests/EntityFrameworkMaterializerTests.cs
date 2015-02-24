@@ -5,6 +5,8 @@ using JSONAPI.EntityFramework.Tests.Models;
 using FluentAssertions;
 using System.Collections.Generic;
 using System.Data.Entity;
+using JSONAPI.Core;
+using Moq;
 
 namespace JSONAPI.EntityFramework.Tests
 {
@@ -54,7 +56,8 @@ namespace JSONAPI.EntityFramework.Tests
         public void GetKeyNamesStandardIdTest()
         {
             // Arrange
-            var materializer = new EntityFrameworkMaterializer(context);
+            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
+            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
 
             // Act
             IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Post));
@@ -68,7 +71,8 @@ namespace JSONAPI.EntityFramework.Tests
         public void GetKeyNamesNonStandardIdTest()
         {
             // Arrange
-            var materializer = new EntityFrameworkMaterializer(context);
+            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
+            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
 
             // Act
             IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Backlink));
@@ -82,7 +86,8 @@ namespace JSONAPI.EntityFramework.Tests
         public void GetKeyNamesNotAnEntityTest()
         {
             // Arrange
-            var materializer = new EntityFrameworkMaterializer(context);
+            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
+            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
 
             // Act
             Action action = () =>
