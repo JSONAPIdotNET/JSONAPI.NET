@@ -17,6 +17,8 @@ namespace JSONAPI.EntityFramework
     /// </summary>
     public partial class EntityFrameworkMaterializer : IMaterializer
     {
+        private readonly IMetadataManager _metadataManager;
+
         /// <summary>
         /// The DbContext instance used to perform materializer operations
         /// </summary>
@@ -26,8 +28,9 @@ namespace JSONAPI.EntityFramework
         /// Creates a new EntityFrameworkMaterializer.
         /// </summary>
         /// <param name="context">The DbContext instance used to perform materializer operations</param>
-        public EntityFrameworkMaterializer(DbContext context)
+        public EntityFrameworkMaterializer(DbContext context, IMetadataManager metadataManager)
         {
+            _metadataManager = metadataManager;
             DbContext = context;
         }
 
@@ -308,7 +311,7 @@ namespace JSONAPI.EntityFramework
             foreach (PropertyInfo prop in props)
             {
                 // Comply with the spec, if a key was not set, it should not be updated!
-                if (!MetadataManager.Instance.PropertyWasPresent(ephemeral, prop)) continue;
+                if (!_metadataManager.PropertyWasPresent(ephemeral, prop)) continue;
 
                 if (IsMany(prop.PropertyType))
                 {

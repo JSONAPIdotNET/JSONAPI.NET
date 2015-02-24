@@ -126,7 +126,7 @@ namespace JSONAPI.EntityFramework.Tests
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
             MemoryStream stream = new MemoryStream();
 
-            EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context);
+            EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context, MetadataManager.Instance);
 
             string underpost = @"{""posts"":{""id"":""" + p.Id.ToString() + @""",""title"":""Not at all linkbait!""}}";
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(underpost));

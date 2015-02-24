@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using JSONAPI.Core;
 
 namespace JSONAPI.EntityFramework.Http
 {
@@ -18,7 +19,8 @@ namespace JSONAPI.EntityFramework.Http
             if (_materializer == null)
             {
                 DbContext context = (DbContext)Activator.CreateInstance(typeof(TC));
-                _materializer = new JSONAPI.EntityFramework.EntityFrameworkMaterializer(context);
+                var metadataManager = MetadataManager.Instance;
+                _materializer = new JSONAPI.EntityFramework.EntityFrameworkMaterializer(context, metadataManager);
             }
             return _materializer;
         }

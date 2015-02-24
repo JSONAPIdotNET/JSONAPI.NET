@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace JSONAPI.Core
 {
-    public sealed class MetadataManager
+    public sealed class MetadataManager : IMetadataManager
     {
         #region Singleton pattern
 
@@ -64,14 +64,7 @@ namespace JSONAPI.Core
             }
         }
 
-        /// <summary>
-        /// Find whether or not a given property was
-        /// posted in the original JSON--i.e. to determine whether an update operation should be
-        /// performed, and/or if a default value should be used.
-        /// </summary>
-        /// <param name="deserialized">The object deserialized by JsonApiFormatter</param>
-        /// <param name="prop">The property to check</param>
-        /// <returns>Whether or not the property was found in the original JSON and set by the deserializer</returns>
+        /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool PropertyWasPresent(object deserialized, PropertyInfo prop)
         {
