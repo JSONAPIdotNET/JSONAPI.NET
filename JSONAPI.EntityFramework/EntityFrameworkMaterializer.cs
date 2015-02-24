@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using JSONAPI.Core;
@@ -13,18 +12,23 @@ using System.Data.Entity.Core;
 
 namespace JSONAPI.EntityFramework
 {
+    /// <summary>
+    /// IMaterializer implementation for use with Entity Framework
+    /// </summary>
     public partial class EntityFrameworkMaterializer : IMaterializer
     {
-        private DbContext context;
+        /// <summary>
+        /// The DbContext instance used to perform materializer operations
+        /// </summary>
+        public DbContext DbContext { get; private set; }
 
-        public DbContext DbContext
+        /// <summary>
+        /// Creates a new EntityFrameworkMaterializer.
+        /// </summary>
+        /// <param name="context">The DbContext instance used to perform materializer operations</param>
+        public EntityFrameworkMaterializer(DbContext context)
         {
-            get { return this.context; }
-        }
-
-        public EntityFrameworkMaterializer(DbContext context) : base()
-        {
-            this.context = context;
+            DbContext = context;
         }
 
         #region IMaterializer contract methods
@@ -58,7 +62,7 @@ namespace JSONAPI.EntityFramework
                     i++;
                 }
             }
-            return this.context.Set(type).FindAsync(idv2);
+            return DbContext.Set(type).FindAsync(idv2);
         }
 
         public async Task<T> GetByIdAsync<T>(params Object[] idValues)
@@ -90,13 +94,13 @@ namespace JSONAPI.EntityFramework
             object retval = null;
             if (!anyNull)
             {
-                retval = await context.Set(type).FindAsync(idValues.ToArray());
+                retval = await DbContext.Set(type).FindAsync(idValues.ToArray());
             }
             if (retval == null)
             {
                 // Didn't find it...create a new one!
                 retval = Activator.CreateInstance(type);
-                context.Set(type).Add(retval);
+                DbContext.Set(type).Add(retval);
                 if (!anyNull)
                 {
                     // For a new object, if a key is specified, we want to merge the key, at least.
@@ -190,7 +194,7 @@ namespace JSONAPI.EntityFramework
             var method = openMethod.MakeGenericMethod(type);
             try
             {
-                return (IEnumerable<string>)method.Invoke(null, new object[] { this.context });
+                return (IEnumerable<string>)method.Invoke(null, new object[] { DbContext });
             }
             catch (TargetInvocationException ex)
             {
@@ -234,9 +238,14 @@ namespace JSONAPI.EntityFramework
             return retval;
         }
 
+        /// <summary>
+        /// Gets the name of the entity set property on the db context corresponding to the given type.
+        /// </summary>
+        /// <param name="type">Type type to get the entity set name for.</param>
+        /// <returns>The name of the entity set property</returns>
         protected string GetEntitySetName(Type type)
         {
-            ObjectContext objectContext = ((IObjectContextAdapter)this.context).ObjectContext;
+            ObjectContext objectContext = ((IObjectContextAdapter)DbContext).ObjectContext;
             try
             {
                 var container = objectContext.MetadataWorkspace
@@ -304,7 +313,6 @@ namespace JSONAPI.EntityFramework
                 if (IsMany(prop.PropertyType))
                 {
                     Type elementType = GetSingleType(prop.PropertyType);
-                    IEnumerable<string> keyNames = GetKeyNames(elementType);
 
                     var materialMany = (IEnumerable<Object>)prop.GetValue(material, null);
                     var ephemeralMany = (IEnumerable<Object>)prop.GetValue(ephemeral, null);
@@ -334,7 +342,7 @@ namespace JSONAPI.EntityFramework
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
                             object obj = await GetByIdAsync(elementType, idParams);
-                            mmadd.Invoke(materialMany, new object[] { obj });
+                            mmadd.Invoke(materialMany, new [] { obj });
                         }
                     // Remove from hasMany
                     if (mmremove != null)
@@ -342,7 +350,7 @@ namespace JSONAPI.EntityFramework
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
                             object obj = await GetByIdAsync(elementType, idParams);
-                            mmremove.Invoke(materialMany, new object[] { obj });
+                            mmremove.Invoke(materialMany, new [] { obj });
                         }
                 }
                 else if(IsModel(prop.PropertyType))
