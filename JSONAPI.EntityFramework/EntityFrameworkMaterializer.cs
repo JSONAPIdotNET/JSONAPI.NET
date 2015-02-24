@@ -186,26 +186,36 @@ namespace JSONAPI.EntityFramework
 
         protected internal virtual IEnumerable<string> GetKeyNames(Type type)
         {
-            ObjectContext objectContext = ((IObjectContextAdapter)this.context).ObjectContext;
-            System.Data.Entity.Core.Metadata.Edm.EdmType meta;
-            try {
-                meta = objectContext.MetadataWorkspace
-                    .GetType(type.Name, type.Namespace, System.Data.Entity.Core.Metadata.Edm.DataSpace.CSpace);
+            var openMethod = typeof (EntityFrameworkMaterializer).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
+            var method = openMethod.MakeGenericMethod(type);
+            try
+            {
+                return (IEnumerable<string>)method.Invoke(null, new object[] { this.context });
             }
-            catch (System.ArgumentException e)
+            catch (TargetInvocationException ex)
+            {
+                throw ex.InnerException;
+            }
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private static IEnumerable<string> GetKeyNamesFromGeneric<T>(DbContext dbContext) where T : class
+        {
+            var objectContext = ((IObjectContextAdapter)dbContext).ObjectContext;
+            ObjectSet<T> objectSet;
+            try
+            {
+                objectSet = objectContext.CreateObjectSet<T>();
+
+            }
+            catch (InvalidOperationException e)
             {
                 throw new ArgumentException(
-                    String.Format("The Type {0} was not found in the DbContext with Type {1}", type.Name, this.context.GetType().Name),
+                    String.Format("The Type {0} was not found in the DbContext with Type {1}", typeof(T).Name, dbContext.GetType().Name),
                     e
                     );
             }
-            var members = (IEnumerable<System.Data.Entity.Core.Metadata.Edm.EdmMember>)meta
-                .MetadataProperties
-                .Where(mp => mp.Name == "KeyMembers")
-                .First()
-                .Value;
-            IEnumerable<string> retval = members.Select(m => m.Name);
-            return retval;
+            return objectSet.EntitySet.ElementType.KeyMembers.Select(k => k.Name).ToArray();
         }
 
         /// <summary>

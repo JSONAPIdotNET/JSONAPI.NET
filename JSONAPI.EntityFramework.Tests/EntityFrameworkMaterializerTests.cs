@@ -4,19 +4,26 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.EntityFramework.Tests.Models;
 using FluentAssertions;
 using System.Collections.Generic;
+using System.Data.Entity;
 
 namespace JSONAPI.EntityFramework.Tests
 {
     [TestClass]
     public class EntityFrameworkMaterializerTests
     {
+        private class TestDbContext : DbContext
+        {
+            public DbSet<Backlink> Backlinks { get; set; }
+            public DbSet<Post> Posts { get; set; }
+        }
+
         private class NotAnEntity
         {
             public string Id { get; set; }
             public string Temporary { get; set; }
         }
 
-        private TestEntities context;
+        private TestDbContext context;
         private Backlink b1, b2;
 
         [TestInitialize]
@@ -26,7 +33,7 @@ namespace JSONAPI.EntityFramework.Tests
             var instance = System.Data.Entity.SqlServer.SqlProviderServices.Instance;
             //-
 
-            context = new TestEntities();
+            context = new TestDbContext();
             //JSONAPI.EntityFramework.Json.ContractResolver.ObjectContext = context;
 
 
@@ -72,17 +79,17 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(System.ArgumentException))]
         public void GetKeyNamesNotAnEntityTest()
         {
             // Arrange
             var materializer = new EntityFrameworkMaterializer(context);
 
             // Act
-            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(NotAnEntity));
-
-            // Assert
-            Assert.Fail("A System.ArgumentException should be thrown, this assertion should be unreachable!");
+            Action action = () =>
+            {
+                materializer.GetKeyNames(typeof (NotAnEntity));
+            };
+            action.ShouldThrow<ArgumentException>().Which.Message.Should().Be("The Type NotAnEntity was not found in the DbContext with Type TestDbContext");
         }
     }
 }
