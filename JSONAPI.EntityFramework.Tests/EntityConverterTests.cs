@@ -135,7 +135,7 @@ namespace JSONAPI.EntityFramework.Tests
 
             EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context, MetadataManager.Instance);
 
-            string underpost = @"{""posts"":{""id"":""" + p.Id.ToString() + @""",""title"":""Not at all linkbait!""}}";
+            string underpost = @"{""data"":{""id"":""" + p.Id.ToString() + @""",""title"":""Not at all linkbait!""}}";
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(underpost));
 
             int previousCommentsCount = p.Comments.Count;

@@ -1,5 +1,6 @@
 {
-    "posts": {
+    "data": {
+        "type": "posts",
         "id": "42",
         "links": {
             "author": {
