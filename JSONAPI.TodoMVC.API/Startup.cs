@@ -5,6 +5,7 @@ using JSONAPI.Core;
 using JSONAPI.EntityFramework.ActionFilters;
 using JSONAPI.Http;
 using JSONAPI.Json;
+using JSONAPI.TodoMVC.API.Models;
 using Owin;
 
 namespace JSONAPI.TodoMVC.API
@@ -24,6 +25,7 @@ namespace JSONAPI.TodoMVC.API
             var config = new HttpConfiguration();
 
             var modelManager = new ModelManager(pluralizationService);
+            modelManager.RegisterResourceType(typeof(Todo));
 
             var formatter = new JsonApiFormatter(modelManager);
             config.Formatters.Clear();

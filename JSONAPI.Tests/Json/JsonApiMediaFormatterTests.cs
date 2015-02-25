@@ -205,16 +205,14 @@ namespace JSONAPI.Tests.Json
         public void SerializerIntegrationTest()
         {
             // Arrange
-            //PayloadConverter pc = new PayloadConverter();
-            //ModelConverter mc = new ModelConverter();
-            //ContractResolver.PluralizationService = new PluralizationService();
-
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Author));
+            modelManager.RegisterResourceType(typeof(Comment));
+            modelManager.RegisterResourceType(typeof(Post));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
-            //Payload payload = new Payload(a.Posts);
-            //js.Serialize(jw, payload);
             formatter.WriteToStreamAsync(typeof(Post), new[] { p, p2, p3, p4 }.ToList(), stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
@@ -230,16 +228,14 @@ namespace JSONAPI.Tests.Json
         public void SerializeArrayIntegrationTest()
         {
             // Arrange
-            //PayloadConverter pc = new PayloadConverter();
-            //ModelConverter mc = new ModelConverter();
-            //ContractResolver.PluralizationService = new PluralizationService();
-
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Author));
+            modelManager.RegisterResourceType(typeof(Comment));
+            modelManager.RegisterResourceType(typeof(Post));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
-            //Payload payload = new Payload(a.Posts);
-            //js.Serialize(jw, payload);
             formatter.WriteToStreamAsync(typeof(Post), new[] { p, p2, p3, p4 }, stream, (System.Net.Http.HttpContent)null, (System.Net.TransportContext)null);
 
             // Assert
@@ -255,7 +251,9 @@ namespace JSONAPI.Tests.Json
         public void Serializes_attributes_properly() 
         {
             // Arrang
-            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Sample));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -273,7 +271,9 @@ namespace JSONAPI.Tests.Json
         public void Serializes_byte_ids_properly() 
         {
             // Arrang
-            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Tag));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -291,7 +291,9 @@ namespace JSONAPI.Tests.Json
         public void Reformats_raw_json_string_with_unquoted_keys()
         {
             // Arrange
-            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -310,7 +312,9 @@ namespace JSONAPI.Tests.Json
         public void Does_not_serialize_malformed_raw_json_string()
         {
             // Arrange
-            JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -329,7 +333,8 @@ namespace JSONAPI.Tests.Json
         public void Should_serialize_error()
         {
             // Arrange
-            var formatter = new JSONAPI.Json.JsonApiFormatter(new MockErrorSerializer());
+            var modelManager = new ModelManager(new PluralizationService());
+            var formatter = new JsonApiFormatter(modelManager, new MockErrorSerializer());
             var stream = new MemoryStream();
 
             // Act
@@ -348,7 +353,8 @@ namespace JSONAPI.Tests.Json
         public void SerializeErrorIntegrationTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             var mockInnerException = new Mock<Exception>(MockBehavior.Strict);
@@ -384,7 +390,9 @@ namespace JSONAPI.Tests.Json
             using (var inputStream = File.OpenRead("DeserializeCollectionRequest.json"))
             {
                 // Arrange
-                JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+                var modelManager = new ModelManager(new PluralizationService());
+                modelManager.RegisterResourceType(typeof(Post));
+                var formatter = new JsonApiFormatter(modelManager);
 
                 // Act
                 var posts = (IList<Post>)formatter.ReadFromStreamAsync(typeof(Post), inputStream, null, null).Result;
@@ -407,7 +415,9 @@ namespace JSONAPI.Tests.Json
             using (var inputStream = File.OpenRead("DeserializeAttributeRequest.json"))
             {
                 // Arrange
-                JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+                var modelManager = new ModelManager(new PluralizationService());
+                modelManager.RegisterResourceType(typeof(Sample));
+                var formatter = new JsonApiFormatter(modelManager);
 
                 // Act
                 var deserialized = (IList<Sample>)await formatter.ReadFromStreamAsync(typeof(Sample), inputStream, null, null);
@@ -426,7 +436,9 @@ namespace JSONAPI.Tests.Json
             using (var inputStream = File.OpenRead("DeserializeRawJsonTest.json"))
             {
                 // Arrange
-                var formatter = new JsonApiFormatter(new PluralizationService());
+                var modelManager = new ModelManager(new PluralizationService());
+                modelManager.RegisterResourceType(typeof(Comment));
+                var formatter = new JsonApiFormatter(modelManager);
 
                 // Act
                 var comments = ((IEnumerable<Comment>)await formatter.ReadFromStreamAsync(typeof (Comment), inputStream, null, null)).ToArray();
@@ -442,7 +454,10 @@ namespace JSONAPI.Tests.Json
         [TestMethod(), Timeout(1000)]
         public void DeserializeExtraPropertyTest()
         {
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Author));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":{""type"": ""posts"",""ids"": []}}}"));
@@ -459,7 +474,10 @@ namespace JSONAPI.Tests.Json
         [TestMethod(), Timeout(1000)]
         public void DeserializeExtraRelationshipTest()
         {
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Author));
+            var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""authors"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":{""type"": ""posts"",""ids"": []},""bogus"":[""PANIC!""]}}}"));
@@ -476,7 +494,10 @@ namespace JSONAPI.Tests.Json
         [DeploymentItem(@"Data\NonStandardIdTest.json")]
         public void SerializeNonStandardIdTest()
         {
-            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(NonStandardIdThing));
+            var formatter = new JsonApiFormatter(modelManager);
             var stream = new MemoryStream();
             var payload = new List<NonStandardIdThing> {
                 new NonStandardIdThing { Uuid = new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"), Data = "Swap" }
@@ -498,7 +519,9 @@ namespace JSONAPI.Tests.Json
         [DeploymentItem(@"Data\NonStandardIdTest.json")]
         public void DeserializeNonStandardIdTest()
         {
-            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(NonStandardIdThing));
+            var formatter = new JsonApiFormatter(modelManager);
             var stream = new FileStream("NonStandardIdTest.json",FileMode.Open);
 
             // Act
@@ -515,7 +538,9 @@ namespace JSONAPI.Tests.Json
         [DeploymentItem(@"Data\NonStandardIdTest.json")]
         public void DeserializeNonStandardIdWithIdOnly()
         {
-            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(NonStandardIdThing));
+            var formatter = new JsonApiFormatter(modelManager);
             string json = File.ReadAllText("NonStandardIdTest.json");
             json = Regex.Replace(json, @"""uuid"":\s*""0657fd6d-a4ab-43c4-84e5-0933c84b4f4f""\s*,",""); // remove the uuid attribute
             var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(json));
@@ -534,7 +559,9 @@ namespace JSONAPI.Tests.Json
         [DeploymentItem(@"Data\NonStandardIdTest.json")]
         public void DeserializeNonStandardIdWithoutId()
         {
-            var formatter = new JSONAPI.Json.JsonApiFormatter(new PluralizationService());
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(NonStandardIdThing));
+            var formatter = new JsonApiFormatter(modelManager);
             string json = File.ReadAllText("NonStandardIdTest.json");
             json = Regex.Replace(json, @"""id"":\s*""0657fd6d-a4ab-43c4-84e5-0933c84b4f4f""\s*,", ""); // remove the uuid attribute
             var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(json));

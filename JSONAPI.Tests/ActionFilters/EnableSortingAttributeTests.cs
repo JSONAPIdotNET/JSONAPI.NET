@@ -75,6 +75,7 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 { "Dummy", "Dummies" }
             }));
+            modelManager.RegisterResourceType(typeof(Dummy));
 
             var filter = new EnableSortingAttribute(modelManager);
 
