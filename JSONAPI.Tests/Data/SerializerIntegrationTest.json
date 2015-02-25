@@ -1,6 +1,7 @@
 {
     "posts": [
         {
+            "type": "posts",
             "id": "1",
             "title": "Linkbait!",
             "links": {
@@ -9,6 +10,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "2",
             "title": "Rant #1023",
             "links": {
@@ -17,6 +19,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "3",
             "title": "Polemic in E-flat minor #824",
             "links": {
@@ -25,6 +28,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "4",
             "title": "This post has no author.",
             "links": {
@@ -36,12 +40,14 @@
     "linked": {
         "comments": [
             {
+                "type": "comments",
                 "id": "2",
                 "body": "Nuh uh!",
                 "customData": null,
                 "links": { "post": "1" }
             },
             {
+                "type": "comments",
                 "id": "3",
                 "body": "Yeah huh!",
                 "customData": null,
@@ -50,6 +56,7 @@
                 }
             },
             {
+                "type": "comments",
                 "id": "4",
                 "body": "Third Reich.",
                 "customData": {
@@ -60,6 +67,7 @@
                 }
             },
             {
+                "type": "comments",
                 "id": "5",
                 "body": "I laughed, I cried!",
                 "customData": null,
@@ -70,6 +78,7 @@
         ],
         "authors": [
             {
+                "type": "authors",
                 "id": "1",
                 "name": "Jason Hater",
                 "links": {

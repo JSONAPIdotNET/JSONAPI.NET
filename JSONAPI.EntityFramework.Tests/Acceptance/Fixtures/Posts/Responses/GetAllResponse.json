@@ -1,6 +1,7 @@
 ﻿{
     "posts": [
         {
+            "type": "posts",
             "id": "201",
             "title": "Post 1",
             "content": "Post 1 content",
@@ -12,6 +13,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "202",
             "title": "Post 2",
             "content": "Post 2 content",
@@ -23,6 +25,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "203",
             "title": "Post 3",
             "content": "Post 3 content",
@@ -34,6 +37,7 @@
             }
         },
         {
+            "type": "posts",
             "id": "204",
             "title": "Post 4",
             "content": "Post 4 content",

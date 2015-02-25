@@ -1,6 +1,7 @@
 ﻿{
     "posts": [
         {
+            "type": "posts",
             "id": "204",
             "title": "Post 4",
             "content": "Post 4 content",

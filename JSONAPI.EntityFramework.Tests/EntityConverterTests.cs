@@ -108,6 +108,7 @@ namespace JSONAPI.EntityFramework.Tests
         {
             // Arrange
             var modelManager = new ModelManager(new Core.PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
             modelManager.RegisterResourceType(typeof(Post));
 
             JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(modelManager);

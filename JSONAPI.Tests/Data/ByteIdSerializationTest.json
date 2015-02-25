@@ -1,12 +1,15 @@
 {
     "tags": [
         {
+            "type": "tags",
             "id": "1",
             "text":  "Ember"
         }, {
+            "type": "tags",
             "id": "2",
             "text":  "React"
         }, {
+            "type": "tags",
             "id": "3",
             "text":  "Angular"
         }

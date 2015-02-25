@@ -167,16 +167,16 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
-            // The spec no longer requires that the ID key be "id":
-            //     "An ID SHOULD be represented by an 'id' key..." :-/
-            // But Ember Data does. So, we'll add "id" to the document
-            // always, and also serialize the property under its given
-            // name, for now at least.
-            //TODO: Partly because of this, we should probably disallow updates to Id properties where practical.
+            var resourceType = value.GetType();
+
+            // Write the type
+            writer.WritePropertyName("type");
+            var jsonTypeKey = _modelManager.GetResourceTypeNameForType(resourceType);
+            writer.WriteValue(jsonTypeKey);
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            var idProp = _modelManager.GetIdProperty(value.GetType());
+            var idProp = _modelManager.GetIdProperty(resourceType);
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             // Leverage the cached map to avoid another costly call to System.Type.GetProperties()

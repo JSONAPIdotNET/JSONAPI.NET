@@ -1,6 +1,7 @@
 ﻿{
     "users": [
         {
+            "type": "users",
             "id": "404",
             "firstName": "Richard",
             "lastName":  "Smith",
@@ -11,6 +12,7 @@
             }
         },
         {
+            "type": "users",
             "id": "401",
             "firstName": "Alice",
             "lastName": "Smith",
@@ -21,6 +23,7 @@
             }
         },
         {
+            "type": "users",
             "id": "407",
             "firstName": "Thomas",
             "lastName": "Potter",
@@ -31,6 +34,7 @@
             }
         },
         {
+            "type": "users",
             "id": "408",
             "firstName": "Pat",
             "lastName": "Morgan",
@@ -41,6 +45,7 @@
             }
         },
         {
+            "type": "users",
             "id": "403",
             "firstName": "Charlie",
             "lastName": "Michaels",
@@ -51,6 +56,7 @@
             }
         },
         {
+            "type": "users",
             "id": "402",
             "firstName": "Bob",
             "lastName": "Jones",
@@ -61,6 +67,7 @@
             }
         },
         {
+            "type": "users",
             "id": "405",
             "firstName": "Michelle",
             "lastName": "Johnson",
@@ -71,6 +78,7 @@
             }
         },
         {
+            "type": "users",
             "id": "410",
             "firstName": "Sally",
             "lastName": "Burns",
@@ -81,6 +89,7 @@
             }
         },
         {
+            "type": "users",
             "id": "406",
             "firstName": "Ed",
             "lastName": "Burns",
@@ -91,6 +100,7 @@
             }
         },
         {
+            "type": "users",
             "id": "409",
             "firstName": "Charlie",
             "lastName": "Burns",
