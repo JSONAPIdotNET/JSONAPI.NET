@@ -16,8 +16,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "user-groups");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\UserGroups\Responses\GetAllResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\UserGroups\Responses\GetAllResponse.json", HttpStatusCode.OK);
             }
         }
     }

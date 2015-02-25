@@ -20,8 +20,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=%2BfirstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedAscendingResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedAscendingResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -37,8 +36,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=-firstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedDescendingResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedDescendingResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -54,8 +52,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=%2BlastName,%2BfirstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleAscendingResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleAscendingResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -71,8 +68,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=-lastName,-firstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleDescendingResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleDescendingResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -88,8 +84,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=%2BlastName,-firstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMixedDirectionResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByMixedDirectionResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -105,8 +100,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=%2Bfoobar");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json", HttpStatusCode.BadRequest);
             }
         }
 
@@ -122,8 +116,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=%2BfirstName,%2BfirstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json", HttpStatusCode.BadRequest);
             }
         }
         
@@ -139,8 +132,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "users?sort=firstName");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByColumnMissingDirectionResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Sorting\Responses\GetSortedByColumnMissingDirectionResponse.json", HttpStatusCode.BadRequest);
             }
         }
     }

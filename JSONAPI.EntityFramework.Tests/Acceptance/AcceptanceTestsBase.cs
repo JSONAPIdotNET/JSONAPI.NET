@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -27,7 +28,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             return TestHelpers.GetEffortConnection(@"Acceptance\Data");
         }
 
-        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath)
+        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode)
         {
             var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -39,6 +40,8 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             redactedResponse.Should().Be(expectedResponse);
             response.Content.Headers.ContentType.MediaType.Should().Be("application/vnd.api+json");
             response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
+
+            response.StatusCode.Should().Be(expectedStatusCode);
         }
 
         #region GET

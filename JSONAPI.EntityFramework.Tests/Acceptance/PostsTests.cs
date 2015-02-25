@@ -24,8 +24,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "posts");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetAllResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetAllResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -41,8 +40,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "posts?title=Post 4");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -58,8 +56,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "posts/202");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetByIdResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetByIdResponse.json", HttpStatusCode.OK);
             }
         }
 
@@ -75,8 +72,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPost(effortConnection, "posts", @"Acceptance\Fixtures\Posts\Requests\PostRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PostResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PostResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -104,8 +100,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithAttributeUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithAttributeUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithAttributeUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -134,8 +129,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -164,8 +158,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyHomogeneousDataUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -194,8 +187,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -224,8 +216,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToOneUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToOneUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToOneUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -254,8 +245,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithNullToOneUpdateRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -284,8 +274,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneIdRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneIdResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneIdResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -314,8 +303,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneTypeRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneTypeResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneTypeResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -344,8 +332,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyIdsRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyIdsResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyIdsResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -374,8 +361,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyTypeRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyTypeResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyTypeResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -404,8 +390,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -434,8 +419,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithStringRelationshipValueRequest.json");
 
-                response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json");
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
