@@ -2,9 +2,9 @@
 
 namespace JSONAPI.Extensions
 {
-    internal static class TypeExtensions
+    public static class TypeExtensions
     {
-        internal static bool CanWriteAsJsonApiAttribute(this Type objectType)
+        public static bool CanWriteAsJsonApiAttribute(this Type objectType)
         {
             if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof (Nullable<>))
                 objectType = objectType.GetGenericArguments()[0];
