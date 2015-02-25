@@ -136,8 +136,15 @@ namespace JSONAPI.Core
             if (IsSerializedAsMany(type))
                 type = GetElementType(type);
 
-            string resourceTypeName;
-            if (_resourceTypeNamesByType.Value.TryGetValue(type, out resourceTypeName)) return resourceTypeName;
+            var currentType = type;
+            while (currentType != null && currentType != typeof(Object))
+            {
+                string resourceTypeName;
+                if (_resourceTypeNamesByType.Value.TryGetValue(currentType, out resourceTypeName)) return resourceTypeName;
+
+                // This particular type wasn't registered, but maybe the base type was
+                currentType = currentType.BaseType;
+            }
 
             throw new InvalidOperationException(String.Format("The type `{0}` was not registered.", type.FullName));
         }

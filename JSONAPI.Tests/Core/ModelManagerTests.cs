@@ -25,6 +25,11 @@ namespace JSONAPI.Tests.Core
             public string Data { get; set; }
         }
 
+        private class DerivedPost : Post
+        {
+            
+        }
+
         [TestMethod]
         public void FindsIdNamedId()
         {
@@ -88,6 +93,21 @@ namespace JSONAPI.Tests.Core
             Assert.AreEqual("comments", commentKey);
             Assert.AreEqual("comments", manyCommentKey);
             Assert.AreEqual("user-groups", userGroupsKey);
+        }
+
+        [TestMethod]
+        public void GetResourceTypeNameForType_gets_name_for_closest_registered_base_type_for_unregistered_type()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            mm.RegisterResourceType(typeof(Post));
+
+            // Act
+            var resourceTypeName = mm.GetResourceTypeNameForType(typeof(DerivedPost));
+
+            // Assert
+            resourceTypeName.Should().Be("posts");
         }
 
         [TestMethod]
