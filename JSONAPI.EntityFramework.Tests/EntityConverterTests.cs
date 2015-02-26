@@ -107,7 +107,10 @@ namespace JSONAPI.EntityFramework.Tests
         public void SerializeTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            var modelManager = new ModelManager(new Core.PluralizationService());
+            modelManager.RegisterResourceType(typeof(Post));
+
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             // Act
@@ -123,7 +126,10 @@ namespace JSONAPI.EntityFramework.Tests
         public async Task UnderpostingTest()
         {
             // Arrange
-            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(new JSONAPI.Core.PluralizationService());
+            var modelManager = new ModelManager(new Core.PluralizationService());
+            modelManager.RegisterResourceType(typeof(Post));
+
+            JsonApiFormatter formatter = new JSONAPI.Json.JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
             EntityFrameworkMaterializer materializer = new EntityFrameworkMaterializer(context, MetadataManager.Instance);

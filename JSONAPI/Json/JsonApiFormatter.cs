@@ -123,7 +123,7 @@ namespace JSONAPI.Json
 
                 //writer.Formatting = Formatting.Indented;
 
-                var root = _modelManager.GetJsonKeyForType(type);
+                var root = _modelManager.GetResourceTypeNameForType(type);
 
                 writer.WriteStartObject();
                 writer.WritePropertyName(root);
@@ -469,7 +469,7 @@ namespace JSONAPI.Json
                 foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
                 {
                     apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(_modelManager.GetJsonKeyForType(apair.Key));
+                    writer.WritePropertyName(_modelManager.GetResourceTypeNameForType(apair.Key));
                     writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
                 }
 
@@ -501,7 +501,7 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = _modelManager.GetJsonKeyForType(type);
+            var pripropname = _modelManager.GetResourceTypeNameForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type

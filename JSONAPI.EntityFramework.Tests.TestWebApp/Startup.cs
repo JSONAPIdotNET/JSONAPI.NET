@@ -66,6 +66,11 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             var pluralizationService = new PluralizationService();
             var modelManager = new ModelManager(pluralizationService);
+            modelManager.RegisterResourceType(typeof(Comment));
+            modelManager.RegisterResourceType(typeof(Post));
+            modelManager.RegisterResourceType(typeof(Tag));
+            modelManager.RegisterResourceType(typeof(User));
+            modelManager.RegisterResourceType(typeof(UserGroup));
 
             var formatter = new JsonApiFormatter(modelManager);
             config.Formatters.Clear();

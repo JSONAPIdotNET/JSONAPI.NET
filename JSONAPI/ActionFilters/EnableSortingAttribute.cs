@@ -90,7 +90,7 @@ namespace JSONAPI.ActionFilters
 
                 if (property == null)
                     throw new SortingException(string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
-                        propertyName, _modelManager.GetJsonKeyForType(typeof (T))));
+                        propertyName, _modelManager.GetResourceTypeNameForType(typeof (T))));
                 
                 if (usedProperties.ContainsKey(property))
                     throw new SortingException(string.Format("The attribute \"{0}\" was specified more than once.", propertyName));

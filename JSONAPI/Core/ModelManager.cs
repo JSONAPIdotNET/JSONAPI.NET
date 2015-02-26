@@ -38,9 +38,14 @@ namespace JSONAPI.Core
                 () => new Dictionary<Type, Dictionary<string, PropertyInfo>>()
             );
 
-        protected Lazy<Dictionary<Type, string>> _jsonKeysForType
+        protected Lazy<Dictionary<Type, string>> _resourceTypeNamesByType
             = new Lazy<Dictionary<Type, string>>(
                 () => new Dictionary<Type, string>()
+            );
+
+        protected Lazy<Dictionary<string, Type>> _typesByResourceTypeName
+            = new Lazy<Dictionary<string, Type>>(
+                () => new Dictionary<string, Type>()
             );
 
         protected Lazy<Dictionary<Type, bool>> _isSerializedAsMany
@@ -126,35 +131,85 @@ namespace JSONAPI.Core
 
         #endregion
 
-        public string GetJsonKeyForType(Type type)
+        public string GetResourceTypeNameForType(Type type)
         {
-            string key = null;
+            if (IsSerializedAsMany(type))
+                type = GetElementType(type);
 
-            var keyCache = _jsonKeysForType.Value;
-
-            lock (keyCache)
+            var currentType = type;
+            while (currentType != null && currentType != typeof(Object))
             {
-                if (IsSerializedAsMany(type))
-                    type = GetElementType(type);
+                string resourceTypeName;
+                if (_resourceTypeNamesByType.Value.TryGetValue(currentType, out resourceTypeName)) return resourceTypeName;
 
-                if (keyCache.TryGetValue(type, out key)) return key;
-
-                var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
-
-                string title = type.Name;
-                if (attrs.Any())
-                {
-                    var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
-                        .Select(arg => arg.TypedValue.Value.ToString()).ToList();
-                    if (titles.Any()) title = titles.First();
-                }
-
-                key = FormatPropertyName(PluralizationService.Pluralize(title)).Dasherize();
-
-                keyCache.Add(type, key);
+                // This particular type wasn't registered, but maybe the base type was
+                currentType = currentType.BaseType;
             }
 
-            return key;
+            throw new InvalidOperationException(String.Format("The type `{0}` was not registered.", type.FullName));
+        }
+
+        public Type GetTypeByResourceTypeName(string resourceTypeName)
+        {
+            Type type;
+            if (_typesByResourceTypeName.Value.TryGetValue(resourceTypeName, out type)) return type;
+
+            throw new InvalidOperationException(String.Format("The resource type name `{0}` was not registered.", resourceTypeName));
+        }
+
+        /// <summary>
+        /// Registers a type with this ModelManager.
+        /// </summary>
+        /// <param name="type">The type to register.</param>
+        public void RegisterResourceType(Type type)
+        {
+            var resourceTypeName = CalculateResourceTypeNameForType(type);
+            RegisterResourceType(type, resourceTypeName);
+        }
+
+        /// <summary>
+        /// Registeres a type with this ModelManager, using a default resource type name.
+        /// </summary>
+        /// <param name="type">The type to register.</param>
+        /// <param name="resourceTypeName">The resource type name to use</param>
+        public void RegisterResourceType(Type type, string resourceTypeName)
+        {
+            lock (_resourceTypeNamesByType.Value)
+            {
+                lock (_typesByResourceTypeName.Value)
+                {
+                    if (_resourceTypeNamesByType.Value.ContainsKey(type))
+                        throw new InvalidOperationException(String.Format("The type `{0}` has already been registered.",
+                            type.FullName));
+
+                    if (_typesByResourceTypeName.Value.ContainsKey(resourceTypeName))
+                        throw new InvalidOperationException(
+                            String.Format("The resource type name `{0}` has already been registered.", resourceTypeName));
+
+                    _resourceTypeNamesByType.Value[type] = resourceTypeName;
+                    _typesByResourceTypeName.Value[resourceTypeName] = type;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines the resource type name for a given type.
+        /// </summary>
+        /// <param name="type">The type to calculate the resouce type name for</param>
+        /// <returns>The type's resource type name</returns>
+        protected virtual string CalculateResourceTypeNameForType(Type type)
+        {
+            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(Newtonsoft.Json.JsonObjectAttribute)).ToList();
+
+            string title = type.Name;
+            if (attrs.Any())
+            {
+                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
+                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
+                if (titles.Any()) title = titles.First();
+            }
+
+            return FormatPropertyName(PluralizationService.Pluralize(title)).Dasherize();
         }
 
         public string GetJsonKeyForProperty(PropertyInfo propInfo)

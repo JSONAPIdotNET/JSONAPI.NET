@@ -16,7 +16,9 @@ namespace JSONAPI.Tests.Core
             using (var inputStream = File.OpenRead("MetadataManagerPropertyWasPresentRequest.json"))
             {
                 // Arrange
-                JsonApiFormatter formatter = new JsonApiFormatter(new PluralizationService());
+                var modelManager = new ModelManager(new PluralizationService());
+                modelManager.RegisterResourceType(typeof(Post));
+                JsonApiFormatter formatter = new JsonApiFormatter(modelManager);
 
                 var p = (Post) formatter.ReadFromStreamAsync(typeof(Post), inputStream, null, null).Result;
 
