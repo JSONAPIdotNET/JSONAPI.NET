@@ -9,6 +9,7 @@ using System.Data.Entity.Infrastructure;
 using System.Reflection;
 using System.Collections;
 using System.Data.Entity.Core;
+using JSONAPI.Extensions;
 
 namespace JSONAPI.EntityFramework
 {
@@ -170,15 +171,7 @@ namespace JSONAPI.EntityFramework
 
         public bool IsModel(Type objectType)
         {
-            if (objectType.IsPrimitive
-                || typeof(System.Guid).IsAssignableFrom(objectType)
-                || typeof(System.DateTime).IsAssignableFrom(objectType)
-                || typeof(System.DateTimeOffset).IsAssignableFrom(objectType)
-                || typeof(System.Guid?).IsAssignableFrom(objectType)
-                || typeof(System.DateTime?).IsAssignableFrom(objectType)
-                || typeof(System.DateTimeOffset?).IsAssignableFrom(objectType)
-                || typeof(String).IsAssignableFrom(objectType)
-                )
+            if (objectType.CanWriteAsJsonApiAttribute())
                 return false;
             else return true;
         }
