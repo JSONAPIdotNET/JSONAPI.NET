@@ -76,11 +76,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\MetadataManagerTests.cs" />
+    <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
     <Compile Include="Json\JsonApiMediaFormaterTests.cs" />
     <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -92,6 +94,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\AttributeSerializationTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\FormatterErrorSerializationTest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -105,7 +110,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

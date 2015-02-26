@@ -70,6 +70,7 @@
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\MetadataManager.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
     <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
