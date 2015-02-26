@@ -88,6 +88,8 @@ namespace JSONAPI.Json
             return true;
         }
 
+        private const string PrimaryDataKeyName = "data";
+
         #region Serialization
 
         public override Task WriteToStreamAsync(System.Type type, object value, Stream writeStream, System.Net.Http.HttpContent content, System.Net.TransportContext transportContext)
@@ -123,10 +125,8 @@ namespace JSONAPI.Json
 
                 //writer.Formatting = Formatting.Indented;
 
-                var root = _modelManager.GetResourceTypeNameForType(type);
-
                 writer.WriteStartObject();
-                writer.WritePropertyName(root);
+                writer.WritePropertyName(PrimaryDataKeyName);
                 if (_modelManager.IsSerializedAsMany(value.GetType()))
                     this.SerializeMany(value, writeStream, writer, serializer, aggregator);
                 else
@@ -167,16 +167,16 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
-            // The spec no longer requires that the ID key be "id":
-            //     "An ID SHOULD be represented by an 'id' key..." :-/
-            // But Ember Data does. So, we'll add "id" to the document
-            // always, and also serialize the property under its given
-            // name, for now at least.
-            //TODO: Partly because of this, we should probably disallow updates to Id properties where practical.
+            var resourceType = value.GetType();
+
+            // Write the type
+            writer.WritePropertyName("type");
+            var jsonTypeKey = _modelManager.GetResourceTypeNameForType(resourceType);
+            writer.WriteValue(jsonTypeKey);
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            var idProp = _modelManager.GetIdProperty(value.GetType());
+            var idProp = _modelManager.GetIdProperty(resourceType);
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
@@ -501,7 +501,6 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = _modelManager.GetResourceTypeNameForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type
@@ -520,6 +519,7 @@ namespace JSONAPI.Json
                 if (reader.TokenType != JsonToken.StartObject)
                     throw new JsonSerializationException("Document root is not an object!");
 
+                bool foundPrimaryData = false;
                 while (reader.Read())
                 {
                     if (reader.TokenType == JsonToken.PropertyName)
@@ -536,42 +536,20 @@ namespace JSONAPI.Json
                                 // ignore this, is it even meaningful in a PUT/POST body?
                                 reader.Skip();
                                 break;
-                            default:
-                                if (value == pripropname)
-                                {
-                                    // Could be a single resource or multiple, according to spec!
-                                    if (reader.TokenType == JsonToken.StartArray)
-                                    {
-                                        Type listType = (typeof (List<>)).MakeGenericType(singleType);
-                                        retval = (IList) Activator.CreateInstance(listType);
-                                        reader.Read(); // Burn off StartArray token
-                                        while (reader.TokenType == JsonToken.StartObject)
-                                        {
-                                            ((IList) retval).Add(Deserialize(singleType, reader));
-                                        }
-                                        // burn EndArray token...
-                                        if (reader.TokenType != JsonToken.EndArray)
-                                            throw new JsonReaderException(
-                                                String.Format("Expected JsonToken.EndArray but got {0}",
-                                                    reader.TokenType));
-                                        reader.Read();
-                                    }
-                                    else
-                                    {
-                                        // Because we choose what to deserialize based on the ApiController method signature
-                                        // (not choose the method signature based on what we're deserializing), the `type`
-                                        // parameter will always be `IList<Model>` even if a single model is sent!
-                                        retval = Deserialize(singleType, reader);
-                                    }
-                                }
-                                else
-                                    reader.Skip();
+                            case PrimaryDataKeyName:
+                                // Could be a single resource or multiple, according to spec!
+                                foundPrimaryData = true;
+                                retval = DeserializePrimaryData(singleType, reader);
                                 break;
                         }
                     }
                     else
                         reader.Skip();
                 }
+
+                if (!foundPrimaryData)
+                    throw new BadRequestException(String.Format("Expected primary data located at the `{0}` key", PrimaryDataKeyName));
+
 
                 /* WARNING: May transform a single object into a list of objects!!!
                  * This is a necessary workaround to support POST and PUT of multiple 
@@ -655,6 +633,40 @@ namespace JSONAPI.Json
              */
 
             return GetDefaultValueForType(type);
+        }
+
+        private object DeserializePrimaryData(Type singleType, JsonReader reader)
+        {
+            object retval;
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                Type listType = (typeof(List<>)).MakeGenericType(singleType);
+                retval = (IList)Activator.CreateInstance(listType);
+                reader.Read(); // Burn off StartArray token
+                while (reader.TokenType == JsonToken.StartObject)
+                {
+                    ((IList)retval).Add(Deserialize(singleType, reader));
+                }
+                // burn EndArray token...
+                if (reader.TokenType != JsonToken.EndArray)
+                    throw new JsonReaderException(
+                        String.Format("Expected JsonToken.EndArray but got {0}",
+                            reader.TokenType));
+                reader.Read();
+            }
+            else if (reader.TokenType == JsonToken.StartObject)
+            {
+                // Because we choose what to deserialize based on the ApiController method signature
+                // (not choose the method signature based on what we're deserializing), the `type`
+                // parameter will always be `IList<Model>` even if a single model is sent!
+                retval = Deserialize(singleType, reader);
+            }
+            else
+            {
+                throw new BadRequestException(String.Format("Unexpected value for the `{0}` key", PrimaryDataKeyName));
+            }
+
+            return retval;
         }
 
         private object Deserialize(Type objectType, JsonReader reader)

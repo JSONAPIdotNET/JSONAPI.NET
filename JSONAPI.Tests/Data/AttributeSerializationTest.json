@@ -1,9 +1,10 @@
 {
-    "samples": [
+    "data": [
         {
+            "type": "samples",
             "id": "1",
             "booleanField": false,
-            "nullableBooleanField":  false,
+            "nullableBooleanField": false,
             "sByteField": 0,
             "nullableSByteField": null,
             "byteField": 0,
@@ -36,6 +37,7 @@
             "enumField": 0,
             "nullableEnumField": null
         }, {
+            "type": "samples",
             "id": "2",
             "booleanField": true,
             "nullableBooleanField": true,

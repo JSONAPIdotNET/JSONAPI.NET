@@ -7,6 +7,7 @@ using JSONAPI.Http;
 using JSONAPI.Json;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
+using PluralizationService = JSONAPI.Core.PluralizationService;
 
 namespace JSONAPI.TodoMVC.API
 {

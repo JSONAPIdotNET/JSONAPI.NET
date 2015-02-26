@@ -110,6 +110,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
     <Compile Include="Acceptance\PostsTests.cs" />
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
@@ -162,6 +163,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Heterogeneous\Responses\GetSearchResultsResponse.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
