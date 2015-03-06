@@ -69,7 +69,7 @@ namespace JSONAPI.ActionFilters
         {
             var selectors = new List<Tuple<bool, Expression<Func<T, object>>>>();
 
-            var usedProperties = new Dictionary<PropertyInfo, object>();
+            var usedProperties = new Dictionary<ModelProperty, object>();
 
             var sortExpressions = sortParam.Split(',');
             foreach (var sortExpression in sortExpressions)
@@ -98,7 +98,7 @@ namespace JSONAPI.ActionFilters
                 usedProperties[property] = null;
 
                 var paramExpr = Expression.Parameter(typeof (T));
-                var propertyExpr = Expression.Property(paramExpr, property);
+                var propertyExpr = Expression.Property(paramExpr, property.Property);
                 var selector = Expression.Lambda<Func<T, object>>(propertyExpr, paramExpr);
 
                 selectors.Add(Tuple.Create(ascending, selector));

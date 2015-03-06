@@ -18,8 +18,8 @@
             "text": "Comment 1",
             "created": "2015-01-31T14:30:00+00:00",
             "links": { 
-                "author": "403",
-                "post": "201"
+                "post": "201",
+                "author": "403"
             }
         }
     ]

@@ -18,6 +18,7 @@ namespace JSONAPI.Tests.Core
                 // Arrange
                 var modelManager = new ModelManager(new PluralizationService());
                 modelManager.RegisterResourceType(typeof(Post));
+                modelManager.RegisterResourceType(typeof(Author));
                 JsonApiFormatter formatter = new JsonApiFormatter(modelManager);
 
                 var p = (Post) formatter.ReadFromStreamAsync(typeof(Post), inputStream, null, null).Result;

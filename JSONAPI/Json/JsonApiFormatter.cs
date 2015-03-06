@@ -180,24 +180,23 @@ namespace JSONAPI.Json
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
-            PropertyInfo[] props = _modelManager.GetProperties(value.GetType());
+            var props = _modelManager.GetProperties(value.GetType());
 
             // Do non-model properties first, everything else goes in "links"
             //TODO: Unless embedded???
-            IList<PropertyInfo> modelProps = new List<PropertyInfo>();
+            var relationshipModelProperties = new List<RelationshipModelProperty>();
 
-            foreach (PropertyInfo prop in props)
+            foreach (var modelProperty in props)
             {
-                string propKey = _modelManager.GetJsonKeyForProperty(prop);
-                if (propKey == "id") continue; // Don't write the "id" property twice, see above!
+                var prop = modelProperty.Property;
+                if (prop == idProp) continue; // Don't write the "id" property twice, see above!
 
-                if (prop.PropertyType.CanWriteAsJsonApiAttribute())
+                if (modelProperty is FieldModelProperty)
                 {
-                    if (prop.GetCustomAttributes().Any(attr => attr is JsonIgnoreAttribute))
-                        continue;
+                    if (modelProperty.IgnoreByDefault) continue; // TODO: allow overriding this
 
                     // numbers, strings, dates...
-                    writer.WritePropertyName(propKey);
+                    writer.WritePropertyName(modelProperty.JsonKey);
 
                     var propertyValue = prop.GetValue(value, null);
 
@@ -239,24 +238,25 @@ namespace JSONAPI.Json
                         serializer.Serialize(writer, propertyValue);
                     }
                 }
-                else
+                else if (modelProperty is RelationshipModelProperty)
                 {
-                    modelProps.Add(prop);
-                    continue;
+                    relationshipModelProperties.Add((RelationshipModelProperty)modelProperty);
                 }
             }
 
             // Now do other stuff
-            if (modelProps.Count() > 0)
+            if (relationshipModelProperties.Count() > 0)
             {
                 writer.WritePropertyName("links");
                 writer.WriteStartObject();
             }
-            foreach (PropertyInfo prop in modelProps)
+            foreach (var relationshipModelProperty in relationshipModelProperties)
             {
                 bool skip = false, iip = false;
                 string lt = null;
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
+
+                var prop = relationshipModelProperty.Property;
 
                 object[] attrs = prop.GetCustomAttributes(true);
 
@@ -382,7 +382,7 @@ namespace JSONAPI.Json
                 }
 
             }
-            if (modelProps.Count() > 0)
+            if (relationshipModelProperties.Count() > 0)
             {
                 writer.WriteEndObject();
             }
@@ -680,9 +680,7 @@ namespace JSONAPI.Json
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
                     string value = (string)reader.Value;
-                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
-                    // If the model object has a non-standard Id property, but the "id" key is being used...
-                    if (prop == null && value == "id") prop = _modelManager.GetIdProperty(objectType);
+                    var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value);
 
                     if (value == "links")
                     {
@@ -690,14 +688,16 @@ namespace JSONAPI.Json
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, reader);
                     }
-                    else if (prop != null)
+                    else if (modelProperty != null)
                     {
-                        if (!prop.PropertyType.CanWriteAsJsonApiAttribute())
+                        if (!(modelProperty is FieldModelProperty))
                         {
                             reader.Read(); // burn the PropertyName token
                             //TODO: Embedded would be dropped here!
                             continue; // These aren't supposed to be here, they're supposed to be in "links"!
                         }
+
+                        var prop = modelProperty.Property;
 
                         object propVal;
                         Type enumType;
@@ -812,10 +812,11 @@ namespace JSONAPI.Json
                 {
                     string value = (string)reader.Value;
                     reader.Read(); // burn the PropertyName token
-                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
-                    if (prop != null && !prop.PropertyType.CanWriteAsJsonApiAttribute())
+                    var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value) as RelationshipModelProperty;
+                    if (modelProperty != null)
                     {
-                        if (_modelManager.IsSerializedAsMany(prop.PropertyType))
+                        var prop = modelProperty.Property;
+                        if (modelProperty.IsToMany)
                         {
                             // Is a hasMany
 

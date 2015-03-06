@@ -392,6 +392,8 @@ namespace JSONAPI.Tests.Json
                 // Arrange
                 var modelManager = new ModelManager(new PluralizationService());
                 modelManager.RegisterResourceType(typeof(Post));
+                modelManager.RegisterResourceType(typeof(Author));
+                modelManager.RegisterResourceType(typeof(Comment));
                 var formatter = new JsonApiFormatter(modelManager);
 
                 // Act
@@ -536,7 +538,7 @@ namespace JSONAPI.Tests.Json
 
         [TestMethod]
         [DeploymentItem(@"Data\NonStandardIdTest.json")]
-        public void DeserializeNonStandardIdWithIdOnly()
+        public void DeserializeNonStandardId()
         {
             var modelManager = new ModelManager(new PluralizationService());
             modelManager.RegisterResourceType(typeof(NonStandardIdThing));
@@ -553,28 +555,6 @@ namespace JSONAPI.Tests.Json
             json.Should().NotContain("uuid", "The \"uuid\" attribute was supposed to be removed, test methodology problem!");
             things.Count.Should().Be(1);
             things.First().Uuid.Should().Be(new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"));
-        }
-
-        [TestMethod]
-        [DeploymentItem(@"Data\NonStandardIdTest.json")]
-        public void DeserializeNonStandardIdWithoutId()
-        {
-            var modelManager = new ModelManager(new PluralizationService());
-            modelManager.RegisterResourceType(typeof(NonStandardIdThing));
-            var formatter = new JsonApiFormatter(modelManager);
-            string json = File.ReadAllText("NonStandardIdTest.json");
-            json = Regex.Replace(json, @"""id"":\s*""0657fd6d-a4ab-43c4-84e5-0933c84b4f4f""\s*,", ""); // remove the uuid attribute
-            var stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(json));
-
-            // Act
-            IList<NonStandardIdThing> things;
-            things = (IList<NonStandardIdThing>)formatter.ReadFromStreamAsync(typeof(NonStandardIdThing), stream, (System.Net.Http.HttpContent)null, (System.Net.Http.Formatting.IFormatterLogger)null).Result;
-
-            // Assert
-            json.Should().NotContain("\"id\"", "The \"id\" attribute was supposed to be removed, test methodology problem!");
-            things.Count.Should().Be(1);
-            things.First().Uuid.Should().Be(new Guid("0657fd6d-a4ab-43c4-84e5-0933c84b4f4f"));
-
         }
     
         #endregion

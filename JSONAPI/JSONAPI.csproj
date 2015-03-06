@@ -79,6 +79,7 @@
     <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Core\ModelManager.cs" />
+    <Compile Include="Core\ModelProperty.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />

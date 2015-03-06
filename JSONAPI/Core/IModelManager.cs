@@ -54,7 +54,7 @@ namespace JSONAPI.Core
         /// <param name="type">The Type to find the property on</param>
         /// <param name="jsonKey">The JSON key representing a property</param>
         /// <returns></returns>
-        PropertyInfo GetPropertyForJsonKey(Type type, string jsonKey);
+        ModelProperty GetPropertyForJsonKey(Type type, string jsonKey);
 
         /// <summary>
         /// Analogue to System.Type.GetProperties(), but made available so that any caching done
@@ -62,8 +62,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="type">The type to get properties from</param>
         /// <returns>All properties recognized by the IModelManager.</returns>
-        //TODO: This needs to include JsonIgnore'd properties, so that they can be found and explicitly included at runtime...confusing? Add another method that excludes these?
-        PropertyInfo[] GetProperties(Type type);
+        ModelProperty[] GetProperties(Type type);
 
         /// <summary>
         /// Determines whether or not the given type will be treated as a "Many" relationship. 

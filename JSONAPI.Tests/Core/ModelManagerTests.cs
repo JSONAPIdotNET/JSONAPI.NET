@@ -35,6 +35,7 @@ namespace JSONAPI.Tests.Core
         {
             // Arrange
             var mm = new ModelManager(new PluralizationService());
+            mm.RegisterResourceType(typeof(Author));
 
             // Act
             PropertyInfo idprop = mm.GetIdProperty(typeof(Author));
@@ -44,17 +45,18 @@ namespace JSONAPI.Tests.Core
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
-        public void DoesntFindMissingId()
+        public void Cant_register_model_with_missing_id()
         {
             // Arrange
             var mm = new ModelManager(new PluralizationService());
 
             // Act
-            PropertyInfo idprop = mm.GetIdProperty(typeof(InvalidModel));
+            Action action = () => mm.RegisterResourceType(typeof(InvalidModel));
 
             // Assert
-            Assert.Fail("An InvalidOperationException should be thrown and we shouldn't get here!");
+            action.ShouldThrow<InvalidOperationException>()
+                .Which.Message.Should()
+                .Be("Unable to determine Id property for type JSONAPI.Tests.Core.ModelManagerTests+InvalidModel");
         }
 
         [TestMethod]
@@ -62,9 +64,11 @@ namespace JSONAPI.Tests.Core
         {
             // Arrange
             var mm = new ModelManager(new PluralizationService());
+            mm.RegisterResourceType(typeof(CustomIdModel));
             
             // Act
             PropertyInfo idprop = mm.GetIdProperty(typeof(CustomIdModel));
+
             // Assert
             Assert.AreSame(typeof(CustomIdModel).GetProperty("Uuid"), idprop);
         }
@@ -194,6 +198,7 @@ namespace JSONAPI.Tests.Core
             var pluralizationService = new PluralizationService();
             var mm = new ModelManager(pluralizationService);
             Type authorType = typeof(Author);
+            mm.RegisterResourceType(authorType);
 
             // Act
             var idProp = mm.GetPropertyForJsonKey(authorType, "id");
@@ -201,10 +206,14 @@ namespace JSONAPI.Tests.Core
             var postsProp = mm.GetPropertyForJsonKey(authorType, "posts");
 
             // Assert
-            Assert.AreSame(authorType.GetProperty("Id"), idProp);
-            Assert.AreSame(authorType.GetProperty("Name"), nameProp);
-            Assert.AreSame(authorType.GetProperty("Posts"), postsProp);
+            idProp.Property.Should().BeSameAs(authorType.GetProperty("Id"));
+            idProp.Should().BeOfType<FieldModelProperty>();
 
+            nameProp.Property.Should().BeSameAs(authorType.GetProperty("Name"));
+            nameProp.Should().BeOfType<FieldModelProperty>();
+
+            postsProp.Property.Should().BeSameAs(authorType.GetProperty("Posts"));
+            postsProp.Should().BeOfType<RelationshipModelProperty>();
         }
 
         [TestMethod]
