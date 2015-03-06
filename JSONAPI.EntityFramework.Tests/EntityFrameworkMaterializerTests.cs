@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.Common;
 using System.Linq;
+using Effort;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.EntityFramework.Tests.Models;
 using FluentAssertions;
@@ -17,6 +19,11 @@ namespace JSONAPI.EntityFramework.Tests
         {
             public DbSet<Backlink> Backlinks { get; set; }
             public DbSet<Post> Posts { get; set; }
+
+            public TestDbContext(DbConnection conn) : base(conn, true)
+            {
+                
+            }
         }
 
         private class NotAnEntity
@@ -25,31 +32,29 @@ namespace JSONAPI.EntityFramework.Tests
             public string Temporary { get; set; }
         }
 
-        private TestDbContext context;
-        private Backlink b1, b2;
+        private DbConnection _conn;
+        private TestDbContext _context;
 
         [TestInitialize]
         public void SetupEntities()
         {
-            //- See http://stackoverflow.com/a/19130718/489116
-            var instance = System.Data.Entity.SqlServer.SqlProviderServices.Instance;
-            //-
+            _conn = DbConnectionFactory.CreateTransient();
+            _context = new TestDbContext(_conn);
 
-            context = new TestDbContext();
-            //JSONAPI.EntityFramework.Json.ContractResolver.ObjectContext = context;
-
-
-            // Clear it out!
-            foreach (Backlink o in context.Backlinks) context.Backlinks.Remove(o);
-            context.SaveChanges();
-
-            b1 = new Backlink
+            var b1 = new Backlink
             {
                 Url = "http://www.google.com/",
                 Snippet = "1 Results"
             };
+            _context.Backlinks.Add(b1);
 
-            context.SaveChanges();
+            _context.SaveChanges();
+        }
+
+        [TestCleanup]
+        private void CleanupTest()
+        {
+            _context.Dispose();
         }
 
         [TestMethod]
@@ -57,10 +62,10 @@ namespace JSONAPI.EntityFramework.Tests
         {
             // Arrange
             var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
+            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
 
             // Act
-            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Post));
+            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Post)).ToArray();
 
             // Assert
             keyNames.Count().Should().Be(1);
@@ -72,10 +77,10 @@ namespace JSONAPI.EntityFramework.Tests
         {
             // Arrange
             var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
+            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
 
             // Act
-            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Backlink));
+            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Backlink)).ToArray();
 
             // Assert
             keyNames.Count().Should().Be(1);
@@ -87,13 +92,10 @@ namespace JSONAPI.EntityFramework.Tests
         {
             // Arrange
             var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(context, mockMetadataManager.Object);
+            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
 
             // Act
-            Action action = () =>
-            {
-                materializer.GetKeyNames(typeof (NotAnEntity));
-            };
+            Action action = () => materializer.GetKeyNames(typeof (NotAnEntity));
             action.ShouldThrow<ArgumentException>().Which.Message.Should().Be("The Type NotAnEntity was not found in the DbContext with Type TestDbContext");
         }
     }

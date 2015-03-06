@@ -116,7 +116,6 @@
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
     <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\EnumerateQueryableAsyncAttributeTests.cs" />
-    <Compile Include="EntityConverterTests.cs" />
     <Compile Include="EntityFrameworkMaterializerTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
     <Compile Include="Helpers\WaitsUntilCancellationDbAsyncEnumerator.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Backlink.cs" />
     <Compile Include="Models\Comment.cs" />
-    <Compile Include="Models\TestEntities.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers.cs" />
