@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using JSONAPI.Extensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace JSONAPI.Core
 {
@@ -170,7 +171,7 @@ namespace JSONAPI.Core
                     var idProperty = CalculateIdProperty(type);
                     if (idProperty == null)
                         throw new InvalidOperationException(String.Format(
-                            "Unable to determine Id property for type {0}", type));
+                            "Unable to determine Id property for type `{0}`.", resourceTypeName));
 
                     registration.IdProperty = idProperty;
 
@@ -179,7 +180,11 @@ namespace JSONAPI.Core
                     {
                         var jsonKey = prop == registration.IdProperty
                             ? "id"
-                            : GetJsonKeyForProperty(prop);
+                            : CalculateJsonKeyForProperty(prop);
+                        if (propertyMap.ContainsKey(jsonKey))
+                            throw new InvalidOperationException(
+                                String.Format("The type `{0}` already contains a property keyed at `{1}`.",
+                                    resourceTypeName, jsonKey));
                         var property = CreateModelProperty(prop, jsonKey);
                         propertyMap[jsonKey] = property;
                     }
@@ -244,13 +249,18 @@ namespace JSONAPI.Core
             return FormatPropertyName(PluralizationService.Pluralize(title)).Dasherize();
         }
 
-        public string GetJsonKeyForProperty(PropertyInfo propInfo)
+        /// <summary>
+        /// Determines the key that a property will be serialized as.
+        /// </summary>
+        /// <param name="propInfo">The property</param>
+        /// <returns>The key to serialize the given property as</returns>
+        protected internal virtual string CalculateJsonKeyForProperty(PropertyInfo propInfo)
         {
-            return FormatPropertyName(propInfo.Name);
-            //TODO: Respect [JsonProperty(PropertyName = "FooBar")], and probably cache the result.
+            var jsonPropertyAttribute = (JsonPropertyAttribute)propInfo.GetCustomAttributes(typeof (JsonPropertyAttribute)).FirstOrDefault();
+            return jsonPropertyAttribute != null ? jsonPropertyAttribute.PropertyName : FormatPropertyName(propInfo.Name);
         }
 
-        protected static string FormatPropertyName(string propertyName)
+        private static string FormatPropertyName(string propertyName)
         {
             string result = propertyName.Substring(0, 1).ToLower() + propertyName.Substring(1);
             return result;

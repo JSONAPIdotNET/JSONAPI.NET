@@ -1,4 +1,5 @@
 ﻿using System;
+using JSONAPI.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using JSONAPI.Core;
 using JSONAPI.Tests.Models;
@@ -6,6 +7,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
 using FluentAssertions;
+using Newtonsoft.Json;
 
 namespace JSONAPI.Tests.Core
 {
@@ -19,7 +21,7 @@ namespace JSONAPI.Tests.Core
 
         private class CustomIdModel
         {
-            [JSONAPI.Attributes.UseAsId]
+            [UseAsId]
             public Guid Uuid { get; set; }
 
             public string Data { get; set; }
@@ -28,6 +30,26 @@ namespace JSONAPI.Tests.Core
         private class DerivedPost : Post
         {
             
+        }
+
+        private class Band
+        {
+            [UseAsId]
+            public string BandName { get; set; }
+
+            [JsonProperty("THE-GENRE")]
+            public string Genre { get; set; }
+        }
+
+        private class Salad
+        {
+            public string Id { get; set; }
+
+            [JsonProperty("salad-type")]
+            public string TheSaladType { get; set; }
+
+            [JsonProperty("salad-type")]
+            public string AnotherSaladType { get; set; }
         }
 
         [TestMethod]
@@ -56,7 +78,7 @@ namespace JSONAPI.Tests.Core
             // Assert
             action.ShouldThrow<InvalidOperationException>()
                 .Which.Message.Should()
-                .Be("Unable to determine Id property for type JSONAPI.Tests.Core.ModelManagerTests+InvalidModel");
+                .Be("Unable to determine Id property for type `invalid-models`.");
         }
 
         [TestMethod]
@@ -180,9 +202,9 @@ namespace JSONAPI.Tests.Core
             var mm = new ModelManager(pluralizationService);
 
             // Act
-            var idKey = mm.GetJsonKeyForProperty(typeof(Author).GetProperty("Id"));
-            var nameKey = mm.GetJsonKeyForProperty(typeof(Author).GetProperty("Name"));
-            var postsKey = mm.GetJsonKeyForProperty(typeof(Author).GetProperty("Posts"));
+            var idKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Id"));
+            var nameKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Name"));
+            var postsKey = mm.CalculateJsonKeyForProperty(typeof(Author).GetProperty("Posts"));
 
             // Assert
             Assert.AreEqual("id", idKey);
@@ -214,6 +236,54 @@ namespace JSONAPI.Tests.Core
 
             postsProp.Property.Should().BeSameAs(authorType.GetProperty("Posts"));
             postsProp.Should().BeOfType<RelationshipModelProperty>();
+        }
+
+        [TestMethod]
+        public void GetPropertyForJsonKey_returns_correct_value_for_custom_id()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            Type bandType = typeof(Band);
+            mm.RegisterResourceType(bandType);
+
+            // Act
+            var idProp = mm.GetPropertyForJsonKey(bandType, "id");
+
+            // Assert
+            idProp.Property.Should().BeSameAs(bandType.GetProperty("BandName"));
+            idProp.Should().BeOfType<FieldModelProperty>();
+        }
+
+        [TestMethod]
+        public void GetPropertyForJsonKey_returns_correct_value_for_JsonProperty_attribute()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            Type bandType = typeof(Band);
+            mm.RegisterResourceType(bandType);
+
+            // Act
+            var prop = mm.GetPropertyForJsonKey(bandType, "THE-GENRE");
+
+            // Assert
+            prop.Property.Should().BeSameAs(bandType.GetProperty("Genre"));
+            prop.Should().BeOfType<FieldModelProperty>();
+        }
+
+        [TestMethod]
+        public void Cant_register_type_with_two_properties_with_the_same_name()
+        {
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            Type saladType = typeof(Salad);
+
+            // Act
+            Action action = () => mm.RegisterResourceType(saladType);
+
+            // Assert
+            action.ShouldThrow<InvalidOperationException>().Which.Message.Should().Be("The type `salads` already contains a property keyed at `salad-type`.");
         }
 
         [TestMethod]

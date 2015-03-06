@@ -41,14 +41,6 @@ namespace JSONAPI.Core
         Type GetTypeByResourceTypeName(string resourceTypeName);
 
         /// <summary>
-        /// Returns the key that will be used to represent the given property in serialized
-        /// JSON. Inverse of GetPropertyForJsonKey.
-        /// </summary>
-        /// <param name="propInfo">The serializable property</param>
-        /// <returns>The string denoting the given property within a JSON document.</returns>
-        string GetJsonKeyForProperty(PropertyInfo propInfo); //TODO: Do we need to have a type parameter here, in case the property is inherited?
-
-        /// <summary>
         /// Returns the property corresponding to a given JSON Key. Inverse of GetJsonKeyForProperty.
         /// </summary>
         /// <param name="type">The Type to find the property on</param>

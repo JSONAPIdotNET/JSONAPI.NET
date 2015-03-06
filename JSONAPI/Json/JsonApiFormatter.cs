@@ -277,7 +277,7 @@ namespace JSONAPI.Json
                 }
                 if (skip) continue;
 
-                writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
+                writer.WritePropertyName(relationshipModelProperty.JsonKey);
 
                 // Now look for enumerable-ness:
                 if (typeof(IEnumerable<Object>).IsAssignableFrom(prop.PropertyType))
