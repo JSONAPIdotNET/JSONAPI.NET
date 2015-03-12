@@ -52,6 +52,7 @@ namespace JSONAPI.Tests.Json
         {
             var modelManager = new ModelManager(new PluralizationService());
             modelManager.RegisterResourceType(typeof(Post));
+            modelManager.RegisterResourceType(typeof(User));
             var formatter = new JsonApiFormatter(modelManager);
             var stream = new MemoryStream();
 

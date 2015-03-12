@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using FluentAssertions;
@@ -563,6 +564,8 @@ namespace JSONAPI.Tests.ActionFilters
         private T[] GetArray<T>(string uri)
         {
             var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Dummy));
+            modelManager.RegisterResourceType(typeof(RelatedItemWithId));
 
             var filter = new EnableFilteringAttribute(modelManager);
 
@@ -1130,8 +1133,8 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Does_not_filter_unknown_type()
         {
-            var returnedArray = GetArray<Dummy>("http://api.example.com/dummies?unknownTypeField=asdfasd");
-            returnedArray.Length.Should().Be(_fixtures.Count);
+            Action action = () => GetArray<Dummy>("http://api.example.com/dummies?unknownTypeField=asdfasd");
+            action.ShouldThrow<HttpResponseException>().Which.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
         #endregion
