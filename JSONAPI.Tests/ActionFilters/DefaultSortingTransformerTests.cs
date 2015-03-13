@@ -39,7 +39,7 @@ namespace JSONAPI.Tests.ActionFilters
                 new Dummy { Id = "6", FirstName = "Abraham", LastName = "Lincoln" },
                 new Dummy { Id = "7", FirstName = "Andrew", LastName = "Jackson" },
                 new Dummy { Id = "8", FirstName = "Andrew", LastName = "Johnson" },
-                new Dummy { Id = "8", FirstName = "William", LastName = "Harrison" }
+                new Dummy { Id = "9", FirstName = "William", LastName = "Harrison" }
             };
             _fixturesQuery = _fixtures.AsQueryable();
         }
