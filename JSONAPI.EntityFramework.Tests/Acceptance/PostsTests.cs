@@ -94,13 +94,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithAttributeUpdate()
+        public async Task PatchWithAttributeUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithAttributeUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithAttributeUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithAttributeUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithAttributeUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -123,13 +123,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithToManyUpdate()
+        public async Task PatchWithToManyUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -152,13 +152,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithToManyHomogeneousDataUpdate()
+        public async Task PatchWithToManyHomogeneousDataUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyHomogeneousDataUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyHomogeneousDataUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyHomogeneousDataUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyHomogeneousDataUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -181,13 +181,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithToManyEmptyDataUpdate()
+        public async Task PatchWithToManyEmptyDataUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToManyEmptyDataUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyEmptyDataUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToManyEmptyDataUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyEmptyDataUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -210,13 +210,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithToOneUpdate()
+        public async Task PatchWithToOneUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithToOneUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToOneUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithToOneUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -239,13 +239,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithNullToOneUpdate()
+        public async Task PatchWithNullToOneUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithNullToOneUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithNullToOneUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithNullToOneUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithNullToOneUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -268,13 +268,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithMissingToOneId()
+        public async Task PatchWithMissingToOneId()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneIdRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneIdRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneIdResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneIdResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -297,13 +297,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithMissingToOneType()
+        public async Task PatchWithMissingToOneType()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToOneTypeRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneTypeRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToOneTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneTypeResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -326,13 +326,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithMissingToManyIds()
+        public async Task PatchWithMissingToManyIds()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyIdsRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyIdsRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyIdsResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyIdsResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -355,13 +355,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithMissingToManyType()
+        public async Task PatchWithMissingToManyType()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithMissingToManyTypeRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyTypeRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithMissingToManyTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyTypeResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -384,13 +384,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithArrayRelationshipValue()
+        public async Task PatchWithArrayRelationshipValue()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithArrayRelationshipValueRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithArrayRelationshipValueRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithArrayRelationshipValueResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayRelationshipValueResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -413,13 +413,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PutWithStringRelationshipValue()
+        public async Task PatchWithStringRelationshipValue()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPut(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PutWithStringRelationshipValueRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringRelationshipValueRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PutWithStringRelationshipValueResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringRelationshipValueResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {

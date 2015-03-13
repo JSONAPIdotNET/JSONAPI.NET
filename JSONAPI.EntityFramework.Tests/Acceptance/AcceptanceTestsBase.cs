@@ -85,9 +85,9 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         }
 
         #endregion
-        #region PUT
+        #region PATCH
 
-        protected async Task<HttpResponseMessage> SubmitPut(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath)
+        protected async Task<HttpResponseMessage> SubmitPatch(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath)
         {
             using (var server = TestServer.Create(app =>
             {
@@ -102,7 +102,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                     .And(request =>
                     {
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
-                    }).SendAsync("PUT");
+                    }).SendAsync("PATCH");
                 return response;
             }
         }

@@ -63,7 +63,7 @@ namespace JSONAPI.EntityFramework.Http
             return materialList;
         }
 
-        public override async Task<IList<T>> Put(string id, IList<T> putObjs)
+        public override async Task<IList<T>> Patch(string id, IList<T> putObjs)
         {
             var materializer = this.MaterializerFactory<EntityFrameworkMaterializer>();
             DbContext context = materializer.DbContext;
