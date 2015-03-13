@@ -102,7 +102,7 @@ namespace JSONAPI.Http
         /// <param name="id"></param>
         /// <param name="payload"></param>
         /// <returns></returns>
-        public virtual async Task<IList<T>> Put(string id, IList<T> putObjs)
+        public virtual async Task<IList<T>> Patch(string id, IList<T> putObjs)
         {
             IMaterializer materializer = this.MaterializerFactory();
             IList<T> materialList = new List<T>();
