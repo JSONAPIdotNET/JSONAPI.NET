@@ -8,7 +8,10 @@ using JSONAPI.ActionFilters;
 
 namespace JSONAPI.EntityFramework.ActionFilters
 {
-    internal class AsynchronousEnumerationTransformer : IQueryableEnumerationTransformer
+    /// <summary>
+    /// Enumerates an IQueryable asynchronously using Entity Framework's ToArrayAsync() method.
+    /// </summary>
+    public class AsynchronousEnumerationTransformer : IQueryableEnumerationTransformer
     {
         private readonly Lazy<MethodInfo> _toArrayAsyncMethod = new Lazy<MethodInfo>(() =>
                typeof(QueryableExtensions).GetMethods().FirstOrDefault(x => x.Name == "ToArrayAsync" && x.GetParameters().Count() == 2));
