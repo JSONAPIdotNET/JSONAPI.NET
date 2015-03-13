@@ -67,8 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionFilters\DefaultFilteringTransformer.cs" />
+    <Compile Include="ActionFilters\DefaultPaginationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableEnumerationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
+    <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableSortingTransformer.cs" />
     <Compile Include="ActionFilters\JsonApiQueryableAttribute.cs" />
     <Compile Include="ActionFilters\QueryableTransformException.cs" />

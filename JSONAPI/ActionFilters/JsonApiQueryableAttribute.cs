@@ -19,6 +19,7 @@ namespace JSONAPI.ActionFilters
         private readonly IQueryableEnumerationTransformer _enumerationTransformer;
         private readonly IQueryableFilteringTransformer _filteringTransformer;
         private readonly IQueryableSortingTransformer _sortingTransformer;
+        private readonly IQueryablePaginationTransformer _paginationTransformer;
 
         /// <summary>
         /// Creates a new JsonApiQueryableAttribute.
@@ -26,12 +27,15 @@ namespace JSONAPI.ActionFilters
         /// <param name="enumerationTransformer">The transform to be used for enumerating IQueryable payloads.</param>
         /// <param name="filteringTransformer">The transform to be used for filtering IQueryable payloads</param>
         /// <param name="sortingTransformer">The transform to be used for sorting IQueryable payloads.</param>
+        /// <param name="paginationTransformer">The transform to be used for pagination of IQueryable payloads.</param>
         public JsonApiQueryableAttribute(
             IQueryableEnumerationTransformer enumerationTransformer,
             IQueryableFilteringTransformer filteringTransformer = null,
-            IQueryableSortingTransformer sortingTransformer = null)
+            IQueryableSortingTransformer sortingTransformer = null,
+            IQueryablePaginationTransformer paginationTransformer = null)
         {
             _sortingTransformer = sortingTransformer;
+            _paginationTransformer = paginationTransformer;
             _enumerationTransformer = enumerationTransformer;
             _filteringTransformer = filteringTransformer;
         }
@@ -97,6 +101,9 @@ namespace JSONAPI.ActionFilters
 
             if (_sortingTransformer != null)
                 query = _sortingTransformer.Sort(query, request);
+
+            if (_paginationTransformer != null)
+                query = _paginationTransformer.ApplyPagination(query, request);
 
             return await _enumerationTransformer.Enumerate(query, cancellationToken);
         }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
-using System.Web.Http.Filters;
 using JSONAPI.ActionFilters;
 using JSONAPI.Http;
 using JSONAPI.Json;
@@ -16,8 +15,10 @@ namespace JSONAPI.Core
     {
         private bool _enableFiltering;
         private bool _enableSorting;
+        private bool _enablePagination;
         private IQueryableFilteringTransformer _filteringTransformer;
         private IQueryableSortingTransformer _sortingTransformer;
+        private IQueryablePaginationTransformer _paginationTransformer;
         private IQueryableEnumerationTransformer _enumerationTransformer;
         private IPluralizationService _pluralizationService;
         private readonly IList<Type> _resourceTypes;
@@ -29,14 +30,16 @@ namespace JSONAPI.Core
         {
             _enableFiltering = true;
             _enableSorting = true;
+            _enablePagination = true;
             _filteringTransformer = null;
             _sortingTransformer = null;
+            _paginationTransformer = null;
             _enumerationTransformer = null;
             _resourceTypes = new List<Type>();
         }
 
         /// <summary>
-        /// Disable filtering of IQueryables in GET methods
+        /// Disables filtering of IQueryables in GET methods
         /// </summary>
         /// <returns>The same configuration object the method was called on.</returns>
         public JsonApiConfiguration DisableFiltering()
@@ -46,12 +49,22 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Disable sorting of IQueryables in GET methods
+        /// Disables sorting of IQueryables in GET methods
         /// </summary>
         /// <returns>The same configuration object the method was called on.</returns>
         public JsonApiConfiguration DisableSorting()
         {
             _enableSorting = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Disables pagination of IQueryables in GET methods
+        /// </summary>
+        /// <returns>The same configuration object the method was called on.</returns>
+        public JsonApiConfiguration DisablePagination()
+        {
+            _enablePagination = false;
             return this;
         }
 
@@ -74,6 +87,17 @@ namespace JSONAPI.Core
         public JsonApiConfiguration SortWith(IQueryableSortingTransformer sortingTransformer)
         {
             _sortingTransformer = sortingTransformer;
+            return this;
+        }
+
+        /// <summary>
+        /// Specifies a pagination transformer to use for paging IQueryable response payloads.
+        /// </summary>
+        /// <param name="paginationTransformer">The pagination transformer.</param>
+        /// <returns>The same configuration object the method was called on.</returns>
+        public JsonApiConfiguration PageWith(IQueryablePaginationTransformer paginationTransformer)
+        {
+            _paginationTransformer = paginationTransformer;
             return this;
         }
 
@@ -131,6 +155,11 @@ namespace JSONAPI.Core
             if (_enableSorting)
                 sortingTransformer = _sortingTransformer ?? new DefaultSortingTransformer(modelManager);
 
+            IQueryablePaginationTransformer paginationTransformer = null;
+            if (_enablePagination)
+                paginationTransformer =
+                    _paginationTransformer ?? new DefaultPaginationTransformer("page.number", "page.size", null);
+
             IQueryableEnumerationTransformer enumerationTransformer =
                 _enumerationTransformer ?? new SynchronousEnumerationTransformer();
 
@@ -139,7 +168,7 @@ namespace JSONAPI.Core
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(formatter);
 
-            httpConfig.Filters.Add(new JsonApiQueryableAttribute(enumerationTransformer, filteringTransformer, sortingTransformer));
+            httpConfig.Filters.Add(new JsonApiQueryableAttribute(enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer));
 
             httpConfig.Services.Replace(typeof (IHttpControllerSelector),
                 new PascalizedControllerSelector(httpConfig));
