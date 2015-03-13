@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
@@ -20,7 +19,7 @@ using Moq;
 namespace JSONAPI.EntityFramework.Tests.ActionFilters
 {
     [TestClass]
-    public class EnumerateQueryableAsyncAttributeTests
+    public class AsynchronousEnumerationTransformerTests
     {
         public class Dummy
         {
@@ -54,7 +53,7 @@ namespace JSONAPI.EntityFramework.Tests.ActionFilters
             }.AsQueryable();
         }
 
-        private HttpActionExecutedContext CreateActionExecutedContext(IDbAsyncEnumerator<Dummy> asyncEnumerator)
+        private IQueryable<Dummy> CreateQueryable(IDbAsyncEnumerator<Dummy> asyncEnumerator)
         {
             var mockSet = new Mock<DbSet<Dummy>>();
             mockSet.As<IDbAsyncEnumerable<Dummy>>()
@@ -69,39 +68,17 @@ namespace JSONAPI.EntityFramework.Tests.ActionFilters
             mockSet.As<IQueryable<Dummy>>().Setup(m => m.ElementType).Returns(_fixtures.ElementType);
             mockSet.As<IQueryable<Dummy>>().Setup(m => m.GetEnumerator()).Returns(_fixtures.GetEnumerator());
 
-            var formatter = new JsonMediaTypeFormatter();
-
-            var httpContent = new ObjectContent(typeof(IQueryable<Dummy>), mockSet.Object, formatter);
-
-            return new HttpActionExecutedContext
-            {
-                ActionContext = new HttpActionContext
-                {
-                    ControllerContext = new HttpControllerContext
-                    {
-                        Request = new HttpRequestMessage(HttpMethod.Get, "http://api.example.com/dummies")
-                    }
-                },
-                Response = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = httpContent
-                }
-            };
+            return mockSet.Object;
         }
 
         [TestMethod]
         public async Task ResolvesQueryable()
         {
-            var actionFilter = new EnumerateQueryableAsyncAttribute();
+            var transformer = new AsynchronousEnumerationTransformer();
 
-            var context = CreateActionExecutedContext(new TestDbAsyncEnumerator<Dummy>(_fixtures.GetEnumerator()));
+            var query = CreateQueryable(new TestDbAsyncEnumerator<Dummy>(_fixtures.GetEnumerator()));
 
-            await actionFilter.OnActionExecutedAsync(context, new CancellationToken());
-
-            var objectContent = context.Response.Content as ObjectContent;
-            objectContent.Should().NotBeNull();
-
-            var array = objectContent.Value as Dummy[];
+            var array = await transformer.Enumerate(query, new CancellationToken());
             array.Should().NotBeNull();
             array.Length.Should().Be(3);
             array[0].Id.Should().Be("1");
@@ -112,16 +89,16 @@ namespace JSONAPI.EntityFramework.Tests.ActionFilters
         [TestMethod]
         public void CancelsProperly()
         {
-            var actionFilter = new EnumerateQueryableAsyncAttribute();
+            var actionFilter = new AsynchronousEnumerationTransformer();
 
-            var context = CreateActionExecutedContext(new WaitsUntilCancellationDbAsyncEnumerator<Dummy>(1000, _fixtures.GetEnumerator()));
+            var context = CreateQueryable(new WaitsUntilCancellationDbAsyncEnumerator<Dummy>(1000, _fixtures.GetEnumerator()));
 
             var cts = new CancellationTokenSource();
             cts.CancelAfter(300);
 
             Func<Task> action = async () =>
             {
-                await actionFilter.OnActionExecutedAsync(context, cts.Token);
+                await actionFilter.Enumerate(context, cts.Token);
             };
             action.ShouldThrow<TaskCanceledException>();
         }

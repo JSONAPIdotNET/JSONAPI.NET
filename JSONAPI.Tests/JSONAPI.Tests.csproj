@@ -79,8 +79,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionFilters\EnableSortingAttributeTests.cs" />
-    <Compile Include="ActionFilters\EnableFilteringAttributeTests.cs" />
+    <Compile Include="ActionFilters\QueryableTransformerTestsBase.cs" />
+    <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
+    <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
     <Compile Include="Core\ModelManagerTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
