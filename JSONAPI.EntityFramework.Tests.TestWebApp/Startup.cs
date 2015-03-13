@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.Dispatcher;
 using Autofac;
 using Autofac.Integration.WebApi;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework.ActionFilters;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
-using JSONAPI.Http;
-using JSONAPI.Json;
 using Microsoft.Owin;
 using Owin;
 
@@ -62,32 +56,25 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
         private static HttpConfiguration GetWebApiConfiguration()
         {
-            var config = new HttpConfiguration();
-
             var pluralizationService = new PluralizationService();
-            var modelManager = new ModelManager(pluralizationService);
-            modelManager.RegisterResourceType(typeof(Comment));
-            modelManager.RegisterResourceType(typeof(Post));
-            modelManager.RegisterResourceType(typeof(Tag));
-            modelManager.RegisterResourceType(typeof(User));
-            modelManager.RegisterResourceType(typeof(UserGroup));
+            var httpConfig = new HttpConfiguration();
 
-            var formatter = new JsonApiFormatter(modelManager);
-            config.Formatters.Clear();
-            config.Formatters.Add(formatter);
+            // Configure JSON API
+            new JsonApiConfiguration()
+                .PluralizeResourceTypesWith(pluralizationService)
+                .UseEntityFramework()
+                .RegisterResourceType(typeof(Comment))
+                .RegisterResourceType(typeof(Post))
+                .RegisterResourceType(typeof(Tag))
+                .RegisterResourceType(typeof(User))
+                .RegisterResourceType(typeof(UserGroup))
+                .Apply(httpConfig);
 
-            // Global filters
-            config.Filters.Add(new EnumerateQueryableAsyncAttribute());
-            config.Filters.Add(new EnableSortingAttribute(modelManager));
-            config.Filters.Add(new EnableFilteringAttribute(modelManager));
-
-            // Override controller selector
-            config.Services.Replace(typeof(IHttpControllerSelector), new PascalizedControllerSelector(config));
 
             // Web API routes
-            config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+            httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
 
-            return config;
+            return httpConfig;
         }
     }
 }

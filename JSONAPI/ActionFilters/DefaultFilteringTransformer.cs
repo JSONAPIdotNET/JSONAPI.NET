@@ -5,21 +5,36 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Web.Http;
-using System.Web.Http.Filters;
 using JSONAPI.Core;
 
 namespace JSONAPI.ActionFilters
 {
-    public class EnableFilteringAttribute : ActionFilterAttribute
+    /// <summary>
+    /// This transformer filters an IQueryable payload based on query-string values.
+    /// </summary>
+    public class DefaultFilteringTransformer : IQueryableFilteringTransformer
     {
         private readonly IModelManager _modelManager;
 
-        public EnableFilteringAttribute(IModelManager modelManager)
+        /// <summary>
+        /// Creates a new FilteringQueryableTransformer
+        /// </summary>
+        /// <param name="modelManager">The model manager used to look up registered type information.</param>
+        public DefaultFilteringTransformer(IModelManager modelManager)
         {
             _modelManager = modelManager;
         }
 
+        public IQueryable<T> Filter<T>(IQueryable<T> query, HttpRequestMessage request)
+        {
+            var parameter = Expression.Parameter(typeof(T));
+            var bodyExpr = GetPredicateBody(request, parameter);
+            var lambdaExpr = Expression.Lambda<Func<T, bool>>(bodyExpr, parameter);
+            return query.Where(lambdaExpr);
+        }
+
         // Borrowed from http://stackoverflow.com/questions/3631547/select-right-generic-method-with-reflection
+        // ReSharper disable once UnusedMember.Local
         private readonly Lazy<MethodInfo> _whereMethod = new Lazy<MethodInfo>(() =>
             typeof(Queryable).GetMethods()
                 .Where(x => x.Name == "Where")
@@ -39,30 +54,6 @@ namespace JSONAPI.ActionFilters
                 .SingleOrDefault()
         );
 
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-        {
-            if (actionExecutedContext.Response != null)
-            {
-                var objectContent = actionExecutedContext.Response.Content as ObjectContent;
-                if (objectContent != null)
-                {
-                    var objectType = objectContent.ObjectType;
-                    if (objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(IQueryable<>))
-                    {
-                        var queryableElementType = objectType.GenericTypeArguments[0];
-                        var parameter = Expression.Parameter(queryableElementType);
-                        var bodyExpr = GetPredicateBody(actionExecutedContext.Request, parameter);
-                        var lambdaExpr = Expression.Lambda(bodyExpr, parameter);
-
-                        var genericMethod = _whereMethod.Value.MakeGenericMethod(queryableElementType);
-                        var filteredQuery = genericMethod.Invoke(null, new[] { objectContent.Value, lambdaExpr });
-
-                        actionExecutedContext.Response.Content = new ObjectContent(objectType, filteredQuery, objectContent.Formatter);
-                    }
-                }
-            }
-        }
-
         private Expression GetPredicateBody(HttpRequestMessage request, ParameterExpression param)
         {
             Expression workingExpr = null;
@@ -72,6 +63,10 @@ namespace JSONAPI.ActionFilters
             foreach (var queryPair in queryPairs)
             {
                 if (String.IsNullOrWhiteSpace(queryPair.Key))
+                    continue;
+
+                // TODO: Filtering needs to change to use the `filter` query parameter so that sorting no longer presents a conflict.
+                if (queryPair.Key == "sort")
                     continue;
 
                 ModelProperty modelProperty;
@@ -100,12 +95,16 @@ namespace JSONAPI.ActionFilters
                 if (relationshipModelProperty != null)
                     expr = GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
 
+                if (expr == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
+
                 workingExpr = workingExpr == null ? expr : Expression.AndAlso(workingExpr, expr);
             }
 
             return workingExpr ?? Expression.Constant(true); // No filters, so return everything
         }
 
+        // ReSharper disable once FunctionComplexityOverflow
+        // TODO: should probably break this method up
         private Expression GetPredicateBodyForField(FieldModelProperty modelProperty, string queryValue, ParameterExpression param)
         {
             var prop = modelProperty.Property;

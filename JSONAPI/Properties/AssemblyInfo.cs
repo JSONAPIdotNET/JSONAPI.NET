@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
 [assembly: Guid("5b46482f-733f-42bf-b507-37767a6bb948")]
 
 [assembly: InternalsVisibleTo("JSONAPI.Tests")]
+[assembly: InternalsVisibleTo("JSONAPI.EntityFramework")]
 [assembly: InternalsVisibleTo("JSONAPI.EntityFramework.Tests")]
 
 // This assembly is the default dynamic assembly generated Castle DynamicProxy, 

@@ -1,10 +1,6 @@
 ﻿using System.Web.Http;
-using System.Web.Http.Dispatcher;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework.ActionFilters;
-using JSONAPI.Http;
-using JSONAPI.Json;
+using JSONAPI.EntityFramework;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 using PluralizationService = JSONAPI.Core.PluralizationService;
@@ -22,28 +18,21 @@ namespace JSONAPI.TodoMVC.API
         private static HttpConfiguration GetWebApiConfiguration()
         {
             var pluralizationService = new PluralizationService();
+            pluralizationService.AddMapping("todo", "todos");
 
-            var config = new HttpConfiguration();
+            var httpConfig = new HttpConfiguration();
 
-            var modelManager = new ModelManager(pluralizationService);
-            modelManager.RegisterResourceType(typeof(Todo));
-
-            var formatter = new JsonApiFormatter(modelManager);
-            config.Formatters.Clear();
-            config.Formatters.Add(formatter);
-
-            // Global filters
-            config.Filters.Add(new EnumerateQueryableAsyncAttribute());
-            config.Filters.Add(new EnableSortingAttribute(modelManager));
-            config.Filters.Add(new EnableFilteringAttribute(modelManager));
-
-            // Override controller selector
-            config.Services.Replace(typeof(IHttpControllerSelector), new PascalizedControllerSelector(config));
+            // Configure JSON API
+            new JsonApiConfiguration()
+                .PluralizeResourceTypesWith(pluralizationService)
+                .UseEntityFramework()
+                .RegisterResourceType(typeof(Todo))
+                .Apply(httpConfig);
 
             // Web API routes
-            config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+            httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
 
-            return config;
+            return httpConfig;
         }
     }
 }
