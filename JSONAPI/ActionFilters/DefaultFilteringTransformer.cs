@@ -66,7 +66,7 @@ namespace JSONAPI.ActionFilters
                     continue;
 
                 // TODO: Filtering needs to change to use the `filter` query parameter so that sorting no longer presents a conflict.
-                if (queryPair.Key == "sort")
+                if (queryPair.Key == "sort" || queryPair.Key.StartsWith("page."))
                     continue;
 
                 ModelProperty modelProperty;
