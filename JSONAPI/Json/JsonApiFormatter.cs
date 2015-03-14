@@ -348,13 +348,13 @@ namespace JSONAPI.Json
                         continue;
                     }
 
-                    string objId = GetIdFor(propertyValue);
+                    Lazy<string> objId = new Lazy<String>(() => GetIdFor(propertyValue));
 
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            serializer.Serialize(writer, objId);
+                            serializer.Serialize(writer, objId.Value);
                             if (iip)
                                 if (aggregator != null)
                                     aggregator.Add(prop.PropertyType, propertyValue);
@@ -363,8 +363,8 @@ namespace JSONAPI.Json
                             if (lt == null)
                                 throw new JsonSerializationException(
                                     "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                            string link = String.Format(lt, objId,  
-                                GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
+                            var relatedObjectId = lt.Contains("{0}") ? objId.Value : null;
+                            string link = String.Format(lt, relatedObjectId, GetIdFor(value));
                                     
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             writer.WriteStartObject();
@@ -376,7 +376,7 @@ namespace JSONAPI.Json
                             // Not really supported by Ember Data yet, incidentally...but easy to implement here.
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //serializer.Serialize(writer, prop.GetValue(value, null));
-                            this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
+                            this.Serialize(propertyValue, writeStream, writer, serializer, aggregator);
                             break;
                     }
                 }
