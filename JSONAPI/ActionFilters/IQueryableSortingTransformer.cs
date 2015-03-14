@@ -15,6 +15,6 @@ namespace JSONAPI.ActionFilters
         /// <param name="request">The request message</param>
         /// <typeparam name="T">The element type of the query</typeparam>
         /// <returns>The sorted query</returns>
-        IQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request);
+        IOrderedQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request);
     }
 }

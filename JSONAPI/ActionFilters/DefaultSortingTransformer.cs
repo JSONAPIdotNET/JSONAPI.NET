@@ -26,17 +26,24 @@ namespace JSONAPI.ActionFilters
         
         private const string SortQueryParamKey = "sort";
 
-        public IQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request)
+        public IOrderedQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request)
         {
             var queryParams = request.GetQueryNameValuePairs();
             var sortParam = queryParams.FirstOrDefault(kvp => kvp.Key == SortQueryParamKey);
-            if (sortParam.Key != SortQueryParamKey) return query; // Nothing to sort here, move along
+
+            string[] sortExpressions;
+            if (sortParam.Key != SortQueryParamKey)
+            {
+                sortExpressions = new[] { "+id" }; // We have to sort by something, so make it the ID.
+            }
+            else
+            {
+                sortExpressions = sortParam.Value.Split(',');
+            }
 
             var selectors = new List<Tuple<bool, Expression<Func<T, object>>>>();
-
             var usedProperties = new Dictionary<PropertyInfo, object>();
 
-            var sortExpressions = sortParam.Value.Split(',');
             foreach (var sortExpression in sortExpressions)
             {
                 if (string.IsNullOrWhiteSpace(sortExpression))
