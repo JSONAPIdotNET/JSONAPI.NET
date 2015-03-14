@@ -319,9 +319,8 @@ namespace JSONAPI.Json
                             break;
                         case SerializeAsOptions.Link:
                             if (lt == null) throw new JsonSerializationException("A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-
-                            string linkId = lt.Contains("{0}") ? GetIdFor(value) : null;
-                            string href = String.Format(lt, null, linkId);
+                            //TODO: Check for "{0}" in linkTemplate and (only) if it's there, get the Ids of all objects and "implode" them.
+                            string href = String.Format(lt, null, GetIdFor(value));
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
