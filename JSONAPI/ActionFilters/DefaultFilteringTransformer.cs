@@ -85,6 +85,8 @@ namespace JSONAPI.ActionFilters
 
                 Expression expr = null;
 
+                if (modelProperty.IgnoreByDefault) continue;
+
                 // See if it is a field property
                 var fieldModelProperty = modelProperty as FieldModelProperty;
                 if (fieldModelProperty != null)
