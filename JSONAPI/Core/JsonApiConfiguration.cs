@@ -20,14 +20,15 @@ namespace JSONAPI.Core
         private IQueryableSortingTransformer _sortingTransformer;
         private IQueryablePaginationTransformer _paginationTransformer;
         private IQueryableEnumerationTransformer _enumerationTransformer;
-        private IPluralizationService _pluralizationService;
-        private readonly IList<Type> _resourceTypes;
+        private readonly IModelManager _modelManager;
 
         /// <summary>
         /// Creates a new configuration
         /// </summary>
-        public JsonApiConfiguration()
+        public JsonApiConfiguration(IModelManager modelManager)
         {
+            if (modelManager == null) throw new Exception("You must provide ");
+
             _enableFiltering = true;
             _enableSorting = true;
             _enablePagination = true;
@@ -35,7 +36,7 @@ namespace JSONAPI.Core
             _sortingTransformer = null;
             _paginationTransformer = null;
             _enumerationTransformer = null;
-            _resourceTypes = new List<Type>();
+            _modelManager = modelManager;
         }
 
         /// <summary>
@@ -113,47 +114,18 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Specifies a service to provide pluralizations of resource type names.
-        /// </summary>
-        /// <param name="pluralizationService">The service</param>
-        /// <returns>The same configuration object that was passed in</returns>
-        public JsonApiConfiguration PluralizeResourceTypesWith(IPluralizationService pluralizationService)
-        {
-            _pluralizationService = pluralizationService;
-            return this;
-        }
-
-        /// <summary>
-        /// Registers a resource type for use with the model manager.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public JsonApiConfiguration RegisterResourceType(Type type)
-        {
-            _resourceTypes.Add(type);
-            return this;
-        }
-
-        /// <summary>
         /// Applies the running configuration to an HttpConfiguration instance
         /// </summary>
         /// <param name="httpConfig">The HttpConfiguration to apply this JsonApiConfiguration to</param>
         public void Apply(HttpConfiguration httpConfig)
         {
-            var pluralizationService = _pluralizationService ?? new PluralizationService();
-            var modelManager = new ModelManager(pluralizationService);
-            foreach (var resourceType in _resourceTypes)
-            {
-                modelManager.RegisterResourceType(resourceType);
-            }
-
             IQueryableFilteringTransformer filteringTransformer = null;
             if (_enableFiltering)
-                filteringTransformer = _filteringTransformer ?? new DefaultFilteringTransformer(modelManager);
+                filteringTransformer = _filteringTransformer ?? new DefaultFilteringTransformer(_modelManager);
 
             IQueryableSortingTransformer sortingTransformer = null;
             if (_enableSorting)
-                sortingTransformer = _sortingTransformer ?? new DefaultSortingTransformer(modelManager);
+                sortingTransformer = _sortingTransformer ?? new DefaultSortingTransformer(_modelManager);
 
             IQueryablePaginationTransformer paginationTransformer = null;
             if (_enablePagination)
@@ -163,7 +135,7 @@ namespace JSONAPI.Core
             IQueryableEnumerationTransformer enumerationTransformer =
                 _enumerationTransformer ?? new SynchronousEnumerationTransformer();
 
-            var formatter = new JsonApiFormatter(modelManager);
+            var formatter = new JsonApiFormatter(_modelManager);
 
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(formatter);

@@ -135,10 +135,10 @@ namespace JSONAPI.Core
         /// Registers a type with this ModelManager.
         /// </summary>
         /// <param name="type">The type to register.</param>
-        public void RegisterResourceType(Type type)
+        public ModelManager RegisterResourceType(Type type)
         {
             var resourceTypeName = CalculateResourceTypeNameForType(type);
-            RegisterResourceType(type, resourceTypeName);
+            return RegisterResourceType(type, resourceTypeName);
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="type">The type to register.</param>
         /// <param name="resourceTypeName">The resource type name to use</param>
-        public void RegisterResourceType(Type type, string resourceTypeName)
+        public ModelManager RegisterResourceType(Type type, string resourceTypeName)
         {
             lock (RegistrationsByType)
             {
@@ -196,6 +196,8 @@ namespace JSONAPI.Core
                     RegistrationsByName.Add(resourceTypeName, registration);
                 }
             }
+
+            return this;
         }
 
         /// <summary>

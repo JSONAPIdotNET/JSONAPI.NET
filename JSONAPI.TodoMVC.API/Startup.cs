@@ -19,14 +19,14 @@ namespace JSONAPI.TodoMVC.API
         {
             var pluralizationService = new PluralizationService();
             pluralizationService.AddMapping("todo", "todos");
+            var modelManager = new ModelManager(pluralizationService);
+            modelManager.RegisterResourceType(typeof (Todo));
 
             var httpConfig = new HttpConfiguration();
 
             // Configure JSON API
-            new JsonApiConfiguration()
-                .PluralizeResourceTypesWith(pluralizationService)
+            new JsonApiConfiguration(modelManager)
                 .UseEntityFramework()
-                .RegisterResourceType(typeof(Todo))
                 .Apply(httpConfig);
 
             // Web API routes

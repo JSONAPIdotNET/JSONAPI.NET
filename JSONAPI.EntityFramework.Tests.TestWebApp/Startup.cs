@@ -56,18 +56,20 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
         private static HttpConfiguration GetWebApiConfiguration()
         {
-            var pluralizationService = new PluralizationService();
             var httpConfig = new HttpConfiguration();
+            
+            // Configure the model manager
+            var pluralizationService = new PluralizationService();
+            var modelManager = new ModelManager(pluralizationService)
+                .RegisterResourceType(typeof (Comment))
+                .RegisterResourceType(typeof (Post))
+                .RegisterResourceType(typeof (Tag))
+                .RegisterResourceType(typeof (User))
+                .RegisterResourceType(typeof (UserGroup));
 
             // Configure JSON API
-            new JsonApiConfiguration()
-                .PluralizeResourceTypesWith(pluralizationService)
+            new JsonApiConfiguration(modelManager)
                 .UseEntityFramework()
-                .RegisterResourceType(typeof(Comment))
-                .RegisterResourceType(typeof(Post))
-                .RegisterResourceType(typeof(Tag))
-                .RegisterResourceType(typeof(User))
-                .RegisterResourceType(typeof(UserGroup))
                 .Apply(httpConfig);
 
 
