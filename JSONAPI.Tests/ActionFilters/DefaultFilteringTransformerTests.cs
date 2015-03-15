@@ -557,7 +557,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_string_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?stringField=String value 1");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[stringField]=String value 1");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("100");
         }
@@ -565,7 +565,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_string_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?stringField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[stringField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 3);
             returnedArray.Any(d => d.Id == "100" || d.Id == "101" || d.Id == "102").Should().BeFalse();
         }
@@ -577,7 +577,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_datetime_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?dateTimeField=1930-11-07");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[dateTimeField]=1930-11-07");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("110");
         }
@@ -585,14 +585,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_datetime_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?dateTimeField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[dateTimeField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_datetime_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDateTimeField=1961-02-18");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDateTimeField]=1961-02-18");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("120");
         }
@@ -600,7 +600,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_datetime_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDateTimeField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDateTimeField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "120").Should().BeFalse();
         }
@@ -612,7 +612,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_datetimeoffset_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?dateTimeOffsetField=1991-01-03");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[dateTimeOffsetField]=1991-01-03");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("130");
         }
@@ -620,14 +620,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_datetimeoffset_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?dateTimeOffsetField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[dateTimeOffsetField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_datetimeoffset_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDateTimeOffsetField=2014-05-05");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDateTimeOffsetField]=2014-05-05");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("140");
         }
@@ -635,7 +635,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_datetimeoffset_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDateTimeOffsetField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDateTimeOffsetField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "140").Should().BeFalse();
         }
@@ -647,7 +647,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_enum_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?enumField=1");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[enumField]=1");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("150");
         }
@@ -655,14 +655,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_enum_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?enumField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[enumField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_enum_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableEnumField=3");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableEnumField]=3");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("160");
         }
@@ -670,7 +670,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_enum_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableEnumField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableEnumField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "160").Should().BeFalse();
         }
@@ -682,7 +682,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_decimal_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?decimalField=4.03");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[decimalField]=4.03");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("170");
         }
@@ -690,14 +690,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_decimal_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?decimalField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[decimalField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_decimal_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDecimalField=12.09");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDecimalField]=12.09");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("180");
         }
@@ -705,7 +705,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_decimal_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDecimalField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDecimalField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "180").Should().BeFalse();
         }
@@ -717,7 +717,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_boolean_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?booleanField=true");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[booleanField]=true");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("190");
         }
@@ -725,14 +725,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_boolean_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?booleanField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[booleanField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_boolean_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableBooleanField=false");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableBooleanField]=false");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("200");
         }
@@ -740,7 +740,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_boolean_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableBooleanField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableBooleanField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "200").Should().BeFalse();
         }
@@ -752,7 +752,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_sbyte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?sByteField=63");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[sByteField]=63");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("210");
         }
@@ -760,14 +760,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_sbyte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?sByteField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[sByteField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_sbyte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableSByteField=91");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableSByteField]=91");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("220");
         }
@@ -775,7 +775,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_sbyte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableSByteField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableSByteField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "220").Should().BeFalse();
         }
@@ -787,7 +787,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_byte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?byteField=250");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[byteField]=250");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("230");
         }
@@ -795,14 +795,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_byte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?byteField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[byteField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_byte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableByteField=44");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableByteField]=44");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("240");
         }
@@ -810,7 +810,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_byte_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableByteField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableByteField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "240").Should().BeFalse();
         }
@@ -822,7 +822,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_int16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int16Field=12345");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int16Field]=12345");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("250");
         }
@@ -830,14 +830,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_int16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int16Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int16Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_int16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt16Field=32764");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt16Field]=32764");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("260");
         }
@@ -845,7 +845,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_int16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt16Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt16Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "260").Should().BeFalse();
         }
@@ -857,7 +857,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_uint16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt16Field=12345");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt16Field]=12345");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("270");
         }
@@ -865,14 +865,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_uint16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt16Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt16Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_uint16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt16Field=65000");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt16Field]=65000");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("280");
         }
@@ -880,7 +880,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_uint16_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt16Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt16Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "280").Should().BeFalse();
         }
@@ -892,7 +892,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_int32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int32Field=100000006");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int32Field]=100000006");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("290");
         }
@@ -900,14 +900,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_int32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int32Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int32Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_int32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt32Field=345678901");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt32Field]=345678901");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("300");
         }
@@ -915,7 +915,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_int32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt32Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt32Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "300").Should().BeFalse();
         }
@@ -927,7 +927,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_uint32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt32Field=123456789");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt32Field]=123456789");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("310");
         }
@@ -935,14 +935,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_uint32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt32Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt32Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_uint32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt32Field=345678901");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt32Field]=345678901");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("320");
         }
@@ -950,7 +950,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_uint32_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt32Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt32Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "320").Should().BeFalse();
         }
@@ -962,7 +962,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_int64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int64Field=123453489012");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int64Field]=123453489012");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("330");
         }
@@ -970,14 +970,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_int64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?int64Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[int64Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_int64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt64Field=345671901234");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt64Field]=345671901234");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("340");
         }
@@ -985,7 +985,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_int64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableInt64Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableInt64Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "340").Should().BeFalse();
         }
@@ -997,7 +997,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_uint64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt64Field=123456789012");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt64Field]=123456789012");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("350");
         }
@@ -1005,14 +1005,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_uint64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?uInt64Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[uInt64Field]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_uint64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt64Field=345678901234");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt64Field]=345678901234");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("360");
         }
@@ -1020,7 +1020,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_uint64_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableUInt64Field=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableUInt64Field]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "360").Should().BeFalse();
         }
@@ -1032,7 +1032,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_single_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?singleField=21.56901");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[singleField]=21.56901");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("370");
         }
@@ -1040,14 +1040,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_single_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?singleField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[singleField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_single_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableSingleField=1.3456");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableSingleField]=1.3456");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("380");
         }
@@ -1055,7 +1055,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_single_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableSingleField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableSingleField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "380").Should().BeFalse();
         }
@@ -1067,7 +1067,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_double_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?doubleField=12.3453489012");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[doubleField]=12.3453489012");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("390");
         }
@@ -1075,14 +1075,14 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_double_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?doubleField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[doubleField]=");
             returnedArray.Length.Should().Be(0);
         }
 
         [TestMethod]
         public void Filters_by_matching_nullable_double_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDoubleField=34567.1901234");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDoubleField]=34567.1901234");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("400");
         }
@@ -1090,7 +1090,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_nullable_double_property()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?nullableDoubleField=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullableDoubleField]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 1);
             returnedArray.Any(d => d.Id == "400").Should().BeFalse();
         }
@@ -1102,7 +1102,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Does_not_filter_unknown_type()
         {
-            Action action = () => GetArray("http://api.example.com/dummies?unknownTypeField=asdfasd");
+            Action action = () => GetArray("http://api.example.com/dummies?filter[unknownTypeField]=asdfasd");
             action.ShouldThrow<HttpResponseException>().Which.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
 
@@ -1113,7 +1113,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_to_one_relationship_id()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?toOneRelatedItem=1101");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[toOneRelatedItem]=1101");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("1100");
         }
@@ -1121,7 +1121,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_to_one_relationship_id()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?toOneRelatedItem=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[toOneRelatedItem]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 2);
             returnedArray.Any(d => d.Id == "1100" || d.Id == "1102").Should().BeFalse();
         }
@@ -1133,7 +1133,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_matching_id_in_to_many_relationship()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?toManyRelatedItems=1111");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[toManyRelatedItems]=1111");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("1110");
         }
@@ -1141,7 +1141,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_missing_id_in_to_many_relationship()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?toManyRelatedItems=");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[toManyRelatedItems]=");
             returnedArray.Length.Should().Be(_fixtures.Count - 2);
             returnedArray.Any(d => d.Id == "1110" || d.Id == "1120").Should().BeFalse();
         }
@@ -1153,7 +1153,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Ands_together_filters()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?stringField=String value 2&enumField=3");
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[stringField]=String value 2&filter[enumField]=3");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("102");
         }

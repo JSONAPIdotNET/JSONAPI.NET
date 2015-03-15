@@ -65,14 +65,15 @@ namespace JSONAPI.ActionFilters
                 if (String.IsNullOrWhiteSpace(queryPair.Key))
                     continue;
 
-                // TODO: Filtering needs to change to use the `filter` query parameter so that sorting no longer presents a conflict.
-                if (queryPair.Key == "sort" || queryPair.Key.StartsWith("page."))
+                if (!queryPair.Key.StartsWith("filter."))
                     continue;
+
+                var filterField = queryPair.Key.Substring(7); // Skip "filter."
 
                 ModelProperty modelProperty;
                 try
                 {
-                    modelProperty = _modelManager.GetPropertyForJsonKey(type, queryPair.Key);
+                    modelProperty = _modelManager.GetPropertyForJsonKey(type, filterField);
                 }
                 catch (InvalidOperationException)
                 {

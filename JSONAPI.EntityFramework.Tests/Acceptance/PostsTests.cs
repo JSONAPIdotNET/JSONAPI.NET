@@ -38,7 +38,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitGet(effortConnection, "posts?title=Post 4");
+                var response = await SubmitGet(effortConnection, "posts?filter[title]=Post 4");
 
                 await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\GetWithFilterResponse.json", HttpStatusCode.OK);
             }
