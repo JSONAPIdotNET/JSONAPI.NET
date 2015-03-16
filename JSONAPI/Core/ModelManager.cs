@@ -109,7 +109,13 @@ namespace JSONAPI.Core
             }
         }
 
-        private TypeRegistration GetRegistrationByType(Type type)
+        public bool TypeIsRegistered(Type type)
+        {
+            var registration = FindRegistrationForType(type);
+            return registration != null;
+        }
+
+        private TypeRegistration FindRegistrationForType(Type type)
         {
             lock (RegistrationsByType)
             {
@@ -127,6 +133,14 @@ namespace JSONAPI.Core
                     currentType = currentType.BaseType;
                 }
             }
+
+            return null;
+        }
+
+        private TypeRegistration GetRegistrationByType(Type type)
+        {
+            var registration = FindRegistrationForType(type);
+            if (registration != null) return registration;
 
             throw new InvalidOperationException(String.Format("The type `{0}` was not registered.", type.FullName));
         }

@@ -195,6 +195,94 @@ namespace JSONAPI.Tests.Core
         }
 
         [TestMethod]
+        public void TypeIsRegistered_returns_true_if_type_is_registered()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            mm.RegisterResourceType(typeof (Post));
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof (Post));
+
+            // Assert
+            isRegistered.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeIsRegistered_returns_true_if_parent_type_is_registered()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            mm.RegisterResourceType(typeof(Post));
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof(DerivedPost));
+
+            // Assert
+            isRegistered.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeIsRegistered_returns_true_for_collection_of_registered_types()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            mm.RegisterResourceType(typeof(Post));
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof(ICollection<Post>));
+
+            // Assert
+            isRegistered.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeIsRegistered_returns_true_for_collection_of_children_of_registered_types()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+            mm.RegisterResourceType(typeof(Post));
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof(ICollection<DerivedPost>));
+
+            // Assert
+            isRegistered.Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void TypeIsRegistered_returns_false_if_no_type_in_hierarchy_is_registered()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof(Comment));
+
+            // Assert
+            isRegistered.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void TypeIsRegistered_returns_false_for_collection_of_unregistered_types()
+        {
+            // Arrange
+            var pluralizationService = new PluralizationService();
+            var mm = new ModelManager(pluralizationService);
+
+            // Act
+            var isRegistered = mm.TypeIsRegistered(typeof(ICollection<Comment>));
+
+            // Assert
+            isRegistered.Should().BeFalse();
+        }
+
+        [TestMethod]
         public void GetJsonKeyForPropertyTest()
         {
             // Arrange

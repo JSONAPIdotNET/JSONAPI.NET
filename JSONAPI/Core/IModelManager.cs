@@ -41,6 +41,13 @@ namespace JSONAPI.Core
         Type GetTypeByResourceTypeName(string resourceTypeName);
 
         /// <summary>
+        /// Determines whether a given type has been registered.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>Whether the type is registered</returns>
+        bool TypeIsRegistered(Type type);
+
+        /// <summary>
         /// Returns the property corresponding to a given JSON Key. Inverse of GetJsonKeyForProperty.
         /// </summary>
         /// <param name="type">The Type to find the property on</param>
