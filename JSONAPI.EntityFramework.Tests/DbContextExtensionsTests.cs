@@ -7,13 +7,11 @@ using JSONAPI.EntityFramework.Tests.Models;
 using FluentAssertions;
 using System.Collections.Generic;
 using System.Data.Entity;
-using JSONAPI.Core;
-using Moq;
 
 namespace JSONAPI.EntityFramework.Tests
 {
     [TestClass]
-    public class EntityFrameworkMaterializerTests
+    public class DbContextExtensionsTests
     {
         private class TestDbContext : DbContext
         {
@@ -60,12 +58,8 @@ namespace JSONAPI.EntityFramework.Tests
         [TestMethod]
         public void GetKeyNamesStandardIdTest()
         {
-            // Arrange
-            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
-
             // Act
-            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Post)).ToArray();
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(Post)).ToArray();
 
             // Assert
             keyNames.Count().Should().Be(1);
@@ -75,12 +69,8 @@ namespace JSONAPI.EntityFramework.Tests
         [TestMethod]
         public void GetKeyNamesNonStandardIdTest()
         {
-            // Arrange
-            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
-
             // Act
-            IEnumerable<string> keyNames = materializer.GetKeyNames(typeof(Backlink)).ToArray();
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(Backlink)).ToArray();
 
             // Assert
             keyNames.Count().Should().Be(1);
@@ -90,12 +80,8 @@ namespace JSONAPI.EntityFramework.Tests
         [TestMethod]
         public void GetKeyNamesNotAnEntityTest()
         {
-            // Arrange
-            var mockMetadataManager = new Mock<IMetadataManager>(MockBehavior.Strict);
-            var materializer = new EntityFrameworkMaterializer(_context, mockMetadataManager.Object);
-
             // Act
-            Action action = () => materializer.GetKeyNames(typeof (NotAnEntity));
+            Action action = () => _context.GetKeyNames(typeof (NotAnEntity));
             action.ShouldThrow<ArgumentException>().Which.Message.Should().Be("The Type NotAnEntity was not found in the DbContext with Type TestDbContext");
         }
     }

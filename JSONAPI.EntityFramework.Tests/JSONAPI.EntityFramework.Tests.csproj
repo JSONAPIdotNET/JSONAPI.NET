@@ -116,7 +116,7 @@
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
     <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformerTests.cs" />
-    <Compile Include="EntityFrameworkMaterializerTests.cs" />
+    <Compile Include="DbContextExtensionsTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
     <Compile Include="Helpers\WaitsUntilCancellationDbAsyncEnumerator.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerator.cs" />
