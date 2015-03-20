@@ -8,9 +8,18 @@ using System.Reflection;
 
 namespace JSONAPI.EntityFramework
 {
-    internal static class DbContextExtensions
+    /// <summary>
+    /// Extensions on DbContext useful for JSONAPI.NET
+    /// </summary>
+    public static class DbContextExtensions
     {
-        internal static IEnumerable<string> GetKeyNames(this DbContext dbContext, Type type)
+        /// <summary>
+        /// Gets the ID key names for an entity type
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static IEnumerable<string> GetKeyNames(this DbContext dbContext, Type type)
         {
             var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
             var method = openMethod.MakeGenericMethod(type);
