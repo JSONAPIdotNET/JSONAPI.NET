@@ -76,6 +76,10 @@ namespace JSONAPI.ActionFilters
                                 materializedResults,
                                 objectContent.Formatter);
                         }
+                        catch (HttpResponseException)
+                        {
+                            throw;
+                        }
                         catch (QueryableTransformException ex)
                         {
                             throw new HttpResponseException(
