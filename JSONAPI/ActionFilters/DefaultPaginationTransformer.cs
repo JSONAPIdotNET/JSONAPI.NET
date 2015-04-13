@@ -43,12 +43,17 @@ namespace JSONAPI.ActionFilters
                 if (kvp.Key == _pageNumberQueryParam)
                 {
                     hasPageNumberParam = true;
-                    if (!int.TryParse(kvp.Value, out pageNumber)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+                    if (!int.TryParse(kvp.Value, out pageNumber))
+                        throw new QueryableTransformException(
+                            String.Format("{0} must be a positive integer.", _pageNumberQueryParam));
+
                 }
                 else if (kvp.Key == _pageSizeQueryParam)
                 {
                     hasPageSizeParam = true;
-                    if (!int.TryParse(kvp.Value, out pageSize)) throw new HttpResponseException(HttpStatusCode.BadRequest);
+                    if (!int.TryParse(kvp.Value, out pageSize))
+                        throw new QueryableTransformException(
+                            String.Format("{0} must be a positive integer.", _pageSizeQueryParam));
                 }
             }
 
@@ -56,10 +61,17 @@ namespace JSONAPI.ActionFilters
                 return query;
 
             if ((hasPageNumberParam && !hasPageSizeParam) || (!hasPageNumberParam && hasPageSizeParam))
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw new QueryableTransformException(
+                    String.Format("In order for paging to work properly, if either {0} or {1} is set, both must be.",
+                        _pageNumberQueryParam, _pageSizeQueryParam));
 
-            if (pageNumber < 0 || pageSize < 0)
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            if (pageNumber < 0)
+                throw new QueryableTransformException(
+                    String.Format("{0} must be not be negative.", _pageNumberQueryParam));
+
+            if (pageSize < 0)
+                throw new QueryableTransformException(
+                    String.Format("{0} must be not be negative.", _pageSizeQueryParam));
 
             if (_maxPageSize != null && pageSize > _maxPageSize.Value)
                 pageSize = _maxPageSize.Value;

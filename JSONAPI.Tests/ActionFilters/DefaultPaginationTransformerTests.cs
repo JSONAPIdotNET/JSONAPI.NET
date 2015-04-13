@@ -120,7 +120,7 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 GetArray("http://api.example.com/dummies?page[number]=-4&page[size]=4");
             };
-            action.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("page.number must be not be negative.");
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 GetArray("http://api.example.com/dummies?page[number]=0&page[size]=-4");
             };
-            action.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("page.size must be not be negative.");
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 GetArray("http://api.example.com/dummies?page[number]=0");
             };
-            action.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
         }
 
         [TestMethod]
@@ -150,7 +150,7 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 GetArray("http://api.example.com/dummies?page[size]=0");
             };
-            action.ShouldThrow<HttpResponseException>().And.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
         }
 
         [TestMethod]
