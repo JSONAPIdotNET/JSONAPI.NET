@@ -308,6 +308,66 @@ namespace JSONAPI.Tests.Json
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\NullResourceResult.json")]
+        public void Serializes_null_resource_properly()
+        {
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
+            var formatter = new JsonApiFormatter(modelManager);
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(Comment), null, stream, null, null);
+
+            // Assert
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(File.ReadAllText("NullResourceResult.json"));
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\EmptyArrayResult.json")]
+        public void Serializes_null_resource_array_as_empty_array()
+        {
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
+            var formatter = new JsonApiFormatter(modelManager);
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(Comment[]), null, stream, null, null);
+
+            // Assert
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(File.ReadAllText("EmptyArrayResult.json"));
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\EmptyArrayResult.json")]
+        public void Serializes_null_list_as_empty_array()
+        {
+            // Arrange
+            var modelManager = new ModelManager(new PluralizationService());
+            modelManager.RegisterResourceType(typeof(Comment));
+            var formatter = new JsonApiFormatter(modelManager);
+            MemoryStream stream = new MemoryStream();
+
+            // Act
+            formatter.WriteToStreamAsync(typeof(List<Comment>), null, stream, null, null);
+
+            // Assert
+            var minifiedExpectedJson = JsonHelpers.MinifyJson(File.ReadAllText("EmptyArrayResult.json"));
+            string output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
+            Trace.WriteLine(output);
+            output.Should().Be(minifiedExpectedJson);
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\MalformedRawJsonString.json")]
         public void Does_not_serialize_malformed_raw_json_string()
         {

@@ -106,6 +106,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\EmptyArrayResult.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\NullResourceResult.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\MetadataManagerPropertyWasPresentRequest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

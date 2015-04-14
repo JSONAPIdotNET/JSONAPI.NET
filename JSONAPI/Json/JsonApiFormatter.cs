@@ -117,23 +117,39 @@ namespace JSONAPI.Json
             }
             else
             {
-                Type valtype = GetSingleType(value.GetType());
-                if (_modelManager.IsSerializedAsMany(value.GetType()))
-                    aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
-                else
-                    aggregator.AddPrimary(valtype, value);
-
-                //writer.Formatting = Formatting.Indented;
-
                 writer.WriteStartObject();
                 writer.WritePropertyName(PrimaryDataKeyName);
-                if (_modelManager.IsSerializedAsMany(value.GetType()))
-                    this.SerializeMany(value, writeStream, writer, serializer, aggregator);
-                else
-                    this.Serialize(value, writeStream, writer, serializer, aggregator);
 
-                // Include links from aggregator
-                SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                if (value == null)
+                {
+                    if (_modelManager.IsSerializedAsMany(type))
+                    {
+                        writer.WriteStartArray();
+                        writer.WriteEndArray();
+                    }
+                    else
+                    {
+                        writer.WriteNull();
+                    }
+                }
+                else
+                {
+                    Type valtype = GetSingleType(value.GetType());
+                    if (_modelManager.IsSerializedAsMany(value.GetType()))
+                        aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
+                    else
+                        aggregator.AddPrimary(valtype, value);
+
+                    //writer.Formatting = Formatting.Indented;
+
+                    if (_modelManager.IsSerializedAsMany(value.GetType()))
+                        this.SerializeMany(value, writeStream, writer, serializer, aggregator);
+                    else
+                        this.Serialize(value, writeStream, writer, serializer, aggregator);
+
+                    // Include links from aggregator
+                    SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                }
 
                 writer.WriteEndObject();
             }
