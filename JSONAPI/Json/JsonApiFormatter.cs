@@ -324,7 +324,7 @@ namespace JSONAPI.Json
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
-                            writer.WritePropertyName("href");
+                            writer.WritePropertyName("related");
                             writer.WriteValue(href);
                             writer.WriteEndObject();
                             break;
@@ -368,7 +368,7 @@ namespace JSONAPI.Json
                                     
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             writer.WriteStartObject();
-                            writer.WritePropertyName("href");
+                            writer.WritePropertyName("related");
                             writer.WriteValue(link);
                             writer.WriteEndObject();
                             break;

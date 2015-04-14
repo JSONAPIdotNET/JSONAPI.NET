@@ -5,7 +5,7 @@
         "title": "How to fry an egg",
         "links": {
             "author": {
-                "href": "/users/5"
+                "related": "/users/5"
             }
         }
     }
