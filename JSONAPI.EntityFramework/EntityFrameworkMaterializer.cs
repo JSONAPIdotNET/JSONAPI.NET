@@ -184,9 +184,15 @@ namespace JSONAPI.EntityFramework
                 return type;
         }
 
+        private static Lazy<MethodInfo> OpenGetKeyNamesFromGenericMethod =
+            new Lazy<MethodInfo>(
+                () =>
+                    typeof (EntityFrameworkMaterializer).GetMethod("GetKeyNamesFromGeneric",
+                        BindingFlags.NonPublic | BindingFlags.Static));
+
         protected internal virtual IEnumerable<string> GetKeyNames(Type type)
         {
-            var openMethod = typeof (EntityFrameworkMaterializer).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
+            var openMethod = OpenGetKeyNamesFromGenericMethod.Value;
             var method = openMethod.MakeGenericMethod(type);
             try
             {
@@ -206,7 +212,21 @@ namespace JSONAPI.EntityFramework
             try
             {
                 objectSet = objectContext.CreateObjectSet<T>();
+            }
+            catch (ArgumentException e)
+            {
+                var baseClass = typeof (T).BaseType;
+                if (baseClass != null && baseClass != typeof (Object))
+                {
+                    var openMethod = OpenGetKeyNamesFromGenericMethod.Value;
+                    var method = openMethod.MakeGenericMethod(baseClass);
+                    return (IEnumerable<string>)method.Invoke(null, new object[] { dbContext });
+                }
 
+                throw new ArgumentException(
+                    String.Format("The Type {0} was not found in the DbContext with Type {1}", typeof(T).Name, dbContext.GetType().Name),
+                    e
+                    );
             }
             catch (InvalidOperationException e)
             {
