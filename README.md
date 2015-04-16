@@ -9,12 +9,10 @@ The NuGet packages are out!
 * [JSONAPI](https://www.nuget.org/packages/JSONAPI/)
 * [JSONAPI.EntityFramework](https://www.nuget.org/packages/JSONAPI.EntityFramework/)
 
-Alpha Quality Software
+JSON API Compliance
 ----------------------
 
-This is an extremely early access library. The tests are a mess, and there is next to no documentation. However, it is working usefully in a project of mine, so hopefully it can be of use to others as well--or at least eventually. This will continue to be developed by me and contributions are welcome!
-
-(Also bear in mind that I'm still relatively new to C# and .NET--I've written all this but I wouldn't say I "grok" those environments--so there may be flaws in the design. I think there is a lot with merit here though.)
+The master branch is currently compliant with JSON API RC1. Work is ongoing in the [0-4-0](https://github.com/SphtKr/JSONAPI.NET/tree/0-4-0) branch to bring the library up to date with the RC3 version of the spec.
 
 What is JSONAPI.NET?
 ====================
