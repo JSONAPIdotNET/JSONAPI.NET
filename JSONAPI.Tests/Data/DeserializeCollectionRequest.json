@@ -5,8 +5,13 @@
             "title": "Linkbait!",
             "links": {
                 "author": {
-                    "type": "authors",
-                    "id": "1"
+                    "linkage": {
+                        "type": "authors",
+                        "id": "1"
+                    }
+                },
+                "comments": {
+                    "linkage": [{ "type": "comments", "id": "400" }, { "type": "comments", "id":  "401" }]
                 }
             }
         },
@@ -15,8 +20,10 @@
             "title": "Rant #1023",
             "links": {
                 "author": {
-                    "type": "authors",
-                    "id": "1"
+                    "linkage": {
+                        "type": "authors",
+                        "id": "1"
+                    }
                 }
             }
         }

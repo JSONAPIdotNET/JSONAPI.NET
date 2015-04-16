@@ -5,7 +5,7 @@
             "id": "202",
             "links": {
                 "tags": {
-                    "data": []
+                    "linkage": { "type": "tags", "id": "301" }
                 }
             }
         }

@@ -464,6 +464,9 @@ namespace JSONAPI.Tests.Json
                 posts[0].Id.Should().Be(p.Id);
                 posts[0].Title.Should().Be(p.Title);
                 posts[0].Author.Id.Should().Be(a.Id);
+                posts[0].Comments.Count.Should().Be(2);
+                posts[0].Comments[0].Id.Should().Be(400);
+                posts[0].Comments[1].Id.Should().Be(401);
                 posts[1].Id.Should().Be(p2.Id);
                 posts[1].Title.Should().Be(p2.Title);
                 posts[1].Author.Id.Should().Be(a.Id);
@@ -522,7 +525,7 @@ namespace JSONAPI.Tests.Json
             var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
-            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":{""type"": ""posts"",""ids"": []}}}"));
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":{""linkage"":[]}}}}"));
 
             // Act
             Author a;
@@ -542,7 +545,7 @@ namespace JSONAPI.Tests.Json
             var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
-            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":{""type"": ""posts"",""ids"": []},""bogus"":[""PANIC!""]}}}"));
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":{""linkage"":[]},""bogus"":{""linkage"":[]}}}}"));
 
             // Act
             Author a;

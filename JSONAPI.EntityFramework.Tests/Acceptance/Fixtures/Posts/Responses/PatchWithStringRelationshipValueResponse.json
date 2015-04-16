@@ -4,7 +4,7 @@
             "id": "{{SOME_GUID}}",
             "status": "500",
             "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
-            "detail": "The value of a to-one relationship must be an object or null.",
+            "detail": "Each relationship key on a links object must have an object value.",
             "stackTrace": "{{STACK_TRACE}}",
             "inner": null
         }

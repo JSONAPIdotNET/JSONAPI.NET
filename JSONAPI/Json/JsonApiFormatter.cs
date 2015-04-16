@@ -817,253 +817,165 @@ namespace JSONAPI.Json
 
         private void DeserializeLinkedResources(object obj, JsonReader reader)
         {
-            //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
 
             Type objectType = obj.GetType();
 
             while (reader.Read())
             {
-                if (reader.TokenType == JsonToken.PropertyName)
+                if (reader.TokenType == JsonToken.EndObject)
                 {
-                    string value = (string)reader.Value;
-                    reader.Read(); // burn the PropertyName token
-                    var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value) as RelationshipModelProperty;
-                    if (modelProperty != null)
+                    reader.Read(); // Burn the EndObject token
+                    break;
+                }
+
+                if (reader.TokenType != JsonToken.PropertyName)
+                    throw new BadRequestException(String.Format("Unexpected token: {0}", reader.TokenType));
+
+                var value = (string)reader.Value;
+                reader.Read(); // burn the PropertyName token
+                var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value) as RelationshipModelProperty;
+                if (modelProperty == null)
+                {
+                    reader.Skip();
+                    continue;
+                }
+
+                var relationshipToken = JToken.ReadFrom(reader);
+                if (!(relationshipToken is JObject))
+                    throw new BadRequestException("Each relationship key on a links object must have an object value.");
+
+                var relationshipObject = (JObject) relationshipToken;
+                var linkageToken = relationshipObject["linkage"];
+
+                var linkageObjects = new List<Tuple<string, string>>();
+
+                if (modelProperty.IsToMany)
+                {
+                    if (linkageToken == null)
+                        throw new BadRequestException("Expected an array value for `linkage` but no `linkage` key was found.");
+
+                    if (linkageToken.Type != JTokenType.Array)
+                        throw new BadRequestException("Expected an array value for `linkage` but got " + linkageToken.Type + ".");
+
+                    foreach (var element in (JArray) linkageToken)
                     {
-                        var prop = modelProperty.Property;
-                        if (modelProperty.IsToMany)
+                        if (!(element is JObject))
+                            throw new BadRequestException("Each element in the `linkage` array must be an object.");
+
+                        var linkageObject = DeserializeLinkageObject((JObject) element);
+                        linkageObjects.Add(linkageObject);
+                    }
+                }
+                else
+                {
+                    if (linkageToken == null)
+                        throw new BadRequestException("Expected an object or null value for `linkage` but no `linkage` key was found.");
+
+                    switch (linkageToken.Type)
+                    {
+                        case JTokenType.Null:
+                            break;
+                        case JTokenType.Object:
+                            linkageObjects.Add(DeserializeLinkageObject((JObject)linkageToken));
+                            break;
+                        default:
+                            throw new BadRequestException("Expected an object value for `linkage` but got " + linkageToken.Type + ".");
+                    }
+                }
+
+                var relatedStubs = linkageObjects.Select(lo =>
+                {
+                    var resourceType = _modelManager.GetTypeByResourceTypeName(lo.Item2);
+                    return GetById(resourceType, lo.Item1);
+                }).ToArray();
+
+                var prop = modelProperty.Property;
+                if (!modelProperty.IsToMany)
+                {
+                    // To-one relationship
+
+                    var relatedStub = relatedStubs.FirstOrDefault();
+                    prop.SetValue(obj, relatedStub);
+                }
+                else
+                {
+                    // To-many relationship
+
+                    Type relType;
+                    if (prop.PropertyType.IsGenericType)
+                    {
+                        relType = prop.PropertyType.GetGenericArguments()[0];
+                    }
+                    else
+                    {
+                        // Must be an array at this point, right??
+                        relType = prop.PropertyType.GetElementType();
+                    }
+
+                    var hmrel = (IEnumerable<Object>) prop.GetValue(obj, null);
+                    if (hmrel == null)
+                    {
+                        // Hmm...now we have to create an object that fits this property. This could get messy...
+                        if (!prop.PropertyType.IsInterface && !prop.PropertyType.IsAbstract)
                         {
-                            // Is a hasMany
-
-                            if (reader.TokenType != JsonToken.StartObject)
-                                throw new BadRequestException("The value of a to-many relationship must be an object.");
-
-                            JArray ids = null;
-                            string resourceType = null;
-                            JArray relatedObjects = null;
-
-                            while (reader.Read())
-                            {
-                                if (reader.TokenType == JsonToken.EndObject)
-                                    break;
-
-                                // Not sure what else could even go here, but if it's not a property name, throw an error.
-                                if (reader.TokenType != JsonToken.PropertyName)
-                                    throw new BadRequestException("Unexpected token: " + reader.TokenType);
-
-                                var propName = (string) reader.Value;
-                                reader.Read();
-
-                                if (propName == "ids")
-                                {
-                                    if (reader.TokenType != JsonToken.StartArray)
-                                        throw new BadRequestException("The value of `ids` must be an array.");
-
-                                    ids = JArray.Load(reader);
-                                }
-                                else if (propName == "type")
-                                {
-                                    if (reader.TokenType != JsonToken.String)
-                                        throw new BadRequestException("Unexpected value for `type`: " + reader.TokenType);
-
-                                    resourceType = (string)reader.Value;
-                                }
-                                else if (propName == "data")
-                                {
-                                    if (reader.TokenType != JsonToken.StartArray)
-                                        throw new BadRequestException("Unexpected value for `data`: " + reader.TokenType);
-                                    
-                                    relatedObjects = JArray.Load(reader);
-                                }
-                                else
-                                {
-                                    throw new BadRequestException("Unexpected property name: " + propName);
-                                }
-                            }
-
-                            var relatedStubs = new List<object>();
-
-                            Type relType;
-                            if (prop.PropertyType.IsGenericType)
-                            {
-                                relType = prop.PropertyType.GetGenericArguments()[0];
-                            }
-                            else
-                            {
-                                // Must be an array at this point, right??
-                                relType = prop.PropertyType.GetElementType();
-                            }
-
-                            // According to the spec, either the type and ids or data must be specified
-                            if (relatedObjects != null)
-                            {
-                                if (ids != null)
-                                    throw new BadRequestException("If `data` is specified, then `ids` may not be.");
-
-                                if (resourceType != null)
-                                    throw new BadRequestException("If `data` is specified, then `type` may not be.");
-
-                                foreach (var relatedObject in relatedObjects)
-                                {
-                                    if (!(relatedObject is JObject))
-                                        throw new BadRequestException("Each element in the `data` array must be an object.");
-
-                                    var relatedObjectType = relatedObject["type"] as JValue;
-                                    if (relatedObjectType == null || relatedObjectType.Type != JTokenType.String)
-                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `type`.");
-
-                                    var relatedObjectId = relatedObject["id"] as JValue;
-                                    if (relatedObjectId == null || relatedObjectId.Type != JTokenType.String)
-                                        throw new BadRequestException("Each element in the `data` array must have a string value for the key `id`.");
-
-                                    var relatedObjectIdValue = relatedObjectId.Value<string>();
-                                    if (string.IsNullOrWhiteSpace(relatedObjectIdValue))
-                                        throw new BadRequestException("The value for `id` must be specified.");
-
-                                    var stub = GetById(relType, relatedObjectIdValue);
-                                    relatedStubs.Add(stub);
-                                }
-                            }
-                            else if (ids == null)
-                            {
-                                throw new BadRequestException("If `data` is not specified, then `ids` must be specified.");
-                            }
-                            else if (resourceType == null)
-                            {
-                                // We aren't doing anything with this value for now, but it needs to be present in the request payload.
-                                // We will need to reference it to properly support polymorphism.
-                                throw new BadRequestException("If `data` is not specified, then `type` must be specified.");
-                            }
-                            else
-                            {
-                                relatedStubs.AddRange(ids.Select(token => GetById(relType, token.ToObject<string>())));
-                            }
-
-                            IEnumerable<Object> hmrel = (IEnumerable<Object>)prop.GetValue(obj, null);
-                            if (hmrel == null)
-                            {
-                                // Hmm...now we have to create an object that fits this property. This could get messy...
-                                if (!prop.PropertyType.IsInterface && !prop.PropertyType.IsAbstract)
-                                {
-                                    // Whew...okay, just instantiate one of these...
-                                    hmrel = (IEnumerable<Object>)Activator.CreateInstance(prop.PropertyType);
-                                }
-                                else
-                                {
-                                    // Ugh...now we're really in trouble...hopefully one of these will work:
-                                    if (prop.PropertyType.IsGenericType)
-                                    {
-                                        if (prop.PropertyType.IsAssignableFrom(typeof(List<>).MakeGenericType(relType)))
-                                        {
-                                            hmrel = (IEnumerable<Object>)Activator.CreateInstance(typeof(List<>).MakeGenericType(relType));
-                                        }
-                                        else if (prop.PropertyType.IsAssignableFrom(typeof(HashSet<>).MakeGenericType(relType)))
-                                        {
-                                            hmrel = (IEnumerable<Object>)Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(relType));
-                                        }
-                                        //TODO: Other likely candidates??
-                                        else
-                                        {
-                                            // punt!
-                                            throw new JsonReaderException(String.Format("Could not create empty container for relationship property {0}!", prop));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // erm...Array??!?
-                                        hmrel = (IEnumerable<Object>)Array.CreateInstance(relType, ids.Count);
-                                    }
-                                }
-                            }
-
-                            // We're having problems with how to generalize/cast/generic-ize this code, so for the time
-                            // being we'll brute-force it in super-dynamic language style...
-                            Type hmtype = hmrel.GetType();
-                            MethodInfo add = hmtype.GetMethod("Add");
-
-                            foreach (var stub in relatedStubs)
-                            {
-                                add.Invoke(hmrel, new [] { stub });
-                            }
-
-                            prop.SetValue(obj, hmrel);
+                            // Whew...okay, just instantiate one of these...
+                            hmrel = (IEnumerable<Object>) Activator.CreateInstance(prop.PropertyType);
                         }
                         else
                         {
-                            // Is a belongsTo
-
-                            if (reader.TokenType == JsonToken.StartObject)
+                            // Ugh...now we're really in trouble...hopefully one of these will work:
+                            if (prop.PropertyType.IsGenericType)
                             {
-                                string id = null;
-                                string resourceType = null;
-
-                                while (reader.Read())
+                                if (prop.PropertyType.IsAssignableFrom(typeof (List<>).MakeGenericType(relType)))
                                 {
-                                    if (reader.TokenType == JsonToken.EndObject)
-                                        break;
-
-                                    // Not sure what else could even go here, but if it's not a property name, throw an error.
-                                    if (reader.TokenType != JsonToken.PropertyName)
-                                        throw new BadRequestException("Unexpected token: " + reader.TokenType);
-
-                                    var propName = (string)reader.Value;
-                                    reader.Read();
-
-                                    if (propName == "id")
-                                    {
-                                        var idValue = reader.Value;
-
-                                        // The id must be a string.
-                                        if (!(idValue is string))
-                                            throw new BadRequestException("The value of the `id` property must be a string.");
-
-                                        id = (string)idValue;
-                                    }
-                                    else if (propName == "type")
-                                    {
-                                        // TODO: we don't do anything with this value yet, but we will need to in order to
-                                        // support polymorphic endpoints
-                                        resourceType = (string)reader.Value;
-                                    }
+                                    hmrel =
+                                        (IEnumerable<Object>)
+                                            Activator.CreateInstance(typeof (List<>).MakeGenericType(relType));
                                 }
-
-                                // The id must be specified.
-                                if (id == null)
-                                    throw new BadRequestException("Nothing was specified for the `id` property.");
-
-                                // The type must be specified.
-                                if (resourceType == null)
-                                    throw new BadRequestException("Nothing was specified for the `type` property.");
-
-                                Type relType = prop.PropertyType;
-
-                                prop.SetValue(obj, GetById(relType, id));
-                            }
-                            else if (reader.TokenType == JsonToken.Null)
-                            {
-                                prop.SetValue(obj, null);
+                                else if (
+                                    prop.PropertyType.IsAssignableFrom(
+                                        typeof (HashSet<>).MakeGenericType(relType)))
+                                {
+                                    hmrel =
+                                        (IEnumerable<Object>)
+                                            Activator.CreateInstance(
+                                                typeof (HashSet<>).MakeGenericType(relType));
+                                }
+                                    //TODO: Other likely candidates??
+                                else
+                                {
+                                    // punt!
+                                    throw new JsonReaderException(
+                                        String.Format(
+                                            "Could not create empty container for relationship property {0}!",
+                                            prop));
+                                }
                             }
                             else
                             {
-                                throw new BadRequestException("The value of a to-one relationship must be an object or null.");
+                                // erm...Array??!?
+                                hmrel =
+                                    (IEnumerable<Object>) Array.CreateInstance(relType, linkageObjects.Count);
                             }
                         }
-
-                        // Tell the MetadataManager that we deserialized this property
-                        MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
                     }
-                    else
-                        reader.Skip();
+
+                    // We're having problems with how to generalize/cast/generic-ize this code, so for the time
+                    // being we'll brute-force it in super-dynamic language style...
+                    Type hmtype = hmrel.GetType();
+                    MethodInfo add = hmtype.GetMethod("Add");
+
+                    foreach (var stub in relatedStubs)
+                    {
+                        add.Invoke(hmrel, new[] {stub});
+                    }
+
+                    prop.SetValue(obj, hmrel);
                 }
-                else if (reader.TokenType == JsonToken.EndObject)
-                {
-                    // Burn the EndObject token and get set to send back to the parent method in the call stack.
-                    reader.Read();
-                    break;
-                }
-                else
-                    reader.Skip();
+
+                // Tell the MetadataManager that we deserialized this property
+                MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
             }
         }
 
@@ -1072,8 +984,29 @@ namespace JSONAPI.Json
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
-            var token = JToken.Load(reader);
+            var token = JToken.ReadFrom(reader);
             return token.ToObject(type);
+        }
+
+        private static Tuple<string, string> DeserializeLinkageObject(JObject token)
+        {
+            var relatedObjectType = token["type"] as JValue;
+            if (relatedObjectType == null || relatedObjectType.Type != JTokenType.String)
+                throw new BadRequestException("Each linkage object must have a string value for the key `type`.");
+
+            var relatedObjectTypeValue = relatedObjectType.Value<string>();
+            if (string.IsNullOrWhiteSpace(relatedObjectTypeValue))
+                throw new BadRequestException("The value for `type` must be specified.");
+
+            var relatedObjectId = token["id"] as JValue;
+            if (relatedObjectId == null || relatedObjectId.Type != JTokenType.String)
+                throw new BadRequestException("Each linkage object must have a string value for the key `id`.");
+
+            var relatedObjectIdValue = relatedObjectId.Value<string>();
+            if (string.IsNullOrWhiteSpace(relatedObjectIdValue))
+                throw new BadRequestException("The value for `id` must be specified.");
+
+            return Tuple.Create(relatedObjectIdValue, relatedObjectType.Value<string>());
         }
 
         #endregion

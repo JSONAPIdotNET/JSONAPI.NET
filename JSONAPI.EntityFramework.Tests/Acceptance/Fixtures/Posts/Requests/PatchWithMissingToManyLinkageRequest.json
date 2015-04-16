@@ -4,8 +4,7 @@
             "type": "posts",
             "id": "202",
             "links": {
-                "author": { 
-                    "linkage": null
+                "tags": {
                 }
             }
         }

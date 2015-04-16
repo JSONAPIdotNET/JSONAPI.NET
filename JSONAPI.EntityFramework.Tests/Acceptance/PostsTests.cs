@@ -181,13 +181,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PatchWithToManyEmptyDataUpdate()
+        public async Task PatchWithToManyEmptyLinkageUpdate()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyEmptyDataUpdateRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyEmptyLinkageUpdateRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyEmptyDataUpdateResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyEmptyLinkageUpdateResponse.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -268,13 +268,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PatchWithMissingToOneId()
+        public async Task PatchWithToOneLinkageObjectMissingId()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneIdRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToOneLinkageObjectMissingIdRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneIdResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -297,13 +297,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PatchWithMissingToOneType()
+        public async Task PatchWithToOneLinkageObjectMissingType()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneTypeRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToOneLinkageObjectMissingTypeRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -326,13 +326,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PatchWithMissingToManyIds()
+        public async Task PatchWithArrayForToOneLinkage()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyIdsRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyIdsResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayForToOneLinkageResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -355,13 +355,188 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
-        public async Task PatchWithMissingToManyType()
+        public async Task PatchWithStringForToOneLinkage()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyTypeRequest.json");
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToOneLinkageResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithMissingToManyLinkage()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyLinkageRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithToManyLinkageObjectMissingId()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyLinkageObjectMissingIdRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithToManyLinkageObjectMissingType()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyLinkageObjectMissingTypeRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithObjectForToManyLinkage()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithObjectForToManyLinkageRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithObjectForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithStringForToManyLinkage()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringForToManyLinkageRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+           
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithNullForToManyLinkage()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithNullForToManyLinkageRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithNullForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {

@@ -5,8 +5,10 @@
             "id": "202",
             "links": {
                 "author": {
-                    "type": "users",
-                    "id": "403"
+                    "linkage": {
+                        "type": "users",
+                        "id": "403"
+                    }
                 }
             }
         }
