@@ -1,4 +1,5 @@
-﻿using JSONAPI.Attributes;
+﻿using System.Collections.ObjectModel;
+using JSONAPI.Attributes;
 using JSONAPI.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -902,63 +903,16 @@ namespace JSONAPI.Json
                 {
                     // To-many relationship
 
-                    Type relType;
-                    if (prop.PropertyType.IsGenericType)
-                    {
-                        relType = prop.PropertyType.GetGenericArguments()[0];
-                    }
-                    else
-                    {
-                        // Must be an array at this point, right??
-                        relType = prop.PropertyType.GetElementType();
-                    }
-
                     var hmrel = (IEnumerable<Object>) prop.GetValue(obj, null);
                     if (hmrel == null)
                     {
-                        // Hmm...now we have to create an object that fits this property. This could get messy...
-                        if (!prop.PropertyType.IsInterface && !prop.PropertyType.IsAbstract)
-                        {
-                            // Whew...okay, just instantiate one of these...
-                            hmrel = (IEnumerable<Object>) Activator.CreateInstance(prop.PropertyType);
-                        }
-                        else
-                        {
-                            // Ugh...now we're really in trouble...hopefully one of these will work:
-                            if (prop.PropertyType.IsGenericType)
-                            {
-                                if (prop.PropertyType.IsAssignableFrom(typeof (List<>).MakeGenericType(relType)))
-                                {
-                                    hmrel =
-                                        (IEnumerable<Object>)
-                                            Activator.CreateInstance(typeof (List<>).MakeGenericType(relType));
-                                }
-                                else if (
-                                    prop.PropertyType.IsAssignableFrom(
-                                        typeof (HashSet<>).MakeGenericType(relType)))
-                                {
-                                    hmrel =
-                                        (IEnumerable<Object>)
-                                            Activator.CreateInstance(
-                                                typeof (HashSet<>).MakeGenericType(relType));
-                                }
-                                    //TODO: Other likely candidates??
-                                else
-                                {
-                                    // punt!
-                                    throw new JsonReaderException(
-                                        String.Format(
-                                            "Could not create empty container for relationship property {0}!",
-                                            prop));
-                                }
-                            }
-                            else
-                            {
-                                // erm...Array??!?
-                                hmrel =
-                                    (IEnumerable<Object>) Array.CreateInstance(relType, linkageObjects.Count);
-                            }
-                        }
+                        hmrel = prop.PropertyType.CreateEnumerableInstance();
+                        if (hmrel == null)
+                            // punt!
+                            throw new JsonReaderException(
+                                String.Format(
+                                    "Could not create empty container for relationship property {0}!",
+                                    prop));
                     }
 
                     // We're having problems with how to generalize/cast/generic-ize this code, so for the time

@@ -104,6 +104,7 @@ namespace JSONAPI.EntityFramework
             {
                 // Didn't find it...create a new one!
                 retval = Activator.CreateInstance(type);
+
                 DbContext.Set(type).Add(retval);
                 if (!anyNull)
                 {
@@ -331,6 +332,12 @@ namespace JSONAPI.EntityFramework
                     Type elementType = GetSingleType(prop.PropertyType);
 
                     var materialMany = (IEnumerable<Object>)prop.GetValue(material, null);
+                    if (materialMany == null)
+                    {
+                        materialMany = prop.PropertyType.CreateEnumerableInstance();
+                        prop.SetValue(material, materialMany);
+                    }
+
                     var ephemeralMany = (IEnumerable<Object>)prop.GetValue(ephemeral, null);
 
                     var materialKeys = new HashSet<EntityKey>();
@@ -389,7 +396,8 @@ namespace JSONAPI.EntityFramework
                         else
                         {
                             object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            prop.SetValue(material, await GetByIdAsync(prop.PropertyType, idParams), null);
+                            var relatedMaterial = await GetByIdAsync(prop.PropertyType, idParams);
+                            prop.SetValue(material, relatedMaterial, null);
                         }
                     }
                 }
