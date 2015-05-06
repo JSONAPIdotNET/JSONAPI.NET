@@ -319,7 +319,7 @@ namespace JSONAPI.EntityFramework
             return key;
         }
 
-        private async Task Merge (Type type, object ephemeral, object material)
+        protected async Task Merge (Type type, object ephemeral, object material)
         {
             PropertyInfo[] props = type.GetProperties();
             foreach (PropertyInfo prop in props)
