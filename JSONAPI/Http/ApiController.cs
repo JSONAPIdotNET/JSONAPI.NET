@@ -13,6 +13,7 @@ namespace JSONAPI.Http
 {
     //TODO: Authorization checking framework, maybe?
     public class ApiController<T> : System.Web.Http.ApiController
+        where T : class
     {
         protected virtual IMaterializer MaterializerFactory()
         {

@@ -43,14 +43,14 @@ namespace JSONAPI.EntityFramework
         /// <param name="type"></param>
         /// <param name="idValues"></param>
         /// <returns></returns>
-        public virtual Task<object> GetByIdAsync(Type type, params Object[] idValues)
+        public async Task<T> GetByIdAsync<T>(params Object[] idValues) where T : class
         {
             //TODO: How to react if the type isn't in the context?
 
             // Input will probably usually be strings... make sure the right types are passed to .Find()...
             Object[] idv2 = new Object[idValues.Length];
             int i = 0;
-            foreach (PropertyInfo prop in GetKeyProperties(type))
+            foreach (PropertyInfo prop in GetKeyProperties(typeof(T)))
             {
                 try
                 {
@@ -66,21 +66,12 @@ namespace JSONAPI.EntityFramework
                     i++;
                 }
             }
-            return DbContext.Set(type).FindAsync(idv2);
+            return await DbContext.Set<T>().FindAsync(idv2);
         }
 
-        public async Task<T> GetByIdAsync<T>(params Object[] idValues)
+        public virtual async Task<T> MaterializeAsync<T>(T ephemeral) where T : class
         {
-            return (T) await GetByIdAsync(typeof(T), idValues);
-        }
-
-        public async Task<T> MaterializeAsync<T>(T ephemeral)
-        {
-            return (T) await MaterializeAsync(typeof(T), ephemeral);
-        }
-
-        public virtual async Task<object> MaterializeAsync(Type type, object ephemeral)
-        {
+            var type = typeof (T);
             IEnumerable<string> keyNames = GetKeyNames(type);
             List<Object> idValues = new List<Object>();
             bool anyNull = false;
@@ -95,15 +86,15 @@ namespace JSONAPI.EntityFramework
                 }
                 idValues.Add(value);
             }
-            object retval = null;
+            T retval = null;
             if (!anyNull)
             {
-                retval = await DbContext.Set(type).FindAsync(idValues.ToArray());
+                retval = await DbContext.Set<T>().FindAsync(idValues.ToArray());
             }
             if (retval == null)
             {
                 // Didn't find it...create a new one!
-                retval = Activator.CreateInstance(type);
+                retval = (T)Activator.CreateInstance(type);
 
                 DbContext.Set(type).Add(retval);
                 if (!anyNull)
@@ -116,50 +107,11 @@ namespace JSONAPI.EntityFramework
             return retval;
         }
 
-        public async Task<T> MaterializeUpdateAsync<T>(T ephemeral)
+        public async Task<T> MaterializeUpdateAsync<T>(T ephemeral) where T : class
         {
-            return (T) await MaterializeUpdateAsync(typeof(T), ephemeral);
-        }
-
-        public async Task<object> MaterializeUpdateAsync(Type type, object ephemeral)
-        {
-            object material = await MaterializeAsync(type, ephemeral);
-            await this.Merge(type, ephemeral, material);
+            var material = await MaterializeAsync(ephemeral);
+            await Merge(typeof(T), ephemeral, material);
             return material;
-        }
-
-        #endregion
-
-        #region Obsolete IMaterializer contract methods
-
-        public T GetById<T>(params object[] keyValues)
-        {
-            return GetByIdAsync<T>(keyValues).Result;
-        }
-
-        public object GetById(Type type, params object[] keyValues)
-        {
-            return GetByIdAsync(type, keyValues).Result;
-        }
-
-        public T Materialize<T>(T ephemeral)
-        {
-            return MaterializeAsync<T>(ephemeral).Result;
-        }
-
-        public object Materialize(Type type, object ephemeral)
-        {
-            return MaterializeAsync(type, ephemeral).Result;
-        }
-
-        public T MaterializeUpdate<T>(T ephemeral)
-        {
-            return MaterializeUpdateAsync<T>(ephemeral).Result;
-        }
-
-        public object MaterializeUpdate(Type type, object ephemeral)
-        {
-            return MaterializeUpdateAsync(type, ephemeral).Result;
         }
 
         #endregion
@@ -359,12 +311,15 @@ namespace JSONAPI.EntityFramework
                     MethodInfo mmadd = mmtype.GetMethod("Add");
                     MethodInfo mmremove = mmtype.GetMethod("Remove");
 
+                    var openGenericGetByIdAsyncMethod = GetType().GetMethod("GetByIdAsync");
+                    var closedGenericGetByIdAsyncMethod = openGenericGetByIdAsyncMethod.MakeGenericMethod(elementType);
+
                     // Add to hasMany
                     if (mmadd != null)
                         foreach (EntityKey key in ephemeralKeys.Except(materialKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = await GetByIdAsync(elementType, idParams);
+                            var obj = (object)await (dynamic)closedGenericGetByIdAsyncMethod.Invoke(this, new[] { idParams });
                             mmadd.Invoke(materialMany, new [] { obj });
                         }
                     // Remove from hasMany
@@ -372,7 +327,7 @@ namespace JSONAPI.EntityFramework
                         foreach (EntityKey key in materialKeys.Except(ephemeralKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = await GetByIdAsync(elementType, idParams);
+                            var obj = (object)await (dynamic) closedGenericGetByIdAsyncMethod.Invoke(this, new[] {idParams});
                             mmremove.Invoke(materialMany, new [] { obj });
                         }
                 }
@@ -395,8 +350,12 @@ namespace JSONAPI.EntityFramework
                         }
                         else
                         {
+
+                            var openGenericGetByIdAsyncMethod = GetType().GetMethod("GetByIdAsync");
+                            var closedGenericGetByIdAsyncMethod = openGenericGetByIdAsyncMethod.MakeGenericMethod(prop.PropertyType);
+
                             object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            var relatedMaterial = await GetByIdAsync(prop.PropertyType, idParams);
+                            var relatedMaterial = (object)await (dynamic)closedGenericGetByIdAsyncMethod.Invoke(this, new[] { idParams });
                             prop.SetValue(material, relatedMaterial, null);
                         }
                     }

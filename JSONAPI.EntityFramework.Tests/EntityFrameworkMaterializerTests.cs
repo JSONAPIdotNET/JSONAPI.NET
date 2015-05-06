@@ -21,7 +21,7 @@ namespace JSONAPI.EntityFramework.Tests
                     var materializer = new EntityFrameworkMaterializer(context, metadataManager.Object);
 
                     var ephemeral = new Post { Id = "201" };
-                    var material = (Post)await materializer.MaterializeAsync(typeof (Post), ephemeral);
+                    var material = await materializer.MaterializeAsync(ephemeral);
 
                     material.Comments.Should().NotBeNull();
                     material.Comments.Count.Should().Be(3);
@@ -40,7 +40,7 @@ namespace JSONAPI.EntityFramework.Tests
                     var materializer = new EntityFrameworkMaterializer(context, metadataManager.Object);
 
                     var ephemeral = new Post { Id = "201" };
-                    var material = (Post)await materializer.MaterializeAsync(typeof(Post), ephemeral);
+                    var material = await materializer.MaterializeAsync(ephemeral);
 
                     material.Tags.Should().NotBeNull();
                     material.Tags.Count.Should().Be(2);
