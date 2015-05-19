@@ -22,7 +22,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\temp\JSONAPI.Tests\bin\Debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -79,18 +79,23 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionFilters\EnableFilteringAttributeTests.cs" />
+    <Compile Include="ActionFilters\DefaultPaginationTransformerTests.cs" />
+    <Compile Include="ActionFilters\QueryableTransformerTestsBase.cs" />
+    <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
+    <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\MetadataManagerTests.cs" />
     <Compile Include="Core\ModelManagerTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
+    <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
     <Compile Include="Json\ErrorSerializerTests.cs" />
-    <Compile Include="Json\JsonApiMediaFormaterTests.cs" />
+    <Compile Include="Json\JsonApiMediaFormatterTests.cs" />
     <Compile Include="Json\LinkTemplateTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
+    <Compile Include="Models\UserGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +106,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Data\EmptyArrayResult.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\NullResourceResult.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\MetadataManagerPropertyWasPresentRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\ByteIdSerializationTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\DeserializeAttributeRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\DeserializeCollectionRequest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\ReformatsRawJsonStringWithUnquotedKeys.json">

@@ -1,0 +1,22 @@
+﻿{
+    "data": [
+        {
+            "type": "posts",
+            "id": "202",
+            "links": {
+                "tags": {
+                    "linkage": [
+                        {
+                            "id": "301",
+                            "type": "tags"
+                        },
+                        { 
+                            "id": "303",
+                            "type": "tags"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

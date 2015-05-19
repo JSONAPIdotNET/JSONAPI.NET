@@ -70,10 +70,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionFilters\EnumerateQueryableAsyncAttribute.cs" />
+    <Compile Include="ActionFilters\AsynchronousEnumerationTransformer.cs" />
+    <Compile Include="DbContextExtensions.cs" />
     <Compile Include="EntityFrameworkMaterializer.cs" />
     <Compile Include="EntityFrameworkMaterializer_Util.cs" />
     <Compile Include="Http\ApiController.cs" />
+    <Compile Include="JsonApiConfigurationExtensions.cs" />
     <Compile Include="PluralizationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

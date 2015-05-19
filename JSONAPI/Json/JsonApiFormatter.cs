@@ -1,4 +1,5 @@
-﻿using JSONAPI.Attributes;
+﻿using System.Collections.ObjectModel;
+using JSONAPI.Attributes;
 using JSONAPI.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,12 +9,14 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 using JSONAPI.Extensions;
 
 namespace JSONAPI.Json
@@ -41,7 +44,7 @@ namespace JSONAPI.Json
         {
             _modelManager = modelManager;
             _errorSerializer = errorSerializer;
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
+            SupportedMediaTypes.Insert(0, new MediaTypeHeaderValue("application/vnd.api+json"));
             ValidateRawJsonStrings = true;
         }
 
@@ -86,6 +89,8 @@ namespace JSONAPI.Json
             return true;
         }
 
+        private const string PrimaryDataKeyName = "data";
+
         #region Serialization
 
         public override Task WriteToStreamAsync(System.Type type, object value, Stream writeStream, System.Net.Http.HttpContent content, System.Net.TransportContext transportContext)
@@ -113,25 +118,39 @@ namespace JSONAPI.Json
             }
             else
             {
-                Type valtype = GetSingleType(value.GetType());
-                if (_modelManager.IsSerializedAsMany(value.GetType()))
-                    aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
-                else
-                    aggregator.AddPrimary(valtype, value);
-
-                //writer.Formatting = Formatting.Indented;
-
-                var root = _modelManager.GetJsonKeyForType(type);
-
                 writer.WriteStartObject();
-                writer.WritePropertyName(root);
-                if (_modelManager.IsSerializedAsMany(value.GetType()))
-                    this.SerializeMany(value, writeStream, writer, serializer, aggregator);
-                else
-                    this.Serialize(value, writeStream, writer, serializer, aggregator);
+                writer.WritePropertyName(PrimaryDataKeyName);
 
-                // Include links from aggregator
-                SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                if (value == null)
+                {
+                    if (_modelManager.IsSerializedAsMany(type))
+                    {
+                        writer.WriteStartArray();
+                        writer.WriteEndArray();
+                    }
+                    else
+                    {
+                        writer.WriteNull();
+                    }
+                }
+                else
+                {
+                    Type valtype = GetSingleType(value.GetType());
+                    if (_modelManager.IsSerializedAsMany(value.GetType()))
+                        aggregator.AddPrimary(valtype, (IEnumerable<object>) value);
+                    else
+                        aggregator.AddPrimary(valtype, value);
+
+                    //writer.Formatting = Formatting.Indented;
+
+                    if (_modelManager.IsSerializedAsMany(value.GetType()))
+                        this.SerializeMany(value, writeStream, writer, serializer, aggregator);
+                    else
+                        this.Serialize(value, writeStream, writer, serializer, aggregator);
+
+                    // Include links from aggregator
+                    SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                }
 
                 writer.WriteEndObject();
             }
@@ -165,37 +184,36 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
-            // The spec no longer requires that the ID key be "id":
-            //     "An ID SHOULD be represented by an 'id' key..." :-/
-            // But Ember Data does. So, we'll add "id" to the document
-            // always, and also serialize the property under its given
-            // name, for now at least.
-            //TODO: Partly because of this, we should probably disallow updates to Id properties where practical.
+            var resourceType = value.GetType();
+
+            // Write the type
+            writer.WritePropertyName("type");
+            var jsonTypeKey = _modelManager.GetResourceTypeNameForType(resourceType);
+            writer.WriteValue(jsonTypeKey);
 
             // Do the Id now...
             writer.WritePropertyName("id");
-            var idProp = _modelManager.GetIdProperty(value.GetType());
+            var idProp = _modelManager.GetIdProperty(resourceType);
             writer.WriteValue(GetValueForIdProperty(idProp, value));
 
             // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
-            PropertyInfo[] props = _modelManager.GetProperties(value.GetType());
+            var props = _modelManager.GetProperties(value.GetType());
 
             // Do non-model properties first, everything else goes in "links"
             //TODO: Unless embedded???
-            IList<PropertyInfo> modelProps = new List<PropertyInfo>();
+            var relationshipModelProperties = new List<RelationshipModelProperty>();
 
-            foreach (PropertyInfo prop in props)
+            foreach (var modelProperty in props)
             {
-                string propKey = _modelManager.GetJsonKeyForProperty(prop);
-                if (propKey == "id") continue; // Don't write the "id" property twice, see above!
+                var prop = modelProperty.Property;
+                if (prop == idProp) continue; // Don't write the "id" property twice, see above!
 
-                if (prop.PropertyType.CanWriteAsJsonApiAttribute())
+                if (modelProperty is FieldModelProperty)
                 {
-                    if (prop.GetCustomAttributes().Any(attr => attr is JsonIgnoreAttribute))
-                        continue;
+                    if (modelProperty.IgnoreByDefault) continue; // TODO: allow overriding this
 
                     // numbers, strings, dates...
-                    writer.WritePropertyName(propKey);
+                    writer.WritePropertyName(modelProperty.JsonKey);
 
                     var propertyValue = prop.GetValue(value, null);
 
@@ -237,24 +255,25 @@ namespace JSONAPI.Json
                         serializer.Serialize(writer, propertyValue);
                     }
                 }
-                else
+                else if (modelProperty is RelationshipModelProperty)
                 {
-                    modelProps.Add(prop);
-                    continue;
+                    relationshipModelProperties.Add((RelationshipModelProperty)modelProperty);
                 }
             }
 
             // Now do other stuff
-            if (modelProps.Count() > 0)
+            if (relationshipModelProperties.Count() > 0)
             {
                 writer.WritePropertyName("links");
                 writer.WriteStartObject();
             }
-            foreach (PropertyInfo prop in modelProps)
+            foreach (var relationshipModelProperty in relationshipModelProperties)
             {
                 bool skip = false, iip = false;
                 string lt = null;
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
+
+                var prop = relationshipModelProperty.Property;
 
                 object[] attrs = prop.GetCustomAttributes(true);
 
@@ -275,7 +294,7 @@ namespace JSONAPI.Json
                 }
                 if (skip) continue;
 
-                writer.WritePropertyName(_modelManager.GetJsonKeyForProperty(prop));
+                writer.WritePropertyName(relationshipModelProperty.JsonKey);
 
                 // Now look for enumerable-ness:
                 if (typeof(IEnumerable<Object>).IsAssignableFrom(prop.PropertyType))
@@ -322,7 +341,7 @@ namespace JSONAPI.Json
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
-                            writer.WritePropertyName("href");
+                            writer.WritePropertyName("related");
                             writer.WriteValue(href);
                             writer.WriteEndObject();
                             break;
@@ -346,13 +365,13 @@ namespace JSONAPI.Json
                         continue;
                     }
 
-                    string objId = GetIdFor(propertyValue);
+                    Lazy<string> objId = new Lazy<String>(() => GetIdFor(propertyValue));
 
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            serializer.Serialize(writer, objId);
+                            serializer.Serialize(writer, objId.Value);
                             if (iip)
                                 if (aggregator != null)
                                     aggregator.Add(prop.PropertyType, propertyValue);
@@ -361,12 +380,12 @@ namespace JSONAPI.Json
                             if (lt == null)
                                 throw new JsonSerializationException(
                                     "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                            string link = String.Format(lt, objId,  
-                                GetIdFor(value)); //value.GetType().GetProperty("Id").GetValue(value, null));
+                            var relatedObjectId = lt.Contains("{0}") ? objId.Value : null;
+                            string link = String.Format(lt, relatedObjectId, GetIdFor(value));
                                     
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             writer.WriteStartObject();
-                            writer.WritePropertyName("href");
+                            writer.WritePropertyName("related");
                             writer.WriteValue(link);
                             writer.WriteEndObject();
                             break;
@@ -374,13 +393,13 @@ namespace JSONAPI.Json
                             // Not really supported by Ember Data yet, incidentally...but easy to implement here.
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //serializer.Serialize(writer, prop.GetValue(value, null));
-                            this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
+                            this.Serialize(propertyValue, writeStream, writer, serializer, aggregator);
                             break;
                     }
                 }
 
             }
-            if (modelProps.Count() > 0)
+            if (relationshipModelProperties.Count() > 0)
             {
                 writer.WriteEndObject();
             }
@@ -467,7 +486,7 @@ namespace JSONAPI.Json
                 foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
                 {
                     apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(_modelManager.GetJsonKeyForType(apair.Key));
+                    writer.WritePropertyName(_modelManager.GetResourceTypeNameForType(apair.Key));
                     writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
                 }
 
@@ -481,6 +500,15 @@ namespace JSONAPI.Json
 
         #region Deserialization
 
+        private class BadRequestException : Exception
+        {
+            public BadRequestException(string message)
+                : base(message)
+            {
+                
+            }
+        }
+
         public override Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
         {
             return Task.FromResult(ReadFromStream(type, readStream, content, formatterLogger)); ;
@@ -490,7 +518,6 @@ namespace JSONAPI.Json
         {
             object retval = null;
             Type singleType = GetSingleType(type);
-            var pripropname = _modelManager.GetJsonKeyForType(type);
             var contentHeaders = content == null ? null : content.Headers;
 
             // If content length is 0 then return default value for this type
@@ -502,17 +529,19 @@ namespace JSONAPI.Json
             {
 
                 var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
-                JsonReader reader = this.CreateJsonReader(typeof(IDictionary<string, object>), readStream, effectiveEncoding);
-                JsonSerializer serializer = this.CreateJsonSerializer();
+                JsonReader reader = this.CreateJsonReader(typeof (IDictionary<string, object>), readStream,
+                    effectiveEncoding);
 
                 reader.Read();
-                if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("Document root is not an object!");
+                if (reader.TokenType != JsonToken.StartObject)
+                    throw new JsonSerializationException("Document root is not an object!");
 
+                bool foundPrimaryData = false;
                 while (reader.Read())
                 {
                     if (reader.TokenType == JsonToken.PropertyName)
                     {
-                        string value = (string)reader.Value;
+                        string value = (string) reader.Value;
                         reader.Read(); // burn the PropertyName token
                         switch (value)
                         {
@@ -524,39 +553,20 @@ namespace JSONAPI.Json
                                 // ignore this, is it even meaningful in a PUT/POST body?
                                 reader.Skip();
                                 break;
-                            default:
-                                if (value == pripropname)
-                                {
-                                    // Could be a single resource or multiple, according to spec!
-                                    if (reader.TokenType == JsonToken.StartArray)
-                                    {
-                                        Type listType = (typeof(List<>)).MakeGenericType(singleType);
-                                        retval = (IList)Activator.CreateInstance(listType);
-                                        reader.Read(); // Burn off StartArray token
-                                        while (reader.TokenType == JsonToken.StartObject)
-                                        {
-                                            ((IList)retval).Add(Deserialize(singleType, readStream, reader, serializer));
-                                        }
-                                        // burn EndArray token...
-                                        if (reader.TokenType != JsonToken.EndArray) throw new JsonReaderException(String.Format("Expected JsonToken.EndArray but got {0}", reader.TokenType));
-                                        reader.Read();
-                                    }
-                                    else
-                                    {
-                                        // Because we choose what to deserialize based on the ApiController method signature
-                                        // (not choose the method signature based on what we're deserializing), the `type`
-                                        // parameter will always be `IList<Model>` even if a single model is sent!
-                                        retval = Deserialize(singleType, readStream, reader, serializer);
-                                    }
-                                }
-                                else
-                                    reader.Skip();
+                            case PrimaryDataKeyName:
+                                // Could be a single resource or multiple, according to spec!
+                                foundPrimaryData = true;
+                                retval = DeserializePrimaryData(singleType, reader);
                                 break;
                         }
                     }
                     else
                         reader.Skip();
                 }
+
+                if (!foundPrimaryData)
+                    throw new BadRequestException(String.Format("Expected primary data located at the `{0}` key", PrimaryDataKeyName));
+
 
                 /* WARNING: May transform a single object into a list of objects!!!
                  * This is a necessary workaround to support POST and PUT of multiple 
@@ -569,7 +579,7 @@ namespace JSONAPI.Json
                 {
                     if (!type.IsAssignableFrom(retval.GetType()) && _modelManager.IsSerializedAsMany(type))
                     {
-                        IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(singleType));
+                        IList list = (IList) Activator.CreateInstance(typeof (List<>).MakeGenericType(singleType));
                         list.Add(retval);
                         return list;
                     }
@@ -579,6 +589,34 @@ namespace JSONAPI.Json
                     }
                 }
 
+            }
+            catch (BadRequestException ex)
+            {
+                // We have to perform our own serialization of the error response here.
+                var response = new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+                using (var writeStream = new MemoryStream())
+                {
+                    var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
+                    JsonWriter writer = CreateJsonWriter(typeof (object), writeStream, effectiveEncoding);
+                    JsonSerializer serializer = CreateJsonSerializer();
+
+                    var httpError = new HttpError(ex, true);
+                        // TODO: allow consumer to choose whether to include error detail
+                    _errorSerializer.SerializeError(httpError, writeStream, writer, serializer);
+
+                    writer.Flush();
+                    writeStream.Flush();
+                    writeStream.Seek(0, SeekOrigin.Begin);
+
+                    using (var stringReader = new StreamReader(writeStream))
+                    {
+                        var stringContent = stringReader.ReadToEnd(); // TODO: use async version
+                        response.Content = new StringContent(stringContent, Encoding.UTF8, "application/vnd.api+json");
+                    }
+                }
+
+                throw new HttpResponseException(response);
             }
             catch (Exception e)
             {
@@ -614,7 +652,41 @@ namespace JSONAPI.Json
             return GetDefaultValueForType(type);
         }
 
-        public object Deserialize(Type objectType, Stream readStream, JsonReader reader, JsonSerializer serializer)
+        private object DeserializePrimaryData(Type singleType, JsonReader reader)
+        {
+            object retval;
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                Type listType = (typeof(List<>)).MakeGenericType(singleType);
+                retval = (IList)Activator.CreateInstance(listType);
+                reader.Read(); // Burn off StartArray token
+                while (reader.TokenType == JsonToken.StartObject)
+                {
+                    ((IList)retval).Add(Deserialize(singleType, reader));
+                }
+                // burn EndArray token...
+                if (reader.TokenType != JsonToken.EndArray)
+                    throw new JsonReaderException(
+                        String.Format("Expected JsonToken.EndArray but got {0}",
+                            reader.TokenType));
+                reader.Read();
+            }
+            else if (reader.TokenType == JsonToken.StartObject)
+            {
+                // Because we choose what to deserialize based on the ApiController method signature
+                // (not choose the method signature based on what we're deserializing), the `type`
+                // parameter will always be `IList<Model>` even if a single model is sent!
+                retval = Deserialize(singleType, reader);
+            }
+            else
+            {
+                throw new BadRequestException(String.Format("Unexpected value for the `{0}` key", PrimaryDataKeyName));
+            }
+
+            return retval;
+        }
+
+        private object Deserialize(Type objectType, JsonReader reader)
         {
             object retval = Activator.CreateInstance(objectType);
 
@@ -625,24 +697,24 @@ namespace JSONAPI.Json
                 if (reader.TokenType == JsonToken.PropertyName)
                 {
                     string value = (string)reader.Value;
-                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
-                    // If the model object has a non-standard Id property, but the "id" key is being used...
-                    if (prop == null && value == "id") prop = _modelManager.GetIdProperty(objectType);
+                    var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value);
 
                     if (value == "links")
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
-                        DeserializeLinkedResources(retval, readStream, reader, serializer);
+                        DeserializeLinkedResources(retval, reader);
                     }
-                    else if (prop != null)
+                    else if (modelProperty != null)
                     {
-                        if (!prop.PropertyType.CanWriteAsJsonApiAttribute())
+                        if (!(modelProperty is FieldModelProperty))
                         {
                             reader.Read(); // burn the PropertyName token
                             //TODO: Embedded would be dropped here!
                             continue; // These aren't supposed to be here, they're supposed to be in "links"!
                         }
+
+                        var prop = modelProperty.Property;
 
                         object propVal;
                         Type enumType;
@@ -744,114 +816,120 @@ namespace JSONAPI.Json
             return retval;
         }
 
-        private void DeserializeLinkedResources(object obj, Stream readStream, JsonReader reader, JsonSerializer serializer)
+        private void DeserializeLinkedResources(object obj, JsonReader reader)
         {
-            //reader.Read();
             if (reader.TokenType != JsonToken.StartObject) throw new JsonSerializationException("'links' property is not an object!");
 
             Type objectType = obj.GetType();
 
             while (reader.Read())
             {
-                if (reader.TokenType == JsonToken.PropertyName)
+                if (reader.TokenType == JsonToken.EndObject)
                 {
-                    string value = (string)reader.Value;
-                    reader.Read(); // burn the PropertyName token
-                    PropertyInfo prop = _modelManager.GetPropertyForJsonKey(objectType, value);
-                    if (prop != null && !prop.PropertyType.CanWriteAsJsonApiAttribute())
-                    {
-                        //FIXME: We're really assuming they're ICollections...but testing for that doesn't work for some reason. Break prone!
-                        if (prop.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && prop.PropertyType.IsGenericType)
-                        {
-                            // Is a hasMany
-
-                            //TODO: At present only supports an array of string IDs!
-                            JArray ids = JArray.Load(reader);
-
-                            Type relType;
-                            if (prop.PropertyType.IsGenericType)
-                            {
-                                relType = prop.PropertyType.GetGenericArguments()[0];
-                            }
-                            else
-                            {
-                                // Must be an array at this point, right??
-                                relType = prop.PropertyType.GetElementType();
-                            }
-
-                            IEnumerable<Object> hmrel = (IEnumerable<Object>)prop.GetValue(obj, null);
-                            if (hmrel == null)
-                            {
-                                // Hmm...now we have to create an object that fits this property. This could get messy...
-                                if (!prop.PropertyType.IsInterface && !prop.PropertyType.IsAbstract)
-                                {
-                                    // Whew...okay, just instantiate one of these...
-                                    hmrel = (IEnumerable<Object>)Activator.CreateInstance(prop.PropertyType);
-                                }
-                                else
-                                {
-                                    // Ugh...now we're really in trouble...hopefully one of these will work:
-                                    if (prop.PropertyType.IsGenericType)
-                                    {
-                                        if (prop.PropertyType.IsAssignableFrom(typeof(List<>).MakeGenericType(relType)))
-                                        {
-                                            hmrel = (IEnumerable<Object>)Activator.CreateInstance(typeof(List<>).MakeGenericType(relType));
-                                        }
-                                        else if (prop.PropertyType.IsAssignableFrom(typeof(HashSet<>).MakeGenericType(relType)))
-                                        {
-                                            hmrel = (IEnumerable<Object>)Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(relType));
-                                        }
-                                        //TODO: Other likely candidates??
-                                        else
-                                        {
-                                            // punt!
-                                            throw new JsonReaderException(String.Format("Could not create empty container for relationship property {0}!", prop));
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // erm...Array??!?
-                                        hmrel = (IEnumerable<Object>)Array.CreateInstance(relType, ids.Count);
-                                    }
-                                }
-                            }
-
-                            // We're having problems with how to generalize/cast/generic-ize this code, so for the time
-                            // being we'll brute-force it in super-dynamic language style...
-                            Type hmtype = hmrel.GetType();
-                            MethodInfo add = hmtype.GetMethod("Add");
-
-                            foreach (JToken token in ids)
-                            {
-                                //((ICollection<object>)prop.GetValue(obj, null)).Add(Activator.CreateInstance(relType));
-                                object dummyobj = Activator.CreateInstance(relType);
-                                add.Invoke(hmrel, new object[] { this.GetById(relType, token.ToObject<string>()) });
-                            }
-                        }
-                        else
-                        {
-                            // Is a belongsTo
-
-                            //TODO: At present only supports a string ID!
-                            Type relType = prop.PropertyType;
-
-                            prop.SetValue(obj, GetById(relType, (string)reader.Value));
-                        }
-
-                        // Tell the MetadataManager that we deserialized this property
-                        MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
-                    }
-                    else
-                        reader.Skip();
-                }
-                else if (reader.TokenType == JsonToken.EndObject)
-                {
-                    // Burn the EndObject token and get set to send back to the parent method in the call stack.
-                    reader.Read();
+                    reader.Read(); // Burn the EndObject token
                     break;
                 }
-                else
+
+                if (reader.TokenType != JsonToken.PropertyName)
+                    throw new BadRequestException(String.Format("Unexpected token: {0}", reader.TokenType));
+
+                var value = (string)reader.Value;
+                reader.Read(); // burn the PropertyName token
+                var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value) as RelationshipModelProperty;
+                if (modelProperty == null)
+                {
                     reader.Skip();
+                    continue;
+                }
+
+                var relationshipToken = JToken.ReadFrom(reader);
+                if (!(relationshipToken is JObject))
+                    throw new BadRequestException("Each relationship key on a links object must have an object value.");
+
+                var relationshipObject = (JObject) relationshipToken;
+                var linkageToken = relationshipObject["linkage"];
+
+                var linkageObjects = new List<Tuple<string, string>>();
+
+                if (modelProperty.IsToMany)
+                {
+                    if (linkageToken == null)
+                        throw new BadRequestException("Expected an array value for `linkage` but no `linkage` key was found.");
+
+                    if (linkageToken.Type != JTokenType.Array)
+                        throw new BadRequestException("Expected an array value for `linkage` but got " + linkageToken.Type + ".");
+
+                    foreach (var element in (JArray) linkageToken)
+                    {
+                        if (!(element is JObject))
+                            throw new BadRequestException("Each element in the `linkage` array must be an object.");
+
+                        var linkageObject = DeserializeLinkageObject((JObject) element);
+                        linkageObjects.Add(linkageObject);
+                    }
+                }
+                else
+                {
+                    if (linkageToken == null)
+                        throw new BadRequestException("Expected an object or null value for `linkage` but no `linkage` key was found.");
+
+                    switch (linkageToken.Type)
+                    {
+                        case JTokenType.Null:
+                            break;
+                        case JTokenType.Object:
+                            linkageObjects.Add(DeserializeLinkageObject((JObject)linkageToken));
+                            break;
+                        default:
+                            throw new BadRequestException("Expected an object value for `linkage` but got " + linkageToken.Type + ".");
+                    }
+                }
+
+                var relatedStubs = linkageObjects.Select(lo =>
+                {
+                    var resourceType = _modelManager.GetTypeByResourceTypeName(lo.Item2);
+                    return GetById(resourceType, lo.Item1);
+                }).ToArray();
+
+                var prop = modelProperty.Property;
+                if (!modelProperty.IsToMany)
+                {
+                    // To-one relationship
+
+                    var relatedStub = relatedStubs.FirstOrDefault();
+                    prop.SetValue(obj, relatedStub);
+                }
+                else
+                {
+                    // To-many relationship
+
+                    var hmrel = (IEnumerable<Object>) prop.GetValue(obj, null);
+                    if (hmrel == null)
+                    {
+                        hmrel = prop.PropertyType.CreateEnumerableInstance();
+                        if (hmrel == null)
+                            // punt!
+                            throw new JsonReaderException(
+                                String.Format(
+                                    "Could not create empty container for relationship property {0}!",
+                                    prop));
+                    }
+
+                    // We're having problems with how to generalize/cast/generic-ize this code, so for the time
+                    // being we'll brute-force it in super-dynamic language style...
+                    Type hmtype = hmrel.GetType();
+                    MethodInfo add = hmtype.GetMethod("Add");
+
+                    foreach (var stub in relatedStubs)
+                    {
+                        add.Invoke(hmrel, new[] {stub});
+                    }
+
+                    prop.SetValue(obj, hmrel);
+                }
+
+                // Tell the MetadataManager that we deserialized this property
+                MetadataManager.Instance.SetMetaForProperty(obj, prop, true);
             }
         }
 
@@ -860,8 +938,29 @@ namespace JSONAPI.Json
             if (reader.TokenType == JsonToken.Null)
                 return null;
 
-            var token = JToken.Load(reader);
+            var token = JToken.ReadFrom(reader);
             return token.ToObject(type);
+        }
+
+        private static Tuple<string, string> DeserializeLinkageObject(JObject token)
+        {
+            var relatedObjectType = token["type"] as JValue;
+            if (relatedObjectType == null || relatedObjectType.Type != JTokenType.String)
+                throw new BadRequestException("Each linkage object must have a string value for the key `type`.");
+
+            var relatedObjectTypeValue = relatedObjectType.Value<string>();
+            if (string.IsNullOrWhiteSpace(relatedObjectTypeValue))
+                throw new BadRequestException("The value for `type` must be specified.");
+
+            var relatedObjectId = token["id"] as JValue;
+            if (relatedObjectId == null || relatedObjectId.Type != JTokenType.String)
+                throw new BadRequestException("Each linkage object must have a string value for the key `id`.");
+
+            var relatedObjectIdValue = relatedObjectId.Value<string>();
+            if (string.IsNullOrWhiteSpace(relatedObjectIdValue))
+                throw new BadRequestException("The value for `id` must be specified.");
+
+            return Tuple.Create(relatedObjectIdValue, relatedObjectType.Value<string>());
         }
 
         #endregion
@@ -884,14 +983,7 @@ namespace JSONAPI.Json
         {
             if (idprop != null)
             {
-                if (idprop.PropertyType == typeof(string))
-                    return (string)idprop.GetValue(obj, null);
-                if (idprop.PropertyType == typeof(Guid))
-                    return idprop.GetValue(obj).ToString();
-                if (idprop.PropertyType == typeof(int))
-                    return ((int)idprop.GetValue(obj, null)).ToString();
-                if (idprop.PropertyType == typeof(byte))
-                    return ((byte)idprop.GetValue(obj, null)).ToString();
+                return idprop.GetValue(obj).ToString();
             }
             return "NOIDCOMPUTABLE!";
         }

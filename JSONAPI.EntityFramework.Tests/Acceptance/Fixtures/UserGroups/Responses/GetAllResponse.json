@@ -1,0 +1,12 @@
+﻿{
+    "data": [
+        {
+            "type": "user-groups",
+            "id": "501",
+            "name": "Admin users",
+            "links": {
+                "users": [ ]
+            }
+        }
+    ]
+}

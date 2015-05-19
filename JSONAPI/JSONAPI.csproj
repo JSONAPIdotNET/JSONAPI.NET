@@ -66,19 +66,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionFilters\EnableFilteringAttribute.cs" />
+    <Compile Include="ActionFilters\DefaultFilteringTransformer.cs" />
+    <Compile Include="ActionFilters\DefaultPaginationTransformer.cs" />
+    <Compile Include="ActionFilters\IQueryableEnumerationTransformer.cs" />
+    <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
+    <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />
+    <Compile Include="ActionFilters\IQueryableSortingTransformer.cs" />
+    <Compile Include="ActionFilters\JsonApiQueryableAttribute.cs" />
+    <Compile Include="ActionFilters\QueryableTransformException.cs" />
+    <Compile Include="ActionFilters\DefaultSortingTransformer.cs" />
+    <Compile Include="ActionFilters\SynchronousEnumerationTransformer.cs" />
     <Compile Include="Attributes\IncludeInPayload.cs" />
     <Compile Include="Attributes\LinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAs.cs" />
     <Compile Include="Attributes\SerializeStringAsRawJsonAttribute.cs" />
     <Compile Include="Attributes\UseAsIdAttribute.cs" />
+    <Compile Include="Core\IMetadataManager.cs" />
     <Compile Include="Core\IModelManager.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
     <Compile Include="Core\IMaterializer.cs" />
+    <Compile Include="Core\JsonApiConfiguration.cs" />
     <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Core\ModelManager.cs" />
+    <Compile Include="Core\ModelProperty.cs" />
+    <Compile Include="Extensions\QueryableExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
+    <Compile Include="Http\PascalizedControllerSelector.cs" />
     <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
     <Compile Include="Json\IErrorIdProvider.cs" />

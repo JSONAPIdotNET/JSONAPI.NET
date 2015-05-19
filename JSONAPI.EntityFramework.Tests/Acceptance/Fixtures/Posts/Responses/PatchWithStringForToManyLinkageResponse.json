@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
+            "detail": "Expected an array value for `linkage` but got String.",
+            "stackTrace": "{{STACK_TRACE}}",
+            "inner": null
+        }
+    ]
+}

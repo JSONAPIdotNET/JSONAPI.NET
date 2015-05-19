@@ -13,6 +13,7 @@ namespace JSONAPI.Http
 {
     //TODO: Authorization checking framework, maybe?
     public class ApiController<T> : System.Web.Http.ApiController
+        where T : class
     {
         protected virtual IMaterializer MaterializerFactory()
         {
@@ -102,7 +103,7 @@ namespace JSONAPI.Http
         /// <param name="id"></param>
         /// <param name="payload"></param>
         /// <returns></returns>
-        public virtual async Task<IList<T>> Put(string id, IList<T> putObjs)
+        public virtual async Task<IList<T>> Patch(string id, IList<T> putObjs)
         {
             IMaterializer materializer = this.MaterializerFactory();
             IList<T> materialList = new List<T>();

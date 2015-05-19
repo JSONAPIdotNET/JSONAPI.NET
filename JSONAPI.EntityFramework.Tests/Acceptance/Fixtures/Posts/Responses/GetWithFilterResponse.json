@@ -1,0 +1,16 @@
+﻿{
+    "data": [
+        {
+            "type": "posts",
+            "id": "204",
+            "title": "Post 4",
+            "content": "Post 4 content",
+            "created": "2015-02-08T06:59:00+00:00",
+            "links": { 
+                "author": "402",
+                "comments": [],
+                "tags": []
+            }
+        }
+    ]
+}

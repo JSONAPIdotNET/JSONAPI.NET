@@ -17,7 +17,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
 
         public DateTimeOffset Created { get; set; }
 
-        [Required]
         [JsonIgnore]
         public string AuthorId { get; set; }
 

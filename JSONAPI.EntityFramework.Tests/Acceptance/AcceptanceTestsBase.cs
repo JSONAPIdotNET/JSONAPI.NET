@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JSONAPI.EntityFramework.Tests.TestWebApp;
@@ -16,6 +17,9 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
     [TestClass]
     public abstract class AcceptanceTestsBase
     {
+        private static readonly Regex GuidRegex = new Regex(@"\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b", RegexOptions.IgnoreCase);
+        //private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace"":[\s]*""[\w\:\\\.\s\,\-]*""");
+        private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace""[\s]*:[\s]*"".*?""");
         private static readonly Uri BaseUri = new Uri("http://localhost");
 
         protected static DbConnection GetEffortConnection()
@@ -23,7 +27,25 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             return TestHelpers.GetEffortConnection(@"Acceptance\Data");
         }
 
-        protected async Task TestGet(DbConnection effortConnection, string requestPath, string expectedResponseTextResourcePath)
+        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            var expectedResponse =
+                JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
+            var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
+            redactedResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+
+            redactedResponse.Should().Be(expectedResponse);
+            response.Content.Headers.ContentType.MediaType.Should().Be("application/vnd.api+json");
+            response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
+
+            response.StatusCode.Should().Be(expectedStatusCode);
+        }
+
+        #region GET
+
+        protected async Task<HttpResponseMessage> SubmitGet(DbConnection effortConnection, string requestPath)
         {
             using (var server = TestServer.Create(app =>
             {
@@ -33,16 +55,14 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var uri = new Uri(BaseUri, requestPath);
                 var response = await server.CreateRequest(uri.ToString()).GetAsync();
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                var expected =
-                    JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-                responseContent.Should().Be(expected);
+                return response;
             }
         }
 
-        protected async Task TestGetWithFilter(DbConnection effortConnection, string requestPath, string expectedResponseTextResourcePath)
+        #endregion
+        #region POST
+
+        protected async Task<HttpResponseMessage> SubmitPost(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath)
         {
             using (var server = TestServer.Create(app =>
             {
@@ -51,47 +71,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
-                var response = await server.CreateRequest(uri.ToString()).GetAsync();
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                var expected =
-                    JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-                responseContent.Should().Be(expected);
-            }
-        }
-
-        protected async Task TestGetById(DbConnection effortConnection, string requestPath, string expectedResponseTextResourcePath)
-        {
-            using (var server = TestServer.Create(app =>
-            {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
-            }))
-            {
-                var uri = new Uri(BaseUri, requestPath);
-                var response = await server.CreateRequest(uri.ToString()).GetAsync();
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                var expected =
-                    JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-                responseContent.Should().Be(expected);
-            }
-        }
-
-        protected async Task TestPost(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath, string expectedResponseTextResourcePath)
-        {
-            using (var server = TestServer.Create(app =>
-            {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
-            }))
-            {
-                var uri = new Uri(BaseUri, requestPath);
-                var requestContent =
-                    JsonHelpers.MinifyJson(
-                        TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath));
+                var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
                     .And(request =>
@@ -99,16 +79,14 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
                     })
                     .PostAsync();
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                var expected =
-                    JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-                responseContent.Should().Be(expected);
+                return response;
             }
         }
 
-        protected async Task TestPut(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath, string expectedResponseTextResourcePath)
+        #endregion
+        #region PATCH
+
+        protected async Task<HttpResponseMessage> SubmitPatch(DbConnection effortConnection, string requestPath, string requestDataTextResourcePath)
         {
             using (var server = TestServer.Create(app =>
             {
@@ -117,26 +95,21 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
-                var requestContent =
-                    JsonHelpers.MinifyJson(
-                        TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath));
+                var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
                     .And(request =>
                     {
-                        request.Content = new StringContent(requestContent, Encoding.UTF8,
-                            "application/vnd.api+json");
-                    }).SendAsync("PUT");
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                var expected =
-                    JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-                responseContent.Should().Be(expected);
+                        request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
+                    }).SendAsync("PATCH");
+                return response;
             }
         }
 
-        protected async Task TestDelete(DbConnection effortConnection, string requestPath)
+        #endregion
+        #region DELETE
+
+        protected async Task<HttpResponseMessage> SubmitDelete(DbConnection effortConnection, string requestPath)
         {
             using (var server = TestServer.Create(app =>
             {
@@ -148,8 +121,10 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var response = await server
                     .CreateRequest(uri.ToString())
                     .SendAsync("DELETE");
-                response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+                return response;
             }
         }
+
+        #endregion
     }
 }

@@ -1,0 +1,14 @@
+{
+    "data": {
+        "type": "posts",
+        "id": "42",
+        "links": {
+            "author": {
+                "linkage": {
+                    "id": "18",
+                    "type": "authors"
+                }
+            }
+        }
+    }
+}

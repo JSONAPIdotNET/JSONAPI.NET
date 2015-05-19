@@ -18,7 +18,7 @@ namespace JSONAPI.EntityFramework
         public T GetDetachedOriginal<T>(T entity, bool fixupRelationships = false)
             where T : class
         {
-            DbPropertyValues originalValues = this.context.Entry<T>(entity).OriginalValues;
+            DbPropertyValues originalValues = DbContext.Entry<T>(entity).OriginalValues;
             T orig = (T)originalValues.ToObject();
             if (fixupRelationships)
             {
@@ -29,7 +29,7 @@ namespace JSONAPI.EntityFramework
 
         public IEnumerable<T2> GetAssociationChanges<T1,T2>(T1 parent, string propertyName, EntityState findState)
         {
-            ObjectContext ocontext = ((IObjectContextAdapter)this.context).ObjectContext;
+            ObjectContext ocontext = ((IObjectContextAdapter)DbContext).ObjectContext;
             MetadataWorkspace metadataWorkspace = ocontext.MetadataWorkspace;
 
             // Find the AssociationType that matches the property traits given as input            

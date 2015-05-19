@@ -1,9 +1,9 @@
 ﻿using System.Web.Http;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework.ActionFilters;
-using JSONAPI.Json;
+using JSONAPI.EntityFramework;
+using JSONAPI.TodoMVC.API.Models;
 using Owin;
+using PluralizationService = JSONAPI.Core.PluralizationService;
 
 namespace JSONAPI.TodoMVC.API
 {
@@ -18,23 +18,21 @@ namespace JSONAPI.TodoMVC.API
         private static HttpConfiguration GetWebApiConfiguration()
         {
             var pluralizationService = new PluralizationService();
-
-            var config = new HttpConfiguration();
-
+            pluralizationService.AddMapping("todo", "todos");
             var modelManager = new ModelManager(pluralizationService);
+            modelManager.RegisterResourceType(typeof (Todo));
 
-            var formatter = new JsonApiFormatter(modelManager);
-            config.Formatters.Clear();
-            config.Formatters.Add(formatter);
+            var httpConfig = new HttpConfiguration();
 
-            // Global filters
-            config.Filters.Add(new EnumerateQueryableAsyncAttribute());
-            config.Filters.Add(new EnableFilteringAttribute(modelManager));
+            // Configure JSON API
+            new JsonApiConfiguration(modelManager)
+                .UseEntityFramework()
+                .Apply(httpConfig);
 
             // Web API routes
-            config.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+            httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
 
-            return config;
+            return httpConfig;
         }
     }
 }

@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "The attribute \"firstName\" was specified more than once.",
+            "detail": null,
+            "stackTrace": null,
+            "inner": null
+        }
+    ]
+}

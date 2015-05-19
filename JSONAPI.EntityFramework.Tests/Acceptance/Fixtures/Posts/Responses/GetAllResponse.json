@@ -1,0 +1,52 @@
+﻿{
+    "data": [
+        {
+            "type": "posts",
+            "id": "201",
+            "title": "Post 1",
+            "content": "Post 1 content",
+            "created": "2015-01-31T14:00:00+00:00",
+            "links": {
+                "author": "401",
+                "comments": [ "101", "102", "103" ],
+                "tags": [ "301", "302" ]
+            }
+        },
+        {
+            "type": "posts",
+            "id": "202",
+            "title": "Post 2",
+            "content": "Post 2 content",
+            "created": "2015-02-05T08:10:00+00:00",
+            "links": { 
+                "author": "401",
+                "comments": [ "104" ],
+                "tags": [ "302", "303" ]
+            }
+        },
+        {
+            "type": "posts",
+            "id": "203",
+            "title": "Post 3",
+            "content": "Post 3 content",
+            "created": "2015-02-07T11:11:00+00:00",
+            "links": { 
+                "author": "401",
+                "comments": [ "105" ],
+                "tags": [ "303" ]
+            }
+        },
+        {
+            "type": "posts",
+            "id": "204",
+            "title": "Post 4",
+            "content": "Post 4 content",
+            "created": "2015-02-08T06:59:00+00:00",
+            "links": { 
+                "author": "402",
+                "comments": [],
+                "tags": []
+            }
+        }
+    ]
+}

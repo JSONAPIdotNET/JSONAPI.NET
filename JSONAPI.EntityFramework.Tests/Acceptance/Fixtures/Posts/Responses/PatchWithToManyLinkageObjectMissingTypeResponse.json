@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
+            "detail": "Each linkage object must have a string value for the key `type`.",
+            "stackTrace": "{{STACK_TRACE}}",
+            "inner": null
+        }
+    ]
+}

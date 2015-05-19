@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "The attribute \"foobar\" does not exist on type \"users\".",
+            "detail": null,
+            "stackTrace": null,
+            "inner": null
+        }
+    ]
+}

@@ -1,0 +1,114 @@
+﻿{
+    "data": [
+        {
+            "type": "users",
+            "id": "409",
+            "firstName": "Charlie",
+            "lastName": "Burns",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "406",
+            "firstName": "Ed",
+            "lastName":  "Burns",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "410",
+            "firstName": "Sally",
+            "lastName":  "Burns",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "405",
+            "firstName": "Michelle",
+            "lastName":  "Johnson",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "402",
+            "firstName": "Bob",
+            "lastName":  "Jones",
+            "links": {
+                "comments": [ "102" ],
+                "posts": [ "204" ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "403",
+            "firstName": "Charlie",
+            "lastName":  "Michaels",
+            "links": {
+                "comments": [ "101", "103", "104" ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "408",
+            "firstName": "Pat",
+            "lastName":  "Morgan",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "407",
+            "firstName": "Thomas",
+            "lastName":  "Potter",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "401",
+            "firstName": "Alice",
+            "lastName":  "Smith",
+            "links": {
+                "comments": [ "105" ],
+                "posts": [ "201", "202", "203" ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "404",
+            "firstName": "Richard",
+            "lastName":  "Smith",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        }
+    ]
+}

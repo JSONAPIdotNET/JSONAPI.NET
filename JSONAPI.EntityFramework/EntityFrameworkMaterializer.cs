@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using JSONAPI.Core;
@@ -14,18 +13,26 @@ using JSONAPI.Extensions;
 
 namespace JSONAPI.EntityFramework
 {
+    /// <summary>
+    /// IMaterializer implementation for use with Entity Framework
+    /// </summary>
     public partial class EntityFrameworkMaterializer : IMaterializer
     {
-        private DbContext context;
+        protected readonly IMetadataManager MetadataManager;
 
-        public DbContext DbContext
-        {
-            get { return this.context; }
-        }
+        /// <summary>
+        /// The DbContext instance used to perform materializer operations
+        /// </summary>
+        public DbContext DbContext { get; private set; }
 
-        public EntityFrameworkMaterializer(DbContext context) : base()
+        /// <summary>
+        /// Creates a new EntityFrameworkMaterializer.
+        /// </summary>
+        /// <param name="context">The DbContext instance used to perform materializer operations</param>
+        public EntityFrameworkMaterializer(DbContext context, IMetadataManager metadataManager)
         {
-            this.context = context;
+            MetadataManager = metadataManager;
+            DbContext = context;
         }
 
         #region IMaterializer contract methods
@@ -36,14 +43,14 @@ namespace JSONAPI.EntityFramework
         /// <param name="type"></param>
         /// <param name="idValues"></param>
         /// <returns></returns>
-        public virtual Task<object> GetByIdAsync(Type type, params Object[] idValues)
+        public async Task<T> GetByIdAsync<T>(params Object[] idValues) where T : class
         {
             //TODO: How to react if the type isn't in the context?
 
             // Input will probably usually be strings... make sure the right types are passed to .Find()...
             Object[] idv2 = new Object[idValues.Length];
             int i = 0;
-            foreach (PropertyInfo prop in GetKeyProperties(type))
+            foreach (PropertyInfo prop in GetKeyProperties(typeof(T)))
             {
                 try
                 {
@@ -59,21 +66,12 @@ namespace JSONAPI.EntityFramework
                     i++;
                 }
             }
-            return this.context.Set(type).FindAsync(idv2);
+            return await DbContext.Set<T>().FindAsync(idv2);
         }
 
-        public async Task<T> GetByIdAsync<T>(params Object[] idValues)
+        public virtual async Task<T> MaterializeAsync<T>(T ephemeral) where T : class
         {
-            return (T) await GetByIdAsync(typeof(T), idValues);
-        }
-
-        public async Task<T> MaterializeAsync<T>(T ephemeral)
-        {
-            return (T) await MaterializeAsync(typeof(T), ephemeral);
-        }
-
-        public virtual async Task<object> MaterializeAsync(Type type, object ephemeral)
-        {
+            var type = typeof (T);
             IEnumerable<string> keyNames = GetKeyNames(type);
             List<Object> idValues = new List<Object>();
             bool anyNull = false;
@@ -88,16 +86,17 @@ namespace JSONAPI.EntityFramework
                 }
                 idValues.Add(value);
             }
-            object retval = null;
+            T retval = null;
             if (!anyNull)
             {
-                retval = await context.Set(type).FindAsync(idValues.ToArray());
+                retval = await DbContext.Set<T>().FindAsync(idValues.ToArray());
             }
             if (retval == null)
             {
                 // Didn't find it...create a new one!
-                retval = Activator.CreateInstance(type);
-                context.Set(type).Add(retval);
+                retval = (T)Activator.CreateInstance(type);
+
+                DbContext.Set(type).Add(retval);
                 if (!anyNull)
                 {
                     // For a new object, if a key is specified, we want to merge the key, at least.
@@ -108,50 +107,11 @@ namespace JSONAPI.EntityFramework
             return retval;
         }
 
-        public async Task<T> MaterializeUpdateAsync<T>(T ephemeral)
+        public async Task<T> MaterializeUpdateAsync<T>(T ephemeral) where T : class
         {
-            return (T) await MaterializeUpdateAsync(typeof(T), ephemeral);
-        }
-
-        public async Task<object> MaterializeUpdateAsync(Type type, object ephemeral)
-        {
-            object material = await MaterializeAsync(type, ephemeral);
-            await this.Merge(type, ephemeral, material);
+            var material = await MaterializeAsync(ephemeral);
+            await Merge(typeof(T), ephemeral, material);
             return material;
-        }
-
-        #endregion
-
-        #region Obsolete IMaterializer contract methods
-
-        public T GetById<T>(params object[] keyValues)
-        {
-            return GetByIdAsync<T>(keyValues).Result;
-        }
-
-        public object GetById(Type type, params object[] keyValues)
-        {
-            return GetByIdAsync(type, keyValues).Result;
-        }
-
-        public T Materialize<T>(T ephemeral)
-        {
-            return MaterializeAsync<T>(ephemeral).Result;
-        }
-
-        public object Materialize(Type type, object ephemeral)
-        {
-            return MaterializeAsync(type, ephemeral).Result;
-        }
-
-        public T MaterializeUpdate<T>(T ephemeral)
-        {
-            return MaterializeUpdateAsync<T>(ephemeral).Result;
-        }
-
-        public object MaterializeUpdate(Type type, object ephemeral)
-        {
-            return MaterializeUpdateAsync(type, ephemeral).Result;
         }
 
         #endregion
@@ -177,13 +137,19 @@ namespace JSONAPI.EntityFramework
                 return type;
         }
 
+        private static Lazy<MethodInfo> OpenGetKeyNamesFromGenericMethod =
+            new Lazy<MethodInfo>(
+                () =>
+                    typeof (EntityFrameworkMaterializer).GetMethod("GetKeyNamesFromGeneric",
+                        BindingFlags.NonPublic | BindingFlags.Static));
+
         protected internal virtual IEnumerable<string> GetKeyNames(Type type)
         {
-            var openMethod = typeof (EntityFrameworkMaterializer).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
+            var openMethod = OpenGetKeyNamesFromGenericMethod.Value;
             var method = openMethod.MakeGenericMethod(type);
             try
             {
-                return (IEnumerable<string>)method.Invoke(null, new object[] { this.context });
+                return (IEnumerable<string>)method.Invoke(null, new object[] { DbContext });
             }
             catch (TargetInvocationException ex)
             {
@@ -199,7 +165,21 @@ namespace JSONAPI.EntityFramework
             try
             {
                 objectSet = objectContext.CreateObjectSet<T>();
+            }
+            catch (ArgumentException e)
+            {
+                var baseClass = typeof (T).BaseType;
+                if (baseClass != null && baseClass != typeof (Object))
+                {
+                    var openMethod = OpenGetKeyNamesFromGenericMethod.Value;
+                    var method = openMethod.MakeGenericMethod(baseClass);
+                    return (IEnumerable<string>)method.Invoke(null, new object[] { dbContext });
+                }
 
+                throw new ArgumentException(
+                    String.Format("The Type {0} was not found in the DbContext with Type {1}", typeof(T).Name, dbContext.GetType().Name),
+                    e
+                    );
             }
             catch (InvalidOperationException e)
             {
@@ -227,9 +207,14 @@ namespace JSONAPI.EntityFramework
             return retval;
         }
 
+        /// <summary>
+        /// Gets the name of the entity set property on the db context corresponding to the given type.
+        /// </summary>
+        /// <param name="type">Type type to get the entity set name for.</param>
+        /// <returns>The name of the entity set property</returns>
         protected string GetEntitySetName(Type type)
         {
-            ObjectContext objectContext = ((IObjectContextAdapter)this.context).ObjectContext;
+            ObjectContext objectContext = ((IObjectContextAdapter)DbContext).ObjectContext;
             try
             {
                 var container = objectContext.MetadataWorkspace
@@ -286,20 +271,25 @@ namespace JSONAPI.EntityFramework
             return key;
         }
 
-        private async Task Merge (Type type, object ephemeral, object material)
+        protected async Task Merge (Type type, object ephemeral, object material)
         {
             PropertyInfo[] props = type.GetProperties();
             foreach (PropertyInfo prop in props)
             {
                 // Comply with the spec, if a key was not set, it should not be updated!
-                if (!MetadataManager.Instance.PropertyWasPresent(ephemeral, prop)) continue;
+                if (!MetadataManager.PropertyWasPresent(ephemeral, prop)) continue;
 
                 if (IsMany(prop.PropertyType))
                 {
                     Type elementType = GetSingleType(prop.PropertyType);
-                    IEnumerable<string> keyNames = GetKeyNames(elementType);
 
                     var materialMany = (IEnumerable<Object>)prop.GetValue(material, null);
+                    if (materialMany == null)
+                    {
+                        materialMany = prop.PropertyType.CreateEnumerableInstance();
+                        prop.SetValue(material, materialMany);
+                    }
+
                     var ephemeralMany = (IEnumerable<Object>)prop.GetValue(ephemeral, null);
 
                     var materialKeys = new HashSet<EntityKey>();
@@ -321,21 +311,24 @@ namespace JSONAPI.EntityFramework
                     MethodInfo mmadd = mmtype.GetMethod("Add");
                     MethodInfo mmremove = mmtype.GetMethod("Remove");
 
+                    var openGenericGetByIdAsyncMethod = GetType().GetMethod("GetByIdAsync");
+                    var closedGenericGetByIdAsyncMethod = openGenericGetByIdAsyncMethod.MakeGenericMethod(elementType);
+
                     // Add to hasMany
                     if (mmadd != null)
                         foreach (EntityKey key in ephemeralKeys.Except(materialKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = await GetByIdAsync(elementType, idParams);
-                            mmadd.Invoke(materialMany, new object[] { obj });
+                            var obj = (object)await (dynamic)closedGenericGetByIdAsyncMethod.Invoke(this, new[] { idParams });
+                            mmadd.Invoke(materialMany, new [] { obj });
                         }
                     // Remove from hasMany
                     if (mmremove != null)
                         foreach (EntityKey key in materialKeys.Except(ephemeralKeys))
                         {
                             object[] idParams = key.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                            object obj = await GetByIdAsync(elementType, idParams);
-                            mmremove.Invoke(materialMany, new object[] { obj });
+                            var obj = (object)await (dynamic) closedGenericGetByIdAsyncMethod.Invoke(this, new[] {idParams});
+                            mmremove.Invoke(materialMany, new [] { obj });
                         }
                 }
                 else if(IsModel(prop.PropertyType))
@@ -351,10 +344,21 @@ namespace JSONAPI.EntityFramework
 
                     if (materialKey != ephemeralKey)
                     {
-                        object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
-                        prop.SetValue(material, await GetByIdAsync(prop.PropertyType, idParams), null);
+                        if (ephemeralKey == null)
+                        {
+                            prop.SetValue(material, null, null);
+                        }
+                        else
+                        {
+
+                            var openGenericGetByIdAsyncMethod = GetType().GetMethod("GetByIdAsync");
+                            var closedGenericGetByIdAsyncMethod = openGenericGetByIdAsyncMethod.MakeGenericMethod(prop.PropertyType);
+
+                            object[] idParams = ephemeralKey.EntityKeyValues.Select(ekv => ekv.Value).ToArray();
+                            var relatedMaterial = (object)await (dynamic)closedGenericGetByIdAsyncMethod.Invoke(this, new[] { idParams });
+                            prop.SetValue(material, relatedMaterial, null);
+                        }
                     }
-                    // else, 
                 }
                 else
                 {

@@ -1,0 +1,12 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "The sort expression \"firstName\" does not begin with a direction indicator (+ or -).",
+            "detail": null,
+            "stackTrace": null,
+            "inner": null
+        }
+    ]
+}

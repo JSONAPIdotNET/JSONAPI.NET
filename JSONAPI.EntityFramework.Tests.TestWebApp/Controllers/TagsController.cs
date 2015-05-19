@@ -15,7 +15,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 
         protected override IMaterializer MaterializerFactory()
         {
-            return new EntityFrameworkMaterializer(DbContext);
+            return new EntityFrameworkMaterializer(DbContext, MetadataManager.Instance);
         }
     }
 }

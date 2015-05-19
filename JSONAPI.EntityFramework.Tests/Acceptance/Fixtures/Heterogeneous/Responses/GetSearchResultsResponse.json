@@ -1,0 +1,26 @@
+﻿{
+    "data": [
+        {
+            "type": "posts",
+            "id": "201",
+            "title": "Post 1",
+            "content": "Post 1 content",
+            "created": "2015-01-31T14:00:00+00:00",
+            "links": {
+                "author": "401",
+                "comments": [ "101", "102", "103" ],
+                "tags": [ "301", "302" ]
+            }
+        },
+        {
+            "type": "comments",
+            "id": "101",
+            "text": "Comment 1",
+            "created": "2015-01-31T14:30:00+00:00",
+            "links": { 
+                "post": "201",
+                "author": "403"
+            }
+        }
+    ]
+}
