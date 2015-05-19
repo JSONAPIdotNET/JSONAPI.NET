@@ -12,7 +12,7 @@ The NuGet packages are out!
 JSON API Compliance
 ----------------------
 
-The master branch is currently compliant with JSON API RC1. Work is ongoing in the [0-4-0](https://github.com/SphtKr/JSONAPI.NET/tree/0-4-0) branch to bring the library up to date with the RC3 version of the spec.
+The master branch is roughly compatible with the RC3 version of JSON API. The major missing feature is inclusion of related resources. Many changes made to the spec since RC3 are not yet available in this library. Full 1.0 compliance is planned, so stay tuned!
 
 What is JSONAPI.NET?
 ====================
@@ -64,7 +64,3 @@ A `JSONAPI.IMaterializer` object can be added to that `ApiController` to broker 
 # Didn't I read something about using Entity Framework?
 
 The classes in the `JSONAPI.EntityFramework` namespace take great advantage of the patterns set out in the `JSONAPI` namespace. The `EntityFrameworkMaterializer` is an `IMaterializer` that can operate with your own `DbContext` class to retrieve objects by Id/Primary Key, and can retrieve and update existing objects from your context in a way that Entity Framework expects for change tracking…that means, in theory, you can use the provided `JSONAPI.EntityFramework.ApiController` base class to handle GET, PUT, POST, and DELETE without writing any additional code! You will still almost certainly subclass `ApiController` to implement your business logic, but that means you only have to worry about your business logic--not implementing the JSON API spec or messing with your persistence layer.
-
-```
-//TODO: More documentation here. :-) 
-```
