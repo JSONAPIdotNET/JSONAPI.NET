@@ -1,0 +1,29 @@
+﻿{
+    "data": [
+        {
+            "type": "users",
+            "id": "6500",
+            "firstName": "George",
+            "lastName": "Washington",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        },
+        {
+            "type": "users",
+            "id": "6501",
+            "firstName": "Abraham",
+            "lastName": "Lincoln",
+            "links": {
+                "comments": [ ],
+                "posts": [ ],
+                "userGroups": [ ]
+            }
+        }
+    ],
+    "meta": { 
+        "count": 2
+    }
+}

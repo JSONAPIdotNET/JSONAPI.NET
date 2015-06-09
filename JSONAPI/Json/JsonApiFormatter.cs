@@ -106,7 +106,7 @@ namespace JSONAPI.Json
                     this.RelationAggregators[writeStream] = aggregator;
                 }
             }
-            
+
             var contentHeaders = content == null ? null : content.Headers;
             var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
             JsonWriter writer = this.CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
@@ -118,6 +118,12 @@ namespace JSONAPI.Json
             }
             else
             {
+                var payload = value as IPayload;
+                if (payload != null)
+                {
+                    value = payload.PrimaryData;
+                }
+            
                 writer.WriteStartObject();
                 writer.WritePropertyName(PrimaryDataKeyName);
 
@@ -150,6 +156,12 @@ namespace JSONAPI.Json
 
                     // Include links from aggregator
                     SerializeLinkedResources(writeStream, writer, serializer, aggregator);
+                }
+
+                if (payload != null && payload.Metadata != null)
+                {
+                    writer.WritePropertyName("meta");
+                    serializer.Serialize(writer, payload.Metadata);
                 }
 
                 writer.WriteEndObject();

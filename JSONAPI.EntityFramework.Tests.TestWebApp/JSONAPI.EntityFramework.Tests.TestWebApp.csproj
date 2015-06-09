@@ -115,6 +115,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\PresidentsController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\UserGroupsController.cs" />

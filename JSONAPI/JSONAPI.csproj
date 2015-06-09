@@ -94,6 +94,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
     <Compile Include="Http\PascalizedControllerSelector.cs" />
+    <Compile Include="IPayload.cs" />
     <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
     <Compile Include="Json\IErrorIdProvider.cs" />
