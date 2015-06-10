@@ -198,91 +198,32 @@ namespace JSONAPI.Json
             writer.WriteStartObject();
 
             var resourceType = value.GetType();
-
-            // Write the type
-            writer.WritePropertyName("type");
             var jsonTypeKey = _modelManager.GetResourceTypeNameForType(resourceType);
-            writer.WriteValue(jsonTypeKey);
-
-            // Do the Id now...
-            writer.WritePropertyName("id");
             var idProp = _modelManager.GetIdProperty(resourceType);
-            writer.WriteValue(GetValueForIdProperty(idProp, value));
+
+            // Write the type and id
+            WriteTypeAndId(writer, resourceType, value);
 
             // Leverage the cached map to avoid another costly call to System.Type.GetProperties()
             var props = _modelManager.GetProperties(value.GetType());
 
-            // Do non-model properties first, everything else goes in "links"
+            // Do non-model properties first, everything else goes in "related"
             //TODO: Unless embedded???
             var relationshipModelProperties = new List<RelationshipModelProperty>();
 
-            foreach (var modelProperty in props)
-            {
-                var prop = modelProperty.Property;
-                if (prop == idProp) continue; // Don't write the "id" property twice, see above!
-
-                if (modelProperty is FieldModelProperty)
-                {
-                    if (modelProperty.IgnoreByDefault) continue; // TODO: allow overriding this
-
-                    // numbers, strings, dates...
-                    writer.WritePropertyName(modelProperty.JsonKey);
-
-                    var propertyValue = prop.GetValue(value, null);
-
-                    if (prop.PropertyType == typeof (Decimal) || prop.PropertyType == typeof (Decimal?))
-                    {
-                        if (propertyValue == null)
-                            writer.WriteNull();
-                        else
-                            writer.WriteValue(propertyValue.ToString());
-                    }
-                    else if (prop.PropertyType == typeof (string) &&
-                        prop.GetCustomAttributes().Any(attr => attr is SerializeStringAsRawJsonAttribute))
-                    {
-                        if (propertyValue == null)
-                        {
-                            writer.WriteNull();
-                        }
-                        else
-                        {
-                            var json = (string) propertyValue;
-                            if (ValidateRawJsonStrings)
-                            {
-                                try
-                                {
-                                    var token = JToken.Parse(json);
-                                    json = token.ToString();
-                                }
-                                catch (Exception)
-                                {
-                                    json = "{}";
-                                }
-                            }
-                            var valueToSerialize = JsonHelpers.MinifyJson(json);
-                            writer.WriteRawValue(valueToSerialize);
-                        }
-                    }
-                    else
-                    {
-                        serializer.Serialize(writer, propertyValue);
-                    }
-                }
-                else if (modelProperty is RelationshipModelProperty)
-                {
-                    relationshipModelProperties.Add((RelationshipModelProperty)modelProperty);
-                }
-            }
+            // Write attributes
+            WriteAttributes(props, writer, idProp, value, serializer, relationshipModelProperties);
 
             // Now do other stuff
             if (relationshipModelProperties.Count() > 0)
             {
-                writer.WritePropertyName("links");
+                writer.WritePropertyName("relastionships");
                 writer.WriteStartObject();
             }
             foreach (var relationshipModelProperty in relationshipModelProperties)
             {
-                bool skip = false, iip = false;
+                bool skip = false, 
+                    iip = false;
                 string lt = null;
                 SerializeAsOptions sa = SerializeAsOptions.Ids;
 
@@ -324,11 +265,12 @@ namespace JSONAPI.Json
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             IEnumerable<object> items = (IEnumerable<object>)prop.GetValue(value, null);
                             if (items == null)
                             {
-                                writer.WriteValue((IEnumerable<object>)null); //TODO: Is it okay with the spec and Ember Data to return null for an empty array?
+                                // Return an empty array when there are no items
+                                writer.WriteStartArray();
+                                writer.WriteEndArray();
                                 break; // LOOK OUT! Ending this case block early here!!!
                             }
                             this.WriteIdsArrayJson(writer, items, serializer);
@@ -354,7 +296,7 @@ namespace JSONAPI.Json
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
-                            writer.WritePropertyName("related");
+                            writer.WritePropertyName("links");
                             writer.WriteValue(href);
                             writer.WriteEndObject();
                             break;
@@ -383,8 +325,15 @@ namespace JSONAPI.Json
                     switch (sa)
                     {
                         case SerializeAsOptions.Ids:
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            serializer.Serialize(writer, objId.Value);
+                            // Write the data element
+                            writer.WriteStartObject();
+                            writer.WritePropertyName(PrimaryDataKeyName);
+                            writer.WriteStartObject();
+                            // Write the type and id
+                            WriteTypeAndId(writer, prop.PropertyType, propertyValue);
+                            
+                            writer.WriteEndObject();
+                            writer.WriteEndObject();
                             if (iip)
                                 if (aggregator != null)
                                     aggregator.Add(prop.PropertyType, propertyValue);
@@ -398,7 +347,7 @@ namespace JSONAPI.Json
                                     
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             writer.WriteStartObject();
-                            writer.WritePropertyName("related");
+                            writer.WritePropertyName("links");
                             writer.WriteValue(link);
                             writer.WriteEndObject();
                             break;
@@ -492,7 +441,7 @@ namespace JSONAPI.Json
 
             if (aggregator.Appendices.Count > 0)
             {
-                writer.WritePropertyName("linked");
+                writer.WritePropertyName("included");
                 writer.WriteStartObject();
 
                 // Okay, we should have captured everything now. Now combine the type writers into the main writer...
@@ -507,6 +456,76 @@ namespace JSONAPI.Json
             }
 
 
+        }
+
+        private void WriteAttributes(ModelProperty[] props, JsonWriter writer, PropertyInfo idProp, object value, JsonSerializer serializer, List<RelationshipModelProperty> relationshipModelProperties)
+        {
+            //if (props.Count() > 0)
+            //{
+            //    writer.WritePropertyName("attributes");
+            //    writer.WriteStartObject();
+            //}
+
+            foreach (var modelProperty in props)
+            {
+                var prop = modelProperty.Property;
+                if (prop == idProp) continue; // Don't write the "id" property twice, see above!
+
+                if (modelProperty is FieldModelProperty)
+                {
+                    if (modelProperty.IgnoreByDefault) continue; // TODO: allow overriding this
+
+                    // numbers, strings, dates...
+                    writer.WritePropertyName(modelProperty.JsonKey);
+
+                    var propertyValue = prop.GetValue(value, null);
+
+                    if (prop.PropertyType == typeof(Decimal) || prop.PropertyType == typeof(Decimal?))
+                    {
+                        if (propertyValue == null)
+                            writer.WriteNull();
+                        else
+                            writer.WriteValue(propertyValue);
+                    }
+                    else if (prop.PropertyType == typeof(string) &&
+                        prop.GetCustomAttributes().Any(attr => attr is SerializeStringAsRawJsonAttribute))
+                    {
+                        if (propertyValue == null)
+                        {
+                            writer.WriteNull();
+                        }
+                        else
+                        {
+                            var json = (string)propertyValue;
+                            if (ValidateRawJsonStrings)
+                            {
+                                try
+                                {
+                                    var token = JToken.Parse(json);
+                                    json = token.ToString();
+                                }
+                                catch (Exception)
+                                {
+                                    json = "{}";
+                                }
+                            }
+                            var valueToSerialize = JsonHelpers.MinifyJson(json);
+                            writer.WriteRawValue(valueToSerialize);
+                        }
+                    }
+                    else
+                    {
+                        serializer.Serialize(writer, propertyValue);
+                    }
+                }
+                else if (modelProperty is RelationshipModelProperty)
+                {
+                    relationshipModelProperties.Add((RelationshipModelProperty)modelProperty);
+                }
+            }
+
+            //if (props.Count() > 0)
+            //    writer.WriteEndObject();
         }
 
         #endregion Serialization
@@ -558,11 +577,11 @@ namespace JSONAPI.Json
                         reader.Read(); // burn the PropertyName token
                         switch (value)
                         {
-                            case "linked":
+                            case "included":
                                 //TODO: If we want to capture linked/related objects in a compound document when deserializing, do it here...do we?
                                 reader.Skip();
                                 break;
-                            case "links":
+                            case "relationships":
                                 // ignore this, is it even meaningful in a PUT/POST body?
                                 reader.Skip();
                                 break;
@@ -712,7 +731,7 @@ namespace JSONAPI.Json
                     string value = (string)reader.Value;
                     var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value);
 
-                    if (value == "links")
+                    if (value == "related")
                     {
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
@@ -724,7 +743,7 @@ namespace JSONAPI.Json
                         {
                             reader.Read(); // burn the PropertyName token
                             //TODO: Embedded would be dropped here!
-                            continue; // These aren't supposed to be here, they're supposed to be in "links"!
+                            continue; // These aren't supposed to be here, they're supposed to be in "related"!
                         }
 
                         var prop = modelProperty.Property;
@@ -1008,16 +1027,31 @@ namespace JSONAPI.Json
             return GetValueForIdProperty(idprop, obj);
         }
 
+        private void WriteTypeAndId(JsonWriter writer, Type propertyType, object propertyValue)
+        {
+            writer.WritePropertyName("type");
+            writer.WriteValue(_modelManager.GetResourceTypeNameForType(propertyType));
+
+            writer.WritePropertyName("id");
+            writer.WriteValue(GetValueForIdProperty(_modelManager.GetIdProperty(propertyType), propertyValue));
+        }
+
         private void WriteIdsArrayJson(Newtonsoft.Json.JsonWriter writer, IEnumerable<object> value, Newtonsoft.Json.JsonSerializer serializer)
         {
+            // Write the data element
+            writer.WriteStartObject();
+            writer.WritePropertyName(PrimaryDataKeyName);
+
             IEnumerator<Object> collectionEnumerator = (value as IEnumerable<object>).GetEnumerator();
             writer.WriteStartArray();
             while (collectionEnumerator.MoveNext())
             {
-                var serializable = collectionEnumerator.Current;
-                writer.WriteValue(this.GetIdFor(serializable));
+                writer.WriteStartObject();
+                WriteTypeAndId(writer, collectionEnumerator.Current.GetType(), collectionEnumerator.Current);
+                writer.WriteEndObject();
             }
             writer.WriteEndArray();
+            writer.WriteEndObject();
         }
 
     }
