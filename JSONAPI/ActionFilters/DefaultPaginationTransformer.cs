@@ -7,7 +7,7 @@ using System.Web.Http;
 namespace JSONAPI.ActionFilters
 {
     /// <summary>
-    /// Performs pagination a
+    /// Performs pagination
     /// </summary>
     public class DefaultPaginationTransformer : IQueryablePaginationTransformer
     {
@@ -32,7 +32,7 @@ namespace JSONAPI.ActionFilters
             _maxPageSize = maxPageSize;
         }
 
-        public IQueryable<T> ApplyPagination<T>(IQueryable<T> query, HttpRequestMessage request)
+        public IPaginationTransformResult<T> ApplyPagination<T>(IQueryable<T> query, HttpRequestMessage request)
         {
             var hasPageNumberParam = false;
             var hasPageSizeParam = false;
@@ -58,7 +58,13 @@ namespace JSONAPI.ActionFilters
             }
 
             if (!hasPageNumberParam && !hasPageSizeParam)
-                return query;
+            {
+                return new DefaultPaginationTransformResult<T>
+                {
+                    PagedQuery = query,
+                    PaginationWasApplied = false
+                };
+            }
 
             if ((hasPageNumberParam && !hasPageSizeParam) || (!hasPageNumberParam && hasPageSizeParam))
                 throw new QueryableTransformException(
@@ -77,7 +83,13 @@ namespace JSONAPI.ActionFilters
                 pageSize = _maxPageSize.Value;
 
             var skip = pageNumber * pageSize;
-            return query.Skip(skip).Take(pageSize);
+            return new DefaultPaginationTransformResult<T>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                PagedQuery = query.Skip(skip).Take(pageSize),
+                PaginationWasApplied = true
+            };
         }
     }
 }

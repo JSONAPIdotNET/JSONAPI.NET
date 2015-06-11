@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="ActionFilters\DefaultFilteringTransformer.cs" />
     <Compile Include="ActionFilters\DefaultPaginationTransformer.cs" />
+    <Compile Include="ActionFilters\DefaultPaginationTransformResult.cs" />
     <Compile Include="ActionFilters\IQueryableEnumerationTransformer.cs" />
     <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
     <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />

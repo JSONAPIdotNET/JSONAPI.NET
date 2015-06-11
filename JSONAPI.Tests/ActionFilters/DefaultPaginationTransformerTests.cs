@@ -54,7 +54,7 @@ namespace JSONAPI.Tests.ActionFilters
         private Dummy[] GetArray(string uri, int maxPageSize = 50)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            return GetTransformer(maxPageSize).ApplyPagination(_fixturesQuery, request).ToArray();
+            return GetTransformer(maxPageSize).ApplyPagination(_fixturesQuery, request).PagedQuery.ToArray();
         }
 
         [TestMethod]

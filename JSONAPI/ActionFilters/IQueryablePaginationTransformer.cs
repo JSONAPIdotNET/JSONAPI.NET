@@ -14,7 +14,34 @@ namespace JSONAPI.ActionFilters
         /// <param name="query">The query to page</param>
         /// <param name="request">The request message</param>
         /// <typeparam name="T">The queryable element type</typeparam>
-        /// <returns>An IQueryable configured to return a page of data</returns>
-        IQueryable<T> ApplyPagination<T>(IQueryable<T> query, HttpRequestMessage request);
+        /// <returns>The result of pagination</returns>
+        IPaginationTransformResult<T> ApplyPagination<T>(IQueryable<T> query, HttpRequestMessage request);
+    }
+
+    /// <summary>
+    /// The result of a pagination transform
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IPaginationTransformResult<out T>
+    {
+        /// <summary>
+        /// A query that has been paginated
+        /// </summary>
+        IQueryable<T> PagedQuery { get; }
+
+        /// <summary>
+        /// Whether the query has been paginated or not
+        /// </summary>
+        bool PaginationWasApplied { get; }
+
+        /// <summary>
+        /// The current page of the query
+        /// </summary>
+        int PageNumber { get; }
+
+        /// <summary>
+        /// The size of this page of data
+        /// </summary>
+        int PageSize { get; }
     }
 }

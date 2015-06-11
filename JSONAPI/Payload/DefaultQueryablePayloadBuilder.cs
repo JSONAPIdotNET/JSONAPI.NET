@@ -45,7 +45,10 @@ namespace JSONAPI.Payload
                 query = _sortingTransformer.Sort(query, request);
 
             if (_paginationTransformer != null)
-                query = _paginationTransformer.ApplyPagination(query, request);
+            {
+                var paginationResults = _paginationTransformer.ApplyPagination(query, request);
+                query = paginationResults.PagedQuery;
+            }
 
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
 
