@@ -45,6 +45,17 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
+        /// Allows overriding the default queryable payload builder
+        /// </summary>
+        /// <param name="queryablePayloadBuilder">The custom queryable payload builder to use</param>
+        /// <returns></returns>
+        public JsonApiConfiguration UseCustomQueryablePayloadBuilder(IQueryablePayloadBuilder queryablePayloadBuilder)
+        {
+            _payloadBuilderFactory = () => queryablePayloadBuilder;
+            return this;
+        }
+
+        /// <summary>
         /// Applies the running configuration to an HttpConfiguration instance
         /// </summary>
         /// <param name="httpConfig">The HttpConfiguration to apply this JsonApiConfiguration to</param>
