@@ -217,7 +217,7 @@ namespace JSONAPI.Json
             // Now do other stuff
             if (relationshipModelProperties.Count() > 0)
             {
-                writer.WritePropertyName("relastionships");
+                writer.WritePropertyName("relationships");
                 writer.WriteStartObject();
             }
             foreach (var relationshipModelProperty in relationshipModelProperties)
@@ -389,70 +389,54 @@ namespace JSONAPI.Json
             /* Oh, and we have to keep a reference to the TextWriter of the JsonWriter
              * because there's no member to get it back out again. ?!?
              * */
-            Dictionary<Type, KeyValuePair<JsonWriter, StringWriter>> writers = new Dictionary<Type, KeyValuePair<JsonWriter, StringWriter>>();
 
             int numAdditions;
-            do
-            {
-                numAdditions = 0;
-                Dictionary<Type, ISet<object>> appxs = new Dictionary<Type, ISet<object>>(aggregator.Appendices); // shallow clone, in case we add a new type during enumeration!
-                foreach (KeyValuePair<Type, ISet<object>> apair in appxs)
-                {
-                    Type type = apair.Key;
-                    ISet<object> appendix = apair.Value;
-                    JsonWriter jw;
-                    if (writers.ContainsKey(type))
-                    {
-                        jw = writers[type].Key;
-                    }
-                    else
-                    {
-                        // Setup and start the writer for this type...
-                        StringWriter sw = new StringWriter();
-                        jw = new JsonTextWriter(sw);
-                        writers[type] = new KeyValuePair<JsonWriter, StringWriter>(jw, sw);
-                        jw.WriteStartArray();
-                    }
-
-                    HashSet<object> tbp;
-                    if (processed.ContainsKey(type))
-                    {
-                        toBeProcessed[type] = tbp = new HashSet<object>(appendix.Except(processed[type]));
-                    }
-                    else
-                    {
-                        toBeProcessed[type] = tbp = new HashSet<object>(appendix);
-                        processed[type] = new HashSet<object>();
-                    }
-
-                    if (tbp.Count > 0)
-                    {
-                        numAdditions += tbp.Count;
-                        foreach (object obj in tbp)
-                        {
-                            Serialize(obj, writeStream, jw, serializer, aggregator); // Note, not writer, but jw--we write each type to its own JsonWriter and combine them later.
-                        }
-                        processed[type].UnionWith(tbp);
-                    }
-
-                    //TODO: Add traversal depth limit??
-                }
-            } while (numAdditions > 0);
 
             if (aggregator.Appendices.Count > 0)
             {
                 writer.WritePropertyName("included");
-                writer.WriteStartObject();
+                writer.WriteStartArray();
 
-                // Okay, we should have captured everything now. Now combine the type writers into the main writer...
-                foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
+                do
                 {
-                    apair.Value.Key.WriteEnd(); // close off the array
-                    writer.WritePropertyName(_modelManager.GetResourceTypeNameForType(apair.Key));
-                    writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
-                }
+                //// Okay, we should have captured everything now. Now combine the type writers into the main writer...
+                //foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
+                //{
+                //    apair.Value.Key.WriteEnd(); // close off the array
+                //    writer.WritePropertyName(_modelManager.GetResourceTypeNameForType(apair.Key));
+                //    writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
+                //}
+                    numAdditions = 0;
+                    Dictionary<Type, ISet<object>> appxs = new Dictionary<Type, ISet<object>>(aggregator.Appendices); // shallow clone, in case we add a new type during enumeration!
+                    foreach (KeyValuePair<Type, ISet<object>> apair in appxs)
+                    {
+                        Type type = apair.Key;
+                        ISet<object> appendix = apair.Value;
 
-                writer.WriteEndObject();
+                        HashSet<object> tbp;
+                        if (processed.ContainsKey(type))
+                        {
+                            toBeProcessed[type] = tbp = new HashSet<object>(appendix.Except(processed[type]));
+                        }
+                        else
+                        {
+                            toBeProcessed[type] = tbp = new HashSet<object>(appendix);
+                            processed[type] = new HashSet<object>();
+                        }
+
+                        if (tbp.Count > 0)
+                        {
+                            numAdditions += tbp.Count;
+                            foreach (object obj in tbp)
+                            {
+                                Serialize(obj, writeStream, writer, serializer, aggregator); // Note, not writer, but jw--we write each type to its own JsonWriter and combine them later.
+                            }
+                            processed[type].UnionWith(tbp);
+                        }
+                    }
+                } while (numAdditions > 0);
+
+                writer.WriteEndArray();
             }
 
 
