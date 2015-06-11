@@ -5,6 +5,7 @@ using System.Web.Http.Dispatcher;
 using JSONAPI.ActionFilters;
 using JSONAPI.Http;
 using JSONAPI.Json;
+using JSONAPI.Payload;
 
 namespace JSONAPI.Core
 {
@@ -140,7 +141,8 @@ namespace JSONAPI.Core
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(formatter);
 
-            httpConfig.Filters.Add(new JsonApiQueryableAttribute(enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer));
+            var queryablePayloadBuilder = new DefaultQueryablePayloadBuilder(enumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
+            httpConfig.Filters.Add(new JsonApiQueryableAttribute(queryablePayloadBuilder));
 
             httpConfig.Services.Replace(typeof (IHttpControllerSelector),
                 new PascalizedControllerSelector(httpConfig));

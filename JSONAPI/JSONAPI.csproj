@@ -94,6 +94,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Http\ApiController.cs" />
     <Compile Include="Http\PascalizedControllerSelector.cs" />
+    <Compile Include="Payload\DefaultQueryablePayloadBuilder.cs" />
     <Compile Include="Payload\IPayload.cs" />
     <Compile Include="Json\ErrorSerializer.cs" />
     <Compile Include="Json\GuidErrorIdProvider.cs" />
@@ -102,6 +103,8 @@
     <Compile Include="Json\JsonApiFormatter.cs" />
     <Compile Include="Json\JsonHelpers.cs" />
     <Compile Include="Json\RelationAggregator.cs" />
+    <Compile Include="Payload\IQueryablePayloadBuilder.cs" />
+    <Compile Include="Payload\Payload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
