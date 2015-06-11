@@ -22,7 +22,7 @@ namespace JSONAPI.Core
         /// </summary>
         public JsonApiConfiguration(IModelManager modelManager)
         {
-            if (modelManager == null) throw new Exception("You must provide ");
+            if (modelManager == null) throw new Exception("You must provide a model manager to begin configuration.");
 
             _modelManager = modelManager;
             _payloadBuilderFactory = () => new DefaultQueryablePayloadBuilderConfiguration().GetBuilder(modelManager);
