@@ -69,7 +69,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             // Configure JSON API
             new JsonApiConfiguration(modelManager)
-                .UseEntityFramework()
+                .UsingDefaultQueryablePayloadBuilder(c => c.EnumerateQueriesAsynchronously())
                 .Apply(httpConfig);
 
 
