@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace JSONAPI
+namespace JSONAPI.Payload
 {
     /// <summary>
     /// Actions may return objects that implement this interface in order to

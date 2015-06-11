@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Http;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.Payload;
 using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
