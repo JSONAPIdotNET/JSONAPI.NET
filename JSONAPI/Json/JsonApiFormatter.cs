@@ -444,11 +444,11 @@ namespace JSONAPI.Json
 
         private void WriteAttributes(ModelProperty[] props, JsonWriter writer, PropertyInfo idProp, object value, JsonSerializer serializer, List<RelationshipModelProperty> relationshipModelProperties)
         {
-            //if (props.Count() > 0)
-            //{
-            //    writer.WritePropertyName("attributes");
-            //    writer.WriteStartObject();
-            //}
+            if (props.Count() > 0)
+            {
+                writer.WritePropertyName("attributes");
+                writer.WriteStartObject();
+            }
 
             foreach (var modelProperty in props)
             {
@@ -508,8 +508,8 @@ namespace JSONAPI.Json
                 }
             }
 
-            //if (props.Count() > 0)
-            //    writer.WriteEndObject();
+            if (props.Count() > 0)
+                writer.WriteEndObject();
         }
 
         #endregion Serialization
