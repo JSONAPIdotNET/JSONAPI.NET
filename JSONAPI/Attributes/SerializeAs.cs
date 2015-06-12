@@ -2,7 +2,7 @@
 
 namespace JSONAPI.Attributes
 {
-    public enum SerializeAsOptions { Ids, Link, Embedded }
+    public enum SerializeAsOptions { Ids, Link }
 
     [System.AttributeUsage(System.AttributeTargets.Property)]
     public class SerializeAs

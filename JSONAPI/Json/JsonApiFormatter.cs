@@ -91,6 +91,11 @@ namespace JSONAPI.Json
         }
 
         private const string PrimaryDataKeyName = "data";
+        private const string AttributesKeyName = "attributes";
+        private const string RelationshipsKeyName = "relationships";
+        private const string IncludedKeyName = "included";
+        private const string LinksKeyName = "links";
+        private const string RelatedKeyName = "related";
 
         #region Serialization
 
@@ -217,7 +222,7 @@ namespace JSONAPI.Json
             // Now do other stuff
             if (relationshipModelProperties.Count() > 0)
             {
-                writer.WritePropertyName("relationships");
+                writer.WritePropertyName(RelationshipsKeyName);
                 writer.WriteStartObject();
             }
             foreach (var relationshipModelProperty in relationshipModelProperties)
@@ -296,15 +301,12 @@ namespace JSONAPI.Json
                             //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             //TODO: Support ids and type properties in "link" object
                             writer.WriteStartObject();
-                            writer.WritePropertyName("links");
+                            writer.WritePropertyName(LinksKeyName);
+                            writer.WriteStartObject();
+                            writer.WritePropertyName(RelatedKeyName);
                             writer.WriteValue(href);
                             writer.WriteEndObject();
-                            break;
-                        case SerializeAsOptions.Embedded:
-                            // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            //serializer.Serialize(writer, prop.GetValue(value, null));
-                            this.Serialize(prop.GetValue(value, null), writeStream, writer, serializer, aggregator);
+                            writer.WriteEndObject();
                             break;
                     }
                 }
@@ -345,17 +347,13 @@ namespace JSONAPI.Json
                             var relatedObjectId = lt.Contains("{0}") ? objId.Value : null;
                             string link = String.Format(lt, relatedObjectId, GetIdFor(value));
                                     
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
                             writer.WriteStartObject();
-                            writer.WritePropertyName("links");
+                            writer.WritePropertyName(LinksKeyName);
+                            writer.WriteStartObject();
+                            writer.WritePropertyName(RelatedKeyName);
                             writer.WriteValue(link);
                             writer.WriteEndObject();
-                            break;
-                        case SerializeAsOptions.Embedded:
-                            // Not really supported by Ember Data yet, incidentally...but easy to implement here.
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            //serializer.Serialize(writer, prop.GetValue(value, null));
-                            this.Serialize(propertyValue, writeStream, writer, serializer, aggregator);
+                            writer.WriteEndObject();
                             break;
                     }
                 }
@@ -394,18 +392,11 @@ namespace JSONAPI.Json
 
             if (aggregator.Appendices.Count > 0)
             {
-                writer.WritePropertyName("included");
+                writer.WritePropertyName(IncludedKeyName);
                 writer.WriteStartArray();
 
                 do
                 {
-                //// Okay, we should have captured everything now. Now combine the type writers into the main writer...
-                //foreach (KeyValuePair<Type, KeyValuePair<JsonWriter, StringWriter>> apair in writers)
-                //{
-                //    apair.Value.Key.WriteEnd(); // close off the array
-                //    writer.WritePropertyName(_modelManager.GetResourceTypeNameForType(apair.Key));
-                //    writer.WriteRawValue(apair.Value.Value.ToString()); // write the contents of the type JsonWriter's StringWriter to the main JsonWriter
-                //}
                     numAdditions = 0;
                     Dictionary<Type, ISet<object>> appxs = new Dictionary<Type, ISet<object>>(aggregator.Appendices); // shallow clone, in case we add a new type during enumeration!
                     foreach (KeyValuePair<Type, ISet<object>> apair in appxs)
@@ -446,14 +437,14 @@ namespace JSONAPI.Json
         {
             if (props.Count() > 0)
             {
-                writer.WritePropertyName("attributes");
+                writer.WritePropertyName(AttributesKeyName);
                 writer.WriteStartObject();
             }
 
             foreach (var modelProperty in props)
             {
                 var prop = modelProperty.Property;
-                if (prop == idProp) continue; // Don't write the "id" property twice, see above!
+                if (prop == idProp) continue; // Don't write the "id" property twice!
 
                 if (modelProperty is FieldModelProperty)
                 {
@@ -561,15 +552,19 @@ namespace JSONAPI.Json
                         reader.Read(); // burn the PropertyName token
                         switch (value)
                         {
-                            case "included":
+                            case IncludedKeyName:
                                 //TODO: If we want to capture linked/related objects in a compound document when deserializing, do it here...do we?
                                 reader.Skip();
                                 break;
-                            case "relationships":
+                            case RelationshipsKeyName:
                                 // ignore this, is it even meaningful in a PUT/POST body?
                                 reader.Skip();
                                 break;
                             case PrimaryDataKeyName:
+                                // Could be a single resource or multiple, according to spec!
+                                foundPrimaryData = true;
+                                break;
+                            case AttributesKeyName:
                                 // Could be a single resource or multiple, according to spec!
                                 foundPrimaryData = true;
                                 retval = DeserializePrimaryData(singleType, reader);
@@ -644,27 +639,6 @@ namespace JSONAPI.Json
                 return GetDefaultValueForType(type);
             }
 
-            /*
-            try
-            {
-                using (var reader = (new StreamReader(readStream, effectiveEncoding)))
-                {
-                    var json = reader.ReadToEnd();
-                    var jo = JObject.Parse(json);
-                    return jo.SelectToken(root, false).ToObject(type);
-                }
-            }
-            catch (Exception e)
-            {
-                if (formatterLogger == null)
-                {
-                    throw;
-                }
-                formatterLogger.LogError(String.Empty, e);
-                return GetDefaultValueForType(type);
-            }
-             */
-
             return GetDefaultValueForType(type);
         }
 
@@ -715,8 +689,9 @@ namespace JSONAPI.Json
                     string value = (string)reader.Value;
                     var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value);
 
-                    if (value == "related")
+                    if (value == RelatedKeyName)
                     {
+                        // This can only happen within a links object
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, reader);
@@ -795,40 +770,6 @@ namespace JSONAPI.Json
             } while (reader.TokenType != JsonToken.EndObject);
             reader.Read(); // burn the EndObject token before returning back up the call stack
 
-            /*
-            // Suss out all the relationship members, and which ones have what cardinality...
-            IEnumerable<PropertyInfo> relations = (
-                from prop in objectType.GetProperties()
-                where !CanWriteTypeAsJsonApiAttribute(prop.PropertyType)
-                && prop.GetCustomAttributes(true).Any(attribute => attribute is System.Runtime.Serialization.DataMemberAttribute)
-                select prop
-                );
-            IEnumerable<PropertyInfo> hasManys = relations.Where(prop => typeof(IEnumerable<object>).IsAssignableFrom(prop.PropertyType));
-            IEnumerable<PropertyInfo> belongsTos = relations.Where(prop => !typeof(IEnumerable<object>).IsAssignableFrom(prop.PropertyType));
-
-            JObject links = (JObject)jo["links"];
-
-            // Lets deal with belongsTos first, that should be simpler...
-            foreach (PropertyInfo prop in belongsTos)
-            {
-                if (links == null) break; // Well, apparently we don't have any data for the relationships!
-
-                string btId = (string)links[_modelManager.GetJsonKeyForProperty(prop)];
-                if (btId == null)
-                {
-                    prop.SetValue(retval, null, null); // Important that we set--the value may have been cleared!
-                    continue; // breaking early!
-                }
-                Type relType = prop.PropertyType;
-                //if (typeof(EntityObject).IsAssignableFrom(relType))
-                if (resolver.CanIncludeTypeAsObject(relType))
-                {
-                    prop.SetValue(retval, resolver.GetById(relType, btId), null);
-                    //throw new ApplicationException(String.Format("Could not assign BelongsTo property \"{0}\" on object of type {1} by ID {2} because no object of type {3} could be retrieved by that ID.", prop.Name, objectType, btId, prop.PropertyType));
-                }
-            }
-             */
-
             return retval;
         }
 
@@ -863,7 +804,7 @@ namespace JSONAPI.Json
                     throw new BadRequestException("Each relationship key on a links object must have an object value.");
 
                 var relationshipObject = (JObject) relationshipToken;
-                var linkageToken = relationshipObject["linkage"];
+                var linkageToken = relationshipObject[PrimaryDataKeyName];
 
                 var linkageObjects = new List<Tuple<string, string>>();
 
