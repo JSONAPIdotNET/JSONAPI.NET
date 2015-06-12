@@ -1,17 +1,25 @@
 {
-    "data": [
-        {
-            "type": "tags",
-            "id": "1",
-            "text":  "Ember"
-        }, {
-            "type": "tags",
-            "id": "2",
-            "text":  "React"
-        }, {
-            "type": "tags",
-            "id": "3",
-            "text":  "Angular"
-        }
-    ]
+   "data": [
+      {
+         "type": "tags",
+         "id": "1",
+         "attributes": {
+            "text": "Ember"
+         }
+      },
+      {
+         "type": "tags",
+         "id": "2",
+         "atributes": {
+            "text": "React"
+         }
+      },
+      {
+         "type": "tags",
+         "id": "3",
+         "attributes": {
+            "text": "Angular"
+         }
+      }
+   ]
 }

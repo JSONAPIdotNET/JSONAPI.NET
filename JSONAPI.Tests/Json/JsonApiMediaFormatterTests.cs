@@ -525,7 +525,7 @@ namespace JSONAPI.Tests.Json
             var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
-            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""bogus"":""PANIC!"",""links"":{""posts"":{""linkage"":[]}}}}"));
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""type"":""authors"",""attributes"":{""name"":""Jason Hater"",""bogus"":""PANIC!""},""relationships"":{""posts"":{""data"":[]}}}}"));
 
             // Act
             Author a;
@@ -545,7 +545,7 @@ namespace JSONAPI.Tests.Json
             var formatter = new JsonApiFormatter(modelManager);
             MemoryStream stream = new MemoryStream();
 
-            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""name"":""Jason Hater"",""links"":{""posts"":{""linkage"":[]},""bogus"":{""linkage"":[]}}}}"));
+            stream = new MemoryStream(System.Text.Encoding.ASCII.GetBytes(@"{""data"":{""id"":13,""type"":""authors"",""attributes"":{""name"":""Jason Hater""},""relationships"":{""posts"":{""data"":[]},""bogus"":{""data"":[]}}}}"));
 
             // Act
             Author a;

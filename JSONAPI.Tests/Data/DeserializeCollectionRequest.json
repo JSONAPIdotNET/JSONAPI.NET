@@ -3,24 +3,24 @@
         {
             "id": "1",
             "title": "Linkbait!",
-            "links": {
+            "relationships": {
                 "author": {
-                    "linkage": {
+                    "data": {
                         "type": "authors",
                         "id": "1"
                     }
                 },
                 "comments": {
-                    "linkage": [{ "type": "comments", "id": "400" }, { "type": "comments", "id":  "401" }]
+                    "data": [{ "type": "comments", "id": "400" }, { "type": "comments", "id":  "401" }]
                 }
             }
         },
         {
             "id": "2",
             "title": "Rant #1023",
-            "links": {
+            "relationships": {
                 "author": {
-                    "linkage": {
+                    "data": {
                         "type": "authors",
                         "id": "1"
                     }

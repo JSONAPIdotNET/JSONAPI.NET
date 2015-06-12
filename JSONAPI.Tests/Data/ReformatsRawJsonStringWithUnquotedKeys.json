@@ -7,7 +7,7 @@
             "customData": {
                 "unquotedKey": 5
             },
-            "links": {
+            "relationships": {
                 "post": null
             }
         }

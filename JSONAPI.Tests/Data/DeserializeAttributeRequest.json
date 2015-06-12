@@ -1,9 +1,10 @@
 {
-    "data": [
-        {
-            "id": "1",
+   "data": [
+      {
+         "id": "1",
+         "attributes": {
             "booleanField": false,
-            "nullableBooleanField":  false,
+            "nullableBooleanField": false,
             "sByteField": 0,
             "nullableSByteField": null,
             "byteField": 0,
@@ -35,8 +36,11 @@
             "stringField": null,
             "enumField": 0,
             "nullableEnumField": null
-        }, {
-            "id": "2",
+         }
+      },
+      {
+         "id": "2",
+         "attributes": {
             "booleanField": true,
             "nullableBooleanField": true,
             "sByteField": 123,
@@ -70,6 +74,7 @@
             "stringField": "Some string 156",
             "enumField": 1,
             "nullableEnumField": 2
-        }
-    ]
-}
+            }
+         }
+      ]
+   }

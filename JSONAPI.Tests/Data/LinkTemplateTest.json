@@ -1,12 +1,14 @@
 {
-    "data": {
-        "type": "posts",
-        "id": "2",
-        "title": "How to fry an egg",
-        "links": {
-            "author": {
-                "related": "/users/5"
+   "data": {
+      "type": "posts",
+      "id": "2",
+      "title": "How to fry an egg",
+      "relationships": {
+         "author": {
+            "links": {
+               "related": "/users/5"
             }
-        }
-    }
+         }
+      }
+   }
 }

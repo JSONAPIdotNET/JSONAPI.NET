@@ -1,8 +1,9 @@
 {
-    "data": [
-        {
-            "type": "samples",
-            "id": "1",
+   "data": [
+      {
+         "type": "samples",
+         "id": "1",
+         "attributes": {
             "booleanField": false,
             "nullableBooleanField": false,
             "sByteField": 0,
@@ -36,9 +37,12 @@
             "stringField": null,
             "enumField": 0,
             "nullableEnumField": null
-        }, {
-            "type": "samples",
-            "id": "2",
+         }
+      },
+      {
+         "type": "samples",
+         "id": "2",
+         "attributes": {
             "booleanField": true,
             "nullableBooleanField": true,
             "sByteField": 123,
@@ -72,6 +76,7 @@
             "stringField": "Some string 156",
             "enumField": 1,
             "nullableEnumField": 2
-        }
-    ]
+         }
+      }
+   ]
 }
