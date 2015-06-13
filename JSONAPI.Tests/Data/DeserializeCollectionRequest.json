@@ -1,8 +1,11 @@
 {
     "data": [
         {
+            "type": "posts",
             "id": "1",
-            "title": "Linkbait!",
+            "attributes": {
+                "title": "Linkbait!"
+            },
             "relationships": {
                 "author": {
                     "data": {
@@ -11,13 +14,25 @@
                     }
                 },
                 "comments": {
-                    "data": [{ "type": "comments", "id": "400" }, { "type": "comments", "id":  "401" }]
+                    "data": [
+                        {
+                            "type": "comments",
+                            "id": "400"
+                        },
+                        {
+                            "type": "comments",
+                            "id": "401"
+                        }
+                    ]
                 }
             }
         },
         {
+            "type": "posts",
             "id": "2",
-            "title": "Rant #1023",
+            "attributes": {
+                "title": "Rant #1023"
+            },
             "relationships": {
                 "author": {
                     "data": {

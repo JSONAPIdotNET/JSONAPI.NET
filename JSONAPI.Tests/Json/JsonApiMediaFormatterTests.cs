@@ -220,7 +220,6 @@ namespace JSONAPI.Tests.Json
             Trace.WriteLine(output);
             var expected = JsonHelpers.MinifyJson(File.ReadAllText("SerializerIntegrationTest.json"));
             Assert.AreEqual(expected, output.Trim());
-            //Assert.AreEqual("[2,3,4]", sw.ToString());
         }
 
         [TestMethod]
@@ -243,7 +242,6 @@ namespace JSONAPI.Tests.Json
             Trace.WriteLine(output);
             var expected = JsonHelpers.MinifyJson(File.ReadAllText("SerializerIntegrationTest.json"));
             Assert.AreEqual(expected, output.Trim());
-            //Assert.AreEqual("[2,3,4]", sw.ToString());
         }
 
         [TestMethod]

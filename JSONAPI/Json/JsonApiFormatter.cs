@@ -563,6 +563,7 @@ namespace JSONAPI.Json
                             case PrimaryDataKeyName:
                                 // Could be a single resource or multiple, according to spec!
                                 foundPrimaryData = true;
+                                retval = DeserializePrimaryData(singleType, reader);
                                 break;
                             case AttributesKeyName:
                                 // Could be a single resource or multiple, according to spec!
@@ -676,9 +677,9 @@ namespace JSONAPI.Json
             return retval;
         }
 
-        private object Deserialize(Type objectType, JsonReader reader)
+        private object Deserialize(Type objectType, JsonReader reader, object obj = null)
         {
-            object retval = Activator.CreateInstance(objectType);
+            object retval = obj == null ? Activator.CreateInstance(objectType) : obj;
 
             if (reader.TokenType != JsonToken.StartObject) throw new JsonReaderException(String.Format("Expected JsonToken.StartObject, got {0}", reader.TokenType.ToString()));
             reader.Read(); // Burn the StartObject token
@@ -695,6 +696,11 @@ namespace JSONAPI.Json
                         reader.Read(); // burn the PropertyName token
                         //TODO: linked resources (Done??)
                         DeserializeLinkedResources(retval, reader);
+                    }
+                    else if (value == AttributesKeyName) {
+                        reader.Read();
+
+                        retval = Deserialize(objectType, reader, retval);
                     }
                     else if (modelProperty != null)
                     {
