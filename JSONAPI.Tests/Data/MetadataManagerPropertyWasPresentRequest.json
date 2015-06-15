@@ -1,14 +1,14 @@
 {
-    "data": {
-        "type": "posts",
-        "id": "42",
-        "relationships": {
-            "author": {
-                "data": {
-                    "id": "18",
-                    "type": "authors"
-                }
+   "data": {
+      "type": "posts",
+      "id": "42",
+      "relationships": {
+         "author": {
+            "data": {
+               "type": "authors",
+               "id": "18"
             }
-        }
-    }
+         }
+      }
+   }
 }

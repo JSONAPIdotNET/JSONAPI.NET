@@ -2,9 +2,15 @@
    "data": {
       "type": "posts",
       "id": "2",
-      "title": "How to fry an egg",
+      "attributes": {
+         "title": "How to fry an egg"
+      },
       "relationships": {
          "author": {
+            "data": {
+               "type": "users",
+               "id":  "5"
+            },
             "links": {
                "related": "/users/5"
             }

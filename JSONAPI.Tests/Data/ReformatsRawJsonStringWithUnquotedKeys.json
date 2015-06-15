@@ -1,15 +1,19 @@
 {
-    "data": [
-        {
-            "type": "comments",
-            "id": "5",
+   "data": [
+      {
+         "type": "comments",
+         "id": "5",
+         "attributes": { 
             "body": null,
             "customData": {
-                "unquotedKey": 5
-            },
-            "relationships": {
-                "post": null
+               "unquotedKey": 5
             }
-        }
-    ]
+         },
+         "relationships": {
+            "post": {
+               "data": null
+            }
+         }
+      }
+   ]
 }

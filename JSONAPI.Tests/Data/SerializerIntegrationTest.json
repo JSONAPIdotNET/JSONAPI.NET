@@ -1,87 +1,93 @@
 {
-    "data": [
-        {
-            "type": "posts",
-            "id": "1",
-            "attributes": {
-                "title": "Linkbait!"
+   "data": [
+      {
+         "type": "posts",
+         "id": "1",
+         "attributes": {
+            "title": "Linkbait!"
+         },
+         "relationships": {
+            "comments": {
+               "data": [
+                  {
+                     "type": "comments",
+                     "id": "2"
+                  },
+                  {
+                     "type": "comments",
+                     "id": "3"
+                  },
+                  {
+                     "type": "comments",
+                     "id": "4"
+                  }
+               ]
             },
-            "relationships": {
-                "comments": {
-                    "data": [
-                        {
-                            "type": "comments",
-                            "id": "2"
-                        },
-                        {
-                            "type": "comments",
-                            "id": "3"
-                        },
-                        {
-                            "type": "comments",
-                            "id": "4"
-                        }
-                    ]
-                },
-                "author": {
-                    "data": {
-                        "type": "authors",
-                        "id": "1"
-                    }
-                }
+            "author": {
+               "data": {
+                  "type": "authors",
+                  "id": "1"
+               }
             }
-        },
-        {
-            "type": "posts",
-            "id": "2",
-            "attributes": {
-                "title": "Rant #1023"
+         }
+      },
+      {
+         "type": "posts",
+         "id": "2",
+         "attributes": {
+            "title": "Rant #1023"
+         },
+         "relationships": {
+            "comments": {
+               "data": [
+                  {
+                     "type": "comments",
+                     "id": "5"
+                  }
+               ]
             },
-            "relationships": {
-                "comments": {
-                    "data": [
-                        {
-                            "type": "comments",
-                            "id": "5"
-                        }
-                    ]
-                },
-                "author": {
-                    "data": {
-                        "type": "authors",
-                        "id": "1"
-                    }
-                }
+            "author": {
+               "data": {
+                  "type": "authors",
+                  "id": "1"
+               }
             }
-        },
-        {
-            "type": "posts",
-            "id": "3",
-            "attributes": {
-                "title": "Polemic in E-flat minor #824"
+         }
+      },
+      {
+         "type": "posts",
+         "id": "3",
+         "attributes": {
+            "title": "Polemic in E-flat minor #824"
+         },
+         "relationships": {
+            "comments": {
+               "data": [ ]
             },
-            "relationships": {
-                "comments": [ ],
-                "author": {
-                    "data": {
-                        "type": "authors",
-                        "id": "1"
-                    }
-                }
+            "author": {
+               "data": {
+                  "type": "authors",
+                  "id": "1"
+               }
             }
-        },
-        {
-            "type": "posts",
-            "id": "4",
-            "attributes": {
-                "title": "This post has no author."
+         }
+      },
+      {
+         "type": "posts",
+         "id": "4",
+         "attributes": {
+            "title": "This post has no author."
+         },
+         "relationships": {
+            "comments": {
+               "data": [ ]
             },
-            "relationships": {
-                "comments": [ ],
-                "author": null
+            "author": {
+               "data": null
             }
-        }
-    ],
+         }
+      }
+   ],
    "included": [
       {
          "type": "comments",

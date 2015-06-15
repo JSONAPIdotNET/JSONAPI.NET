@@ -230,7 +230,7 @@ namespace JSONAPI.Json
                 bool skip = false, 
                     iip = false;
                 string lt = null;
-                SerializeAsOptions sa = SerializeAsOptions.Ids;
+                SerializeAsOptions sa = SerializeAsOptions.NoLinks;
 
                 var prop = relationshipModelProperty.Property;
 
@@ -253,111 +253,115 @@ namespace JSONAPI.Json
                 }
                 if (skip) continue;
 
+                // Write the relationship's type
                 writer.WritePropertyName(relationshipModelProperty.JsonKey);
+                
 
                 // Now look for enumerable-ness:
                 if (typeof(IEnumerable<Object>).IsAssignableFrom(prop.PropertyType))
                 {
+                    writer.WriteStartObject();
+                    // Write the data element
+                    writer.WritePropertyName(PrimaryDataKeyName);
                     // Look out! If we want to SerializeAs a link, computing the property is probably 
                     // expensive...so don't force it just to check for null early!
-                    if (sa != SerializeAsOptions.Link && prop.GetValue(value, null) == null)
+                    if (sa == SerializeAsOptions.NoLinks && prop.GetValue(value, null) == null)
                     {
                         writer.WriteStartArray();
                         writer.WriteEndArray();
+                        writer.WriteEndObject();
                         continue;
                     }
 
-                    switch (sa)
+                    // Always write the data attribute of a relationship
+                    IEnumerable<object> items = (IEnumerable<object>)prop.GetValue(value, null);
+                    if (items == null)
                     {
-                        case SerializeAsOptions.Ids:
-                            IEnumerable<object> items = (IEnumerable<object>)prop.GetValue(value, null);
-                            if (items == null)
-                            {
-                                // Return an empty array when there are no items
-                                writer.WriteStartArray();
-                                writer.WriteEndArray();
-                                break; // LOOK OUT! Ending this case block early here!!!
-                            }
-                            this.WriteIdsArrayJson(writer, items, serializer);
-                            if (iip)
-                            {
-                                Type itemType;
-                                if (prop.PropertyType.IsGenericType)
-                                {
-                                    itemType = prop.PropertyType.GetGenericArguments()[0];
-                                }
-                                else
-                                {
-                                    // Must be an array at this point, right??
-                                    itemType = prop.PropertyType.GetElementType();
-                                }
-                                if (aggregator != null) aggregator.Add(itemType, items); // should call the IEnumerable one...right?
-                            }
-                            break;
-                        case SerializeAsOptions.Link:
-                            if (lt == null) throw new JsonSerializationException("A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                            //TODO: Check for "{0}" in linkTemplate and (only) if it's there, get the Ids of all objects and "implode" them.
-                            string href = String.Format(lt, null, GetIdFor(value));
-                            //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
-                            //TODO: Support ids and type properties in "link" object
-                            writer.WriteStartObject();
-                            writer.WritePropertyName(LinksKeyName);
-                            writer.WriteStartObject();
-                            writer.WritePropertyName(RelatedKeyName);
-                            writer.WriteValue(href);
-                            writer.WriteEndObject();
-                            writer.WriteEndObject();
-                            break;
+                        // Return an empty array when there are no items
+                        writer.WriteStartArray();
+                        writer.WriteEndArray();
                     }
+                    else
+                    {
+                        // Write the array with data
+                        this.WriteIdsArrayJson(writer, items, serializer);
+                        if (iip)
+                        {
+                            Type itemType;
+                            if (prop.PropertyType.IsGenericType)
+                            {
+                                itemType = prop.PropertyType.GetGenericArguments()[0];
+                            }
+                            else
+                            {
+                                // Must be an array at this point, right??
+                                itemType = prop.PropertyType.GetElementType();
+                            }
+                            if (aggregator != null) aggregator.Add(itemType, items); // should call the IEnumerable one...right?
+                        }
+                    } 
+
+                    // in case there is also a link defined, add it to the relationship
+                    if (sa == SerializeAsOptions.RelatedLink) 
+                    {
+                        if (lt == null) throw new JsonSerializationException("A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
+                        //TODO: Check for "{0}" in linkTemplate and (only) if it's there, get the Ids of all objects and "implode" them.
+                        string href = String.Format(lt, null, GetIdFor(value));
+                        //writer.WritePropertyName(ContractResolver._modelManager.GetJsonKeyForProperty(prop));
+                        //TODO: Support ids and type properties in "link" object
+
+                        writer.WritePropertyName(LinksKeyName);
+                        writer.WriteStartObject();
+                        writer.WritePropertyName(RelatedKeyName);
+                        writer.WriteValue(href);
+                        writer.WriteEndObject();
+                    }
+                    writer.WriteEndObject();
                 }
                 else
                 {
                     var propertyValue = prop.GetValue(value, null);
 
+                    writer.WriteStartObject();
+                    // Write the data element
+                    writer.WritePropertyName(PrimaryDataKeyName);
                     // Look out! If we want to SerializeAs a link, computing the property is probably 
                     // expensive...so don't force it just to check for null early!
-                    if (sa != SerializeAsOptions.Link && propertyValue == null)
+                    if (sa == SerializeAsOptions.NoLinks && propertyValue == null)
                     {
                         writer.WriteNull();
+                        writer.WriteEndObject();
                         continue;
                     }
 
                     Lazy<string> objId = new Lazy<String>(() => GetIdFor(propertyValue));
 
-                    switch (sa)
-                    {
-                        case SerializeAsOptions.Ids:
-                            // Write the data element
-                            writer.WriteStartObject();
-                            writer.WritePropertyName(PrimaryDataKeyName);
-                            writer.WriteStartObject();
-                            // Write the type and id
-                            WriteTypeAndId(writer, prop.PropertyType, propertyValue);
-                            
-                            writer.WriteEndObject();
-                            writer.WriteEndObject();
-                            if (iip)
-                                if (aggregator != null)
-                                    aggregator.Add(prop.PropertyType, propertyValue);
-                            break;
-                        case SerializeAsOptions.Link:
-                            if (lt == null)
-                                throw new JsonSerializationException(
-                                    "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
-                            var relatedObjectId = lt.Contains("{0}") ? objId.Value : null;
-                            string link = String.Format(lt, relatedObjectId, GetIdFor(value));
-                                    
-                            writer.WriteStartObject();
-                            writer.WritePropertyName(LinksKeyName);
-                            writer.WriteStartObject();
-                            writer.WritePropertyName(RelatedKeyName);
-                            writer.WriteValue(link);
-                            writer.WriteEndObject();
-                            writer.WriteEndObject();
-                            break;
-                    }
-                }
+                    // Write the data object
+                    writer.WriteStartObject();
+                    WriteTypeAndId(writer, prop.PropertyType, propertyValue);
+                    writer.WriteEndObject();
 
+                    if (iip)
+                        if (aggregator != null)
+                            aggregator.Add(prop.PropertyType, propertyValue);
+
+                    // If there are links write them next to the data object
+                    if (sa == SerializeAsOptions.RelatedLink)
+                    {
+                        if (lt == null)
+                            throw new JsonSerializationException(
+                                "A property was decorated with SerializeAs(SerializeAsOptions.Link) but no LinkTemplate attribute was provided.");
+                        var relatedObjectId = lt.Contains("{0}") ? objId.Value : null;
+                        string link = String.Format(lt, relatedObjectId, GetIdFor(value));
+
+                        writer.WritePropertyName(LinksKeyName);
+                        writer.WriteStartObject();
+                        writer.WritePropertyName(RelatedKeyName);
+                        writer.WriteValue(link);
+                        writer.WriteEndObject();
+                    }
+                    writer.WriteEndObject();
+                }
             }
             if (relationshipModelProperties.Count() > 0)
             {
@@ -690,7 +694,7 @@ namespace JSONAPI.Json
                     string value = (string)reader.Value;
                     var modelProperty = _modelManager.GetPropertyForJsonKey(objectType, value);
 
-                    if (value == RelatedKeyName)
+                    if (value == RelationshipsKeyName)
                     {
                         // This can only happen within a links object
                         reader.Read(); // burn the PropertyName token
@@ -969,10 +973,6 @@ namespace JSONAPI.Json
 
         private void WriteIdsArrayJson(Newtonsoft.Json.JsonWriter writer, IEnumerable<object> value, Newtonsoft.Json.JsonSerializer serializer)
         {
-            // Write the data element
-            writer.WriteStartObject();
-            writer.WritePropertyName(PrimaryDataKeyName);
-
             IEnumerator<Object> collectionEnumerator = (value as IEnumerable<object>).GetEnumerator();
             writer.WriteStartArray();
             while (collectionEnumerator.MoveNext())
@@ -982,7 +982,6 @@ namespace JSONAPI.Json
                 writer.WriteEndObject();
             }
             writer.WriteEndArray();
-            writer.WriteEndObject();
         }
 
     }

@@ -3,12 +3,14 @@
       {
          "type": "comments",
          "id": "5",
-         "attributes": { 
-            "body": null
+         "attributes": {
+            "body": null,
+            "customData": { }
          },
-         "customData": { },
          "relationships": {
-            "post": null
+            "post": { 
+               "data": null
+            }
          }
       }
    ]

@@ -2,7 +2,7 @@
 
 namespace JSONAPI.Attributes
 {
-    public enum SerializeAsOptions { Ids, Link }
+    public enum SerializeAsOptions { RelatedLink, SelfLink, BothLinks, NoLinks }
 
     [System.AttributeUsage(System.AttributeTargets.Property)]
     public class SerializeAs
