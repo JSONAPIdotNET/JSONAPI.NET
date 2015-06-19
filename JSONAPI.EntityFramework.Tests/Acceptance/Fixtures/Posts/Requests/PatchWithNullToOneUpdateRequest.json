@@ -3,9 +3,9 @@
         {
             "type": "posts",
             "id": "202",
-            "links": {
-                "author": { 
-                    "linkage": null
+            "relationships": {
+                "author": {
+                    "data": null
                 }
             }
         }

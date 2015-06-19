@@ -3,9 +3,11 @@
         {
             "type": "user-groups",
             "id": "501",
-            "name": "Admin users",
-            "links": {
-                "users": [ ]
+            "attributes": {
+                "name": "Admin users"
+            },
+            "relationships": {
+                "users": { "data": [ ] }
             }
         }
     ]

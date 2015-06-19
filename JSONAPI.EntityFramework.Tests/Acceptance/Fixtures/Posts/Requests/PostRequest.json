@@ -3,15 +3,16 @@
         {
             "type": "posts",
             "id": "205",
-            "title": "Added post",
-            "content": "Added post content",
-            "created": "2015-03-11T04:31:00+00:00",
-            "links": {
+            "attributes": {
+                "title": "Added post",
+                "content": "Added post content",
+                "created": "2015-03-11T04:31:00+00:00"
+            },
+            "relationships": {
                 "author": {
-                    "linkage": {
+                    "data": {
                         "type": "users",
                         "id": "401"
-
                     }
                 }
             }

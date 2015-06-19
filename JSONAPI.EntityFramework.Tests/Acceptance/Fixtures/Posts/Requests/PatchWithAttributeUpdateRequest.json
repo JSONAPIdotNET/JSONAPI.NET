@@ -3,7 +3,9 @@
         {
             "type": "posts",
             "id": "202",
-            "title": "New post title"
+            "attributes": {
+                "title": "New post title"
+            }
         }
     ]
 }

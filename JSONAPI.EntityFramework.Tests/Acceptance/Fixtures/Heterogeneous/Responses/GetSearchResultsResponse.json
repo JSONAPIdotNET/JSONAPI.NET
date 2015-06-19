@@ -3,23 +3,53 @@
         {
             "type": "posts",
             "id": "201",
-            "title": "Post 1",
-            "content": "Post 1 content",
-            "created": "2015-01-31T14:00:00+00:00",
-            "links": {
-                "author": "401",
-                "comments": [ "101", "102", "103" ],
-                "tags": [ "301", "302" ]
+            "attributes": {
+                "title": "Post 1",
+                "content": "Post 1 content",
+                "created": "2015-01-31T14:00:00+00:00"
+            },
+            "relationships": {
+                "author": {
+                    "data": {
+                        "type": "users",
+                        "id": "401"
+                    }
+                },
+                "comments": {
+                    "data": [
+                        { "type": "comments", "id": "101" },
+                        { "type": "comments", "id": "102" },
+                        { "type": "comments", "id": "103" }
+                    ]
+                },
+                "tags": {
+                    "data": [
+                        { "type": "tags", "id": "301" },
+                        { "type": "tags", "id": "302" }
+                    ]
+                }
             }
         },
         {
             "type": "comments",
             "id": "101",
-            "text": "Comment 1",
-            "created": "2015-01-31T14:30:00+00:00",
-            "links": { 
-                "post": "201",
-                "author": "403"
+            "attributes": {
+                "text": "Comment 1",
+                "created": "2015-01-31T14:30:00+00:00"
+            },
+            "relationships": {
+                "post": {
+                    "data": {
+                        "type":  "posts",
+                        "id": "201"
+                    }
+                },
+                "author": {
+                    "data": {
+                        "type": "users",
+                        "id": "403"
+                    }
+                }
             }
         }
     ]

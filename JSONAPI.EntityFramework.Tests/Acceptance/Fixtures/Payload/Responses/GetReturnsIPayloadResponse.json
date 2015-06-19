@@ -3,23 +3,27 @@
         {
             "type": "users",
             "id": "6500",
-            "firstName": "George",
-            "lastName": "Washington",
-            "links": {
-                "comments": [ ],
-                "posts": [ ],
-                "userGroups": [ ]
+            "attributes": {
+                "firstName": "George",
+                "lastName": "Washington"
+            },
+            "relationships": {
+                "comments": { "data": [ ] },
+                "posts": { "data": [ ] },
+                "userGroups": { "data": [ ] }
             }
         },
         {
             "type": "users",
             "id": "6501",
-            "firstName": "Abraham",
-            "lastName": "Lincoln",
-            "links": {
-                "comments": [ ],
-                "posts": [ ],
-                "userGroups": [ ]
+            "attributes": {
+                "firstName": "Abraham",
+                "lastName": "Lincoln"
+            },
+            "relationships": {
+                "comments": { "data": [ ] },
+                "posts": { "data": [ ] },
+                "userGroups": { "data": [ ] }
             }
         }
     ],

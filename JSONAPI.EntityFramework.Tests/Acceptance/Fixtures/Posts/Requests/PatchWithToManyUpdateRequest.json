@@ -3,9 +3,11 @@
         {
             "type": "posts",
             "id": "202",
-            "links": {
+            "relationships": {
                 "tags": {
-                    "linkage": [ { "type": "tags", "id": "301" } ]
+                    "data": [
+                        { "type": "tags", "id": "301" }
+                    ]
                 }
             }
         }

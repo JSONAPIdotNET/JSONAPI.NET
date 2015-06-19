@@ -3,7 +3,7 @@
         {
             "type": "posts",
             "id": "202",
-            "links": {
+            "relationships": {
                 "author": "301"
             }
         }
