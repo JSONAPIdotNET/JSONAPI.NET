@@ -336,10 +336,8 @@ namespace JSONAPI.Json
 
                     Lazy<string> objId = new Lazy<String>(() => GetIdFor(propertyValue));
 
-                    // Write the data object
-                    writer.WriteStartObject();
-                    WriteTypeAndId(writer, prop.PropertyType, propertyValue);
-                    writer.WriteEndObject();
+                    // Write the resource identifier object
+                    WriteResourceIdentifierObject(writer, prop.PropertyType, propertyValue);
 
                     if (iip)
                         if (aggregator != null)
@@ -962,6 +960,13 @@ namespace JSONAPI.Json
             return GetValueForIdProperty(idprop, obj);
         }
 
+        private void WriteResourceIdentifierObject(JsonWriter writer, Type propertyType, object propertyValue)
+        {
+            writer.WriteStartObject();
+            WriteTypeAndId(writer, propertyType, propertyValue);
+            writer.WriteEndObject();
+        }
+
         private void WriteTypeAndId(JsonWriter writer, Type propertyType, object propertyValue)
         {
             writer.WritePropertyName("type");
@@ -977,9 +982,7 @@ namespace JSONAPI.Json
             writer.WriteStartArray();
             while (collectionEnumerator.MoveNext())
             {
-                writer.WriteStartObject();
-                WriteTypeAndId(writer, collectionEnumerator.Current.GetType(), collectionEnumerator.Current);
-                writer.WriteEndObject();
+                WriteResourceIdentifierObject(writer, collectionEnumerator.Current.GetType(), collectionEnumerator.Current);
             }
             writer.WriteEndArray();
         }
