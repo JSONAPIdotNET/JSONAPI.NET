@@ -1,12 +1,12 @@
 ﻿using System.Web.Http;
 using Autofac;
+using Autofac.Integration.WebApi;
 using JSONAPI.Autofac;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.Http;
 using JSONAPI.Http;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
-using PluralizationService = JSONAPI.Core.PluralizationService;
 
 namespace JSONAPI.TodoMVC.API
 {
@@ -33,7 +33,9 @@ namespace JSONAPI.TodoMVC.API
                     .WithParameter("apiBaseUrl", "https://www.example.com")
                     .As<IPayloadMaterializer>();
             });
-            configuration.Apply(httpConfig);
+            var container = configuration.Apply(httpConfig);
+
+            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
 
             // Web API routes
             httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
