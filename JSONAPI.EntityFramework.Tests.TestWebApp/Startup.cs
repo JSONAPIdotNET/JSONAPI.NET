@@ -49,15 +49,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             var namingConventions = new DefaultNamingConventions(pluralizationService);
 
             var configuration = new JsonApiAutofacConfiguration(namingConventions);
-            configuration.OnContainerBuilding(builder =>
-            {
-                builder.RegisterType<EntityFrameworkPayloadMaterializer>()
-                    .WithParameter("apiBaseUrl", "https://www.example.com")
-                    .As<IPayloadMaterializer>();
-                builder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
-                builder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();
-                builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-            });
             configuration.RegisterResourceType(typeof(City));
             configuration.RegisterResourceType(typeof(Comment));
             configuration.RegisterResourceType(typeof(Post));
@@ -66,18 +57,27 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             configuration.RegisterResourceType(typeof(Tag));
             configuration.RegisterResourceType(typeof(User));
             configuration.RegisterResourceType(typeof(UserGroup));
+            var module = configuration.GetAutofacModule();
+
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterModule(module);
+            containerBuilder.RegisterType<EntityFrameworkPayloadMaterializer>()
+                .WithParameter("apiBaseUrl", "https://www.example.com")
+                .As<IPayloadMaterializer>();
+            containerBuilder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
+            containerBuilder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();
+            containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            var container = containerBuilder.Build();
 
             var httpConfig = new HttpConfiguration
             {
                 IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always
             };
+            httpConfig.UseJsonApiWithAutofac(container);
 
             // Web API routes
             httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
 
-            var container = configuration.Apply(httpConfig);
-
-            //var appContainerBuilder = new ContainerBuilder();
             app.UseAutofacMiddleware(container);
 
             httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);

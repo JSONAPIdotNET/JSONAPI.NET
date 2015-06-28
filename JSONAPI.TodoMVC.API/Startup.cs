@@ -20,22 +20,23 @@ namespace JSONAPI.TodoMVC.API
 
         private static HttpConfiguration GetWebApiConfiguration()
         {
+            var httpConfig = new HttpConfiguration();
+
             var pluralizationService = new PluralizationService();
             pluralizationService.AddMapping("todo", "todos");
             var namingConventions = new DefaultNamingConventions(pluralizationService);
 
-            var httpConfig = new HttpConfiguration();
             var configuration = new JsonApiAutofacConfiguration(namingConventions);
             configuration.RegisterResourceType(typeof(Todo));
-            configuration.OnContainerBuilding(builder =>
-            {
-                builder.RegisterType<EntityFrameworkPayloadMaterializer>()
-                    .WithParameter("apiBaseUrl", "https://www.example.com")
-                    .As<IPayloadMaterializer>();
-            });
-            var container = configuration.Apply(httpConfig);
+            var module = configuration.GetAutofacModule();
 
-            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterModule(module);
+            containerBuilder.RegisterType<EntityFrameworkPayloadMaterializer>()
+                .WithParameter("apiBaseUrl", "https://www.example.com")
+                .As<IPayloadMaterializer>();
+            var container = containerBuilder.Build();
+            httpConfig.UseJsonApiWithAutofac(container);
 
             // Web API routes
             httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });

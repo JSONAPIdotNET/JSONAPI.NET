@@ -59,7 +59,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpConfigurationExtensions.cs" />
     <Compile Include="JsonApiAutofacConfiguration.cs" />
+    <Compile Include="JsonApiAutofacModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
