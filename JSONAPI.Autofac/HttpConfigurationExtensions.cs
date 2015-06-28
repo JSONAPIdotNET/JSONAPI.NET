@@ -7,11 +7,11 @@ namespace JSONAPI.Autofac
 {
     public static class HttpConfigurationExtensions
     {
-        public static void UseJsonApiWithAutofac(this HttpConfiguration httpConfig, IContainer applicationContainer)
+        public static void UseJsonApiWithAutofac(this HttpConfiguration httpConfig, ILifetimeScope applicationLifetimeScope)
         {
-            var jsonApiConfiguration = applicationContainer.Resolve<JsonApiHttpConfiguration>();
+            var jsonApiConfiguration = applicationLifetimeScope.Resolve<JsonApiHttpConfiguration>();
             jsonApiConfiguration.Apply(httpConfig);
-            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(applicationContainer);
+            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(applicationLifetimeScope);
         }
     }
 }
