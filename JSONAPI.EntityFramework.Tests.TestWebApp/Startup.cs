@@ -80,7 +80,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             app.UseAutofacMiddleware(container);
 
-            httpConfig.DependencyResolver = new AutofacWebApiDependencyResolver(container);
             app.UseWebApi(httpConfig);
             app.UseAutofacWebApi(httpConfig);
         }
