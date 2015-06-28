@@ -110,6 +110,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Acceptance\AttributeSerializationTests.cs" />
+    <Compile Include="Acceptance\ErrorsTests.cs" />
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\PayloadTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
@@ -118,7 +120,8 @@
     <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformerTests.cs" />
     <Compile Include="DbContextExtensionsTests.cs" />
-    <Compile Include="EntityFrameworkMaterializerTests.cs" />
+    <Compile Include="Http\EntityFrameworkMaterializerTests.cs" />
+    <Compile Include="EntityFrameworkPayloadMaterializerTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
     <Compile Include="Helpers\WaitsUntilCancellationDbAsyncEnumerator.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerator.cs" />
@@ -176,7 +179,14 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PatchWithArrayForToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\GetReturnsIPayloadResponse.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\Get_returns_IResourceCollectionPayload.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_does_not_exist.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_action_throws_exception.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneLinkageRequest.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneLinkageResponse.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

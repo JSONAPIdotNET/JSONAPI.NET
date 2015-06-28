@@ -1,0 +1,7 @@
+﻿{
+    "title": "Unexpected Content",
+    "detail": "The JsonApiFormatter was asked to serialize an unsupported object.",
+    "meta": {
+        "objectTypeName": "Color"
+    }
+}

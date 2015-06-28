@@ -7,6 +7,7 @@ using System.Web.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters
@@ -48,7 +49,7 @@ namespace JSONAPI.Tests.ActionFilters
 
         private DefaultPaginationTransformer GetTransformer(int maxPageSize)
         {
-            return new DefaultPaginationTransformer("page.number", "page.size", maxPageSize);
+            return new DefaultPaginationTransformer(maxPageSize);
         }
             
         private Dummy[] GetArray(string uri, int maxPageSize = 50)
@@ -69,13 +70,6 @@ namespace JSONAPI.Tests.ActionFilters
         {
             var array = GetArray("http://api.example.com/dummies?page[number]=0&page[size]=10");
             array.Length.Should().Be(9);
-        }
-
-        [TestMethod]
-        public void ApplyPagination_returns_no_results_when_page_size_is_zero()
-        {
-            var array = GetArray("http://api.example.com/dummies?page[number]=0&page[size]=0");
-            array.Length.Should().Be(0);
         }
 
         [TestMethod]
@@ -114,43 +108,53 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
-        public void ApplyPagination_returns_400_if_page_number_is_negative()
+        public void ApplyPagination_throws_exception_if_page_number_is_negative()
         {
             Action action = () =>
             {
                 GetArray("http://api.example.com/dummies?page[number]=-4&page[size]=4");
             };
-            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("page.number must be not be negative.");
+            action.ShouldThrow<JsonApiException>().And.Error.Detail.Should().Be("Page number must not be negative.");
         }
 
         [TestMethod]
-        public void ApplyPagination_returns_400_if_page_size_is_negative()
+        public void ApplyPagination_throws_exception_if_page_size_is_negative()
         {
             Action action = () =>
             {
                 GetArray("http://api.example.com/dummies?page[number]=0&page[size]=-4");
             };
-            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("page.size must be not be negative.");
+            action.ShouldThrow<JsonApiException>().And.Error.Detail.Should().Be("Page size must be greater than or equal to 1.");
         }
 
         [TestMethod]
-        public void ApplyPagination_returns_400_if_page_number_specified_but_not_size()
+        public void ApplyPagination_throws_exception_when_page_size_is_zero()
+        {
+            Action action = () =>
+            {
+                GetArray("http://api.example.com/dummies?page[number]=0&page[size]=0");
+            };
+            action.ShouldThrow<JsonApiException>().And.Error.Detail.Should().Be("Page size must be greater than or equal to 1.");
+        }
+
+        [TestMethod]
+        public void ApplyPagination_throws_exception_if_page_number_specified_but_not_size()
         {
             Action action = () =>
             {
                 GetArray("http://api.example.com/dummies?page[number]=0");
             };
-            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
+            action.ShouldThrow<JsonApiException>().And.Error.Detail.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
         }
 
         [TestMethod]
-        public void ApplyPagination_returns_400_if_page_size_specified_but_not_number()
+        public void ApplyPagination_throws_exception_if_page_size_specified_but_not_number()
         {
             Action action = () =>
             {
                 GetArray("http://api.example.com/dummies?page[size]=0");
             };
-            action.ShouldThrow<QueryableTransformException>().And.Message.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
+            action.ShouldThrow<JsonApiException>().And.Error.Detail.Should().Be("In order for paging to work properly, if either page.number or page.size is set, both must be.");
         }
 
         [TestMethod]

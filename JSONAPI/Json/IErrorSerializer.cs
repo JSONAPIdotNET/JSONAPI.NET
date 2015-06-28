@@ -1,12 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.IO;
+﻿using JSONAPI.Payload;
 
 namespace JSONAPI.Json
 {
-    internal interface IErrorSerializer
+    /// <summary>
+    /// Service responsible for serializing IError instances
+    /// </summary>
+    public interface IErrorSerializer : IJsonApiSerializer<IError>
     {
-        bool CanSerialize(Type type);
-        void SerializeError(object error, Stream writeStream, JsonWriter writer, JsonSerializer serializer);
     }
 }

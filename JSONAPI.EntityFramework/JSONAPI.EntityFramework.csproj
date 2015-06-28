@@ -74,10 +74,10 @@
     <Compile Include="DbContextExtensions.cs" />
     <Compile Include="EntityFrameworkMaterializer.cs" />
     <Compile Include="EntityFrameworkMaterializer_Util.cs" />
-    <Compile Include="Http\ApiController.cs" />
-    <Compile Include="DefaultQueryablePayloadBuilderConfigurationExtensions.cs" />
-    <Compile Include="PluralizationService.cs" />
+    <Compile Include="Http\EntityFrameworkPayloadMaterializer.cs" />
+    <Compile Include="EntityFrameworkPluralizationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EntityFrameworkResourceObjectMaterializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.TodoMVC.API", "JSON
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.EntityFramework.Tests.TestWebApp", "JSONAPI.EntityFramework.Tests.TestWebApp\JSONAPI.EntityFramework.Tests.TestWebApp.csproj", "{76DEE472-723B-4BE6-8B97-428AC326E30F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac", "JSONAPI.Autofac\JSONAPI.Autofac.csproj", "{AF7861F3-550B-4F70-A33E-1E5F48D39333}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

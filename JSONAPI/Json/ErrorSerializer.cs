@@ -1,75 +1,105 @@
 ﻿using System;
-using System.IO;
-using System.Web.Http;
+using System.Net;
+using System.Threading.Tasks;
+using JSONAPI.Payload;
 using Newtonsoft.Json;
 
 namespace JSONAPI.Json
 {
-    internal class ErrorSerializer : IErrorSerializer
+    /// <summary>
+    /// Default implementation of IErrorSerializer
+    /// </summary>
+    public class ErrorSerializer : IErrorSerializer
     {
-        private class JsonApiError
+        private readonly ILinkSerializer _linkSerializer;
+        private readonly IMetadataSerializer _metadataSerializer;
+
+        /// <summary>
+        /// Creates a new ErrorSerializer
+        /// </summary>
+        /// <param name="linkSerializer"></param>
+        /// <param name="metadataSerializer"></param>
+        public ErrorSerializer(ILinkSerializer linkSerializer, IMetadataSerializer metadataSerializer)
         {
-            [JsonProperty(PropertyName = "id")]
-            public string Id { get; private set; }
-
-            [JsonProperty(PropertyName = "status")]
-            public string Status { get; private set; }
-
-            [JsonProperty(PropertyName = "title")]
-            public string Title { get; private set; }
-
-            [JsonProperty(PropertyName = "detail")]
-            public string Detail { get; private set; }
-
-            [JsonProperty(PropertyName = "stackTrace")]
-            public string StackTrace { get; private set; }
-
-            [JsonProperty(PropertyName = "inner")]
-            public JsonApiError Inner { get; private set; }
-
-            public JsonApiError(HttpError error, IErrorIdProvider idProvider)
-            {
-                Id = idProvider.GenerateId(error);
-                Title = error.ExceptionType ?? error.Message;
-                Status = "500";
-                Detail = error.ExceptionMessage ?? error.MessageDetail;
-                StackTrace = error.StackTrace;
-
-                if (error.InnerException != null)
-                    Inner = new JsonApiError(error.InnerException, idProvider);
-            }
+            _linkSerializer = linkSerializer;
+            _metadataSerializer = metadataSerializer;
         }
 
-        private readonly IErrorIdProvider _errorIdProvider;
-
-        public ErrorSerializer()
-            : this(new GuidErrorIdProvider())
+        public Task Serialize(IError error, JsonWriter writer)
         {
-            
-        }
-
-        public ErrorSerializer(IErrorIdProvider errorIdProvider)
-        {
-            _errorIdProvider = errorIdProvider;
-        }
-
-        public bool CanSerialize(Type type)
-        {
-            return type == typeof (HttpError);
-        }
-
-        public void SerializeError(object error, Stream writeStream, JsonWriter writer, JsonSerializer serializer)
-        {
-            var httpError = error as HttpError;
-            if (httpError == null) throw new Exception("Unsupported error type.");
-
             writer.WriteStartObject();
-            writer.WritePropertyName("errors");
 
-            var jsonApiError = new JsonApiError(httpError, _errorIdProvider);
-            serializer.Serialize(writer, new[] { jsonApiError });
+            if (error.Id != null)
+            {
+                writer.WritePropertyName("id");
+                writer.WriteValue(error.Id);
+            }
+
+            if (error.AboutLink != null)
+            {
+                writer.WritePropertyName("links");
+                writer.WriteStartObject();
+                writer.WritePropertyName("about");
+                _linkSerializer.Serialize(error.AboutLink, writer);
+                writer.WriteEndObject();
+            }
+
+            if (error.Status != default(HttpStatusCode))
+            {
+                writer.WritePropertyName("status");
+                writer.WriteValue(((int)error.Status).ToString());
+            }
+
+            if (error.Code != null)
+            {
+                writer.WritePropertyName("code");
+                writer.WriteValue(error.Code);
+            }
+
+            if (error.Title != null)
+            {
+                writer.WritePropertyName("title");
+                writer.WriteValue(error.Title);
+            }
+
+            if (error.Detail != null)
+            {
+                writer.WritePropertyName("detail");
+                writer.WriteValue(error.Detail);
+            }
+
+            if (error.Pointer != null || error.Parameter != null)
+            {
+                writer.WritePropertyName("source");
+                writer.WriteStartObject();
+                if (error.Pointer != null)
+                {
+                    writer.WritePropertyName("pointer");
+                    writer.WriteValue(error.Pointer);
+                }
+                if (error.Parameter != null)
+                {
+                    writer.WritePropertyName("parameter");
+                    writer.WriteValue(error.Parameter);
+                }
+                writer.WriteEndObject();
+            }
+
+            if (error.Metadata != null)
+            {
+                writer.WritePropertyName("meta");
+                error.Metadata.MetaObject.WriteTo(writer);
+            }
 
             writer.WriteEndObject();
+
+            return Task.FromResult(0);
+        }
+
+        public Task<IError> Deserialize(JsonReader reader, string currentPath)
+        {
+            // The client should never be sending us errors
+            throw new NotSupportedException();
         }
     }
 }

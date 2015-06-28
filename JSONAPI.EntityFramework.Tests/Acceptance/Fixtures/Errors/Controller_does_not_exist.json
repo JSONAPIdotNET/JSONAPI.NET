@@ -1,0 +1,10 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "404",
+            "title": "Resource not found",
+            "detail": "The resource you requested does not exist."
+        }
+    ]
+}

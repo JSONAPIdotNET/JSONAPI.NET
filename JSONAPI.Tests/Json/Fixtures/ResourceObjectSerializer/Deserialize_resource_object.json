@@ -1,0 +1,16 @@
+﻿{
+    "type": "posts",
+    "id": "123456",
+    "attributes": {
+        "title": "Another awesome post",
+        "likes": 43,
+        "some-complex-attribute": { 
+            "qux": 5
+        }
+    },
+    "relationships": {
+        "author": "AUTHOR_RELATIONSHIP",
+        "comments": "COMMENTS_RELATIONSHIP"
+    },
+    "meta": "metadata goes here"
+}

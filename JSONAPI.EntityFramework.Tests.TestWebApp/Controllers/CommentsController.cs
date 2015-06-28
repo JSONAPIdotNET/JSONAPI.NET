@@ -1,21 +1,12 @@
-﻿using JSONAPI.Core;
-using JSONAPI.EntityFramework.Http;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+﻿using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.Http;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
-    public class CommentsController : ApiController<Comment, TestDbContext>
+    public class CommentsController : JsonApiController<Comment>
     {
-        protected readonly TestDbContext DbContext;
-
-        public CommentsController(TestDbContext dbContext)
+        public CommentsController(IPayloadMaterializer payloadMaterializer) : base(payloadMaterializer)
         {
-            DbContext = dbContext;
-        }
-
-        protected override IMaterializer MaterializerFactory()
-        {
-            return new EntityFrameworkMaterializer(DbContext, MetadataManager.Instance);
         }
     }
 }

@@ -17,27 +17,36 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
     [TestClass]
     public abstract class AcceptanceTestsBase
     {
+        private const string JsonApiContentType = "application/vnd.api+json";
         private static readonly Regex GuidRegex = new Regex(@"\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b", RegexOptions.IgnoreCase);
         //private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace"":[\s]*""[\w\:\\\.\s\,\-]*""");
         private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace""[\s]*:[\s]*"".*?""");
-        private static readonly Uri BaseUri = new Uri("http://localhost");
+        private static readonly Uri BaseUri = new Uri("https://www.example.com");
 
         protected static DbConnection GetEffortConnection()
         {
             return TestHelpers.GetEffortConnection(@"Acceptance\Data");
         }
 
-        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode)
+        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode, bool redactErrorData = false)
         {
             var responseContent = await response.Content.ReadAsStringAsync();
 
             var expectedResponse =
                 JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
-            var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
-            redactedResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+            string actualResponse;
+            if (redactErrorData)
+            {
+                var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
+                actualResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+            }
+            else
+            {
+                actualResponse = responseContent;
+            }
 
-            redactedResponse.Should().Be(expectedResponse);
-            response.Content.Headers.ContentType.MediaType.Should().Be("application/vnd.api+json");
+            actualResponse.Should().Be(expectedResponse);
+            response.Content.Headers.ContentType.MediaType.Should().Be(JsonApiContentType);
             response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
 
             response.StatusCode.Should().Be(expectedStatusCode);
@@ -54,7 +63,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
-                var response = await server.CreateRequest(uri.ToString()).GetAsync();
+                var response = await server.CreateRequest(uri.ToString()).AddHeader("Accept", JsonApiContentType).GetAsync();
                 return response;
             }
         }
@@ -74,6 +83,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .And(request =>
                     {
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
@@ -98,6 +108,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var requestContent = TestHelpers.ReadEmbeddedFile(requestDataTextResourcePath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .And(request =>
                     {
                         request.Content = new StringContent(requestContent, Encoding.UTF8, "application/vnd.api+json");
@@ -120,6 +131,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var uri = new Uri(BaseUri, requestPath);
                 var response = await server
                     .CreateRequest(uri.ToString())
+                    .AddHeader("Accept", JsonApiContentType)
                     .SendAsync("DELETE");
                 return response;
             }

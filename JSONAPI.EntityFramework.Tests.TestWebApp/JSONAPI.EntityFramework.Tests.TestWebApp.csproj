@@ -115,16 +115,22 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\CitiesController.cs" />
     <Compile Include="Controllers\PresidentsController.cs" />
+    <Compile Include="Controllers\SamplesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
+    <Compile Include="Controllers\TreesController.cs" />
     <Compile Include="Controllers\UserGroupsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="Controllers\PostsController.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Post.cs" />
+    <Compile Include="Models\Sample.cs" />
+    <Compile Include="Models\State.cs" />
     <Compile Include="Models\Tag.cs" />
+    <Compile Include="Models\City.cs" />
     <Compile Include="Models\TestDbContext.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserGroup.cs" />
@@ -132,6 +138,10 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Autofac\JSONAPI.Autofac.csproj">
+      <Project>{af7861f3-550b-4f70-a33e-1e5f48d39333}</Project>
+      <Name>JSONAPI.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI.EntityFramework\JSONAPI.EntityFramework.csproj">
       <Project>{e906356c-93f6-41f6-9a0d-73b8a99aa53c}</Project>
       <Name>JSONAPI.EntityFramework</Name>

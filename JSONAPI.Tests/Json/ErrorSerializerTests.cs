@@ -1,67 +1,70 @@
-﻿using System;
-using System.IO;
-using System.Web.Http;
-using FluentAssertions;
+﻿using System.Net;
+using System.Threading.Tasks;
 using JSONAPI.Json;
+using JSONAPI.Payload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Tests.Json
 {
     [TestClass]
-    public class ErrorSerializerTests
+    public class ErrorSerializerTests : JsonApiSerializerTestsBase
     {
         [TestMethod]
-        public void CanSerialize_returns_true_for_HttpError()
+        public async Task Serialize_error_with_only_id()
         {
-            var serializer = new ErrorSerializer();
-            var result = serializer.CanSerialize(typeof (HttpError));
-            result.Should().BeTrue();
+            var error = new Mock<IError>();
+            error.Setup(e => e.Id).Returns("123456");
+
+            var serializer = new ErrorSerializer(null, null);
+            await AssertSerializeOutput(serializer, error.Object, "Json/Fixtures/ErrorSerializer/Serialize_error_with_only_id.json");
         }
 
         [TestMethod]
-        public void CanSerialize_returns_false_for_Exception()
+        public async Task Serialize_error_with_all_possible_members()
         {
-            var serializer = new ErrorSerializer();
-            var result = serializer.CanSerialize(typeof(Exception));
-            result.Should().BeFalse();
-        }
+            var mockAboutLink = new Mock<ILink>(MockBehavior.Strict);
+            mockAboutLink.Setup(l => l.Href).Returns("http://example.com/my-about-link");
 
-        [TestMethod]
-        [DeploymentItem(@"Data\ErrorSerializerTest.json")]
-        public void SerializeError_serializes_httperror()
-        {
-            using (var stream = new MemoryStream())
+            var mockMetadata = new Mock<IMetadata>(MockBehavior.Strict);
+            mockMetadata.Setup(m => m.MetaObject).Returns(() =>
             {
-                var textWriter = new StreamWriter(stream);
-                var writer = new JsonTextWriter(textWriter);
+                var obj = new JObject();
+                obj["foo"] = "qux";
+                return obj;
+            });
 
-                var mockInnerException = new Mock<Exception>(MockBehavior.Strict);
-                mockInnerException.Setup(m => m.Message).Returns("Inner exception message");
-                mockInnerException.Setup(m => m.StackTrace).Returns("Inner stack trace");
+            var error = new Mock<IError>(MockBehavior.Strict);
+            error.Setup(e => e.Id).Returns("654321");
+            error.Setup(e => e.AboutLink).Returns(mockAboutLink.Object);
+            error.Setup(e => e.Status).Returns(HttpStatusCode.BadRequest);
+            error.Setup(e => e.Code).Returns("9000");
+            error.Setup(e => e.Title).Returns("Some error occurred.");
+            error.Setup(e => e.Detail).Returns("The thingamabob fell through the whatsit.");
+            error.Setup(e => e.Pointer).Returns("/data/attributes/bob");
+            error.Setup(e => e.Parameter).Returns("sort");
+            error.Setup(e => e.Metadata).Returns(mockMetadata.Object);
 
-                var outerException = new Exception("Outer exception message", mockInnerException.Object);
-
-                var error = new HttpError(outerException, true)
+            var mockLinkSerializer = new Mock<ILinkSerializer>(MockBehavior.Strict);
+            mockLinkSerializer.Setup(s => s.Serialize(mockAboutLink.Object, It.IsAny<JsonWriter>()))
+                .Returns((ILink link, JsonWriter writer) =>
                 {
-                    StackTrace = "Outer stack trace"
-                };
-                var jsonSerializer = new JsonSerializer();
+                    writer.WriteValue(link.Href);
+                    return Task.FromResult(0);
+                });
 
-                var mockIdProvider = new Mock<IErrorIdProvider>(MockBehavior.Strict);
-                mockIdProvider.SetupSequence(p => p.GenerateId(It.IsAny<HttpError>())).Returns("OUTER-ID").Returns("INNER-ID");
+            var mockMetadataSerializer = new Mock<IMetadataSerializer>(MockBehavior.Strict);
+            mockMetadataSerializer.Setup(s => s.Serialize(mockMetadata.Object, It.IsAny<JsonWriter>()))
+                .Returns((IMetadata metadata, JsonWriter writer) =>
+                {
+                    metadata.MetaObject.WriteTo(writer);
+                    return Task.FromResult(0);
+                });
 
-                var serializer = new ErrorSerializer(mockIdProvider.Object);
-                serializer.SerializeError(error, stream, writer, jsonSerializer);
-
-                writer.Flush();
-
-                var expectedJson = File.ReadAllText("ErrorSerializerTest.json");
-                var minifiedExpectedJson = JsonHelpers.MinifyJson(expectedJson);
-                var output = System.Text.Encoding.ASCII.GetString(stream.ToArray());
-                output.Should().Be(minifiedExpectedJson);
-            }
+            var serializer = new ErrorSerializer(mockLinkSerializer.Object, mockMetadataSerializer.Object);
+            await AssertSerializeOutput(serializer, error.Object, "Json/Fixtures/ErrorSerializer/Serialize_error_with_all_possible_members.json");
         }
     }
 }

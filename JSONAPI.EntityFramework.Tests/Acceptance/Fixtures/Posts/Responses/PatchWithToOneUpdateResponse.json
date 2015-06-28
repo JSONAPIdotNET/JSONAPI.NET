@@ -1,32 +1,31 @@
 ﻿{
-    "data": [
-        {
-            "type": "posts",
-            "id": "202",
-            "attributes": {
-                "title": "Post 2",
-                "content": "Post 2 content",
-                "created": "2015-02-05T08:10:00+00:00"
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "attributes": {
+            "content": "Post 2 content",
+            "created": "2015-02-05T08:10:00.0000000+00:00",
+            "title": "Post 2"
+        },
+        "relationships": {
+            "author": {
+                "links": {
+                    "self": "https://www.example.com/posts/202/relationships/author",
+                    "related": "https://www.example.com/posts/202/author"
+                }
             },
-            "relationships": {
-                "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "403"
-                    }
-                },
-                "comments": {
-                    "data": [
-                        { "type": "comments", "id": "104" }
-                    ]
-                },
-                "tags": {
-                    "data": [
-                        { "type": "tags", "id": "302" },
-                        { "type": "tags", "id": "303" }
-                    ]
+            "comments": {
+                "links": {
+                    "self": "https://www.example.com/posts/202/relationships/comments",
+                    "related": "https://www.example.com/posts/202/comments"
+                }
+            },
+            "tags": {
+                "links": {
+                    "self": "https://www.example.com/posts/202/relationships/tags",
+                    "related": "https://www.example.com/posts/202/tags"
                 }
             }
         }
-    ]
+    }
 }

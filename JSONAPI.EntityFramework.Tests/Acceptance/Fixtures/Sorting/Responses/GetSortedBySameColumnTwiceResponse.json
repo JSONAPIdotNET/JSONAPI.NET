@@ -2,11 +2,12 @@
     "errors": [
         {
             "id": "{{SOME_GUID}}",
-            "status": "500",
-            "title": "The attribute \"firstName\" was specified more than once.",
-            "detail": null,
-            "stackTrace": null,
-            "inner": null
+            "status": "400",
+            "title": "Attribute specified more than once",
+            "detail": "The attribute \"first-name\" was specified more than once.",
+            "source": { 
+                "parameter": "sort"
+            }
         }
     ]
 }

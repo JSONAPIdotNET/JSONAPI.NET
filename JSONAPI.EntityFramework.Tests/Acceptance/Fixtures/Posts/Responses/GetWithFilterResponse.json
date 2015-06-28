@@ -4,19 +4,29 @@
             "type": "posts",
             "id": "204",
             "attributes": {
-                "title": "Post 4",
                 "content": "Post 4 content",
-                "created": "2015-02-08T06:59:00+00:00"
+                "created": "2015-02-08T06:59:00.0000000+00:00",
+                "title": "Post 4"
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "402"
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/author",
+                        "related": "https://www.example.com/posts/204/author"
                     }
                 },
-                "comments": { "data": [ ] },
-                "tags": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/comments",
+                        "related": "https://www.example.com/posts/204/comments"
+                    }
+                },
+                "tags": {
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/tags",
+                        "related": "https://www.example.com/posts/204/tags"
+                    }
+                }
             }
         }
     ]

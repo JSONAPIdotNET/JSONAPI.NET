@@ -1,0 +1,8 @@
+﻿{
+    "links": {
+        "self": "some self link",
+        "related": "some related link"
+    },
+    "data": "linkage goes here",
+    "meta": "metadata goes here"
+}

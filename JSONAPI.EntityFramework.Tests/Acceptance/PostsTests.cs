@@ -249,6 +249,35 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
+                    var allPosts = dbContext.Posts.Include(p => p.Author).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("Post 2");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.Author.Should().BeNull();
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task PatchWithMissingToOneLinkage()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneLinkageRequest.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneLinkageResponse.json", HttpStatusCode.BadRequest, true);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
                     var allPosts = dbContext.Posts.ToArray();
                     allPosts.Length.Should().Be(4);
                     var actualPost = allPosts.First(t => t.Id == "202");
@@ -256,7 +285,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                     actualPost.Title.Should().Be("Post 2");
                     actualPost.Content.Should().Be("Post 2 content");
                     actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
-                    actualPost.AuthorId.Should().BeNull();
+                    actualPost.AuthorId.Should().Be("401");
                     actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
                 }
             }
@@ -274,7 +303,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToOneLinkageObjectMissingIdRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -303,7 +332,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToOneLinkageObjectMissingTypeRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToOneLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -332,7 +361,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithArrayForToOneLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayForToOneLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayForToOneLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -361,7 +390,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringForToOneLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToOneLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToOneLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -390,7 +419,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithMissingToManyLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -419,7 +448,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyLinkageObjectMissingIdRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingIdResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -448,7 +477,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithToManyLinkageObjectMissingTypeRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithToManyLinkageObjectMissingTypeResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -477,7 +506,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithObjectForToManyLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithObjectForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithObjectForToManyLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -506,7 +535,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringForToManyLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringForToManyLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
            
@@ -536,7 +565,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithNullForToManyLinkageRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithNullForToManyLinkageResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithNullForToManyLinkageResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -565,7 +594,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithArrayRelationshipValueRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayRelationshipValueResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithArrayRelationshipValueResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -594,7 +623,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\Posts\Requests\PatchWithStringRelationshipValueRequest.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringRelationshipValueResponse.json", HttpStatusCode.BadRequest);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Posts\Responses\PatchWithStringRelationshipValueResponse.json", HttpStatusCode.BadRequest, true);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -623,6 +652,8 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitDelete(effortConnection, "posts/203");
 
+                var responseContent = await response.Content.ReadAsStringAsync();
+                responseContent.Should().Be("");
                 response.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))

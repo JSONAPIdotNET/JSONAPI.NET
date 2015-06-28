@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
@@ -11,29 +12,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class PresidentsController : ApiController
     {
-        public class MyArrayPayload<T> : IPayload
-        {
-            private readonly T[] _array;
-
-            public MyArrayPayload(T[] array)
-            {
-                _array = array;
-            }
-
-            public object PrimaryData { get { return _array; } }
-
-            public JObject Metadata
-            {
-                get
-                {
-                    var obj = new JObject();
-                    obj["count"] = _array.Length;
-                    return obj;
-                }
-            }
-        }
-
-        // This endpoint exists to demonstrate returning IPayload
+        // This endpoint exists to demonstrate returning IResourceCollectionPayload
         [Route("presidents")]
         public IHttpActionResult GetPresidents()
         {
@@ -52,8 +31,10 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
                     LastName = "Lincoln"
                 }
             };
+            
+            var userResources = users.Select(u => (IResourceObject)new ResourceObject("users", u.Id)).ToArray();
 
-            var payload = new MyArrayPayload<User>(users);
+            var payload = new ResourceCollectionPayload(userResources, null, null);
             return Ok(payload);
         }
     }

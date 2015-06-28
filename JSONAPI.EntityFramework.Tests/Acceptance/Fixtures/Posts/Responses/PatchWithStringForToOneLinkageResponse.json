@@ -2,11 +2,12 @@
     "errors": [
         {
             "id": "{{SOME_GUID}}",
-            "status": "500",
-            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
-            "detail": "Expected an object value for `linkage` but got String.",
-            "stackTrace": "{{STACK_TRACE}}",
-            "inner": null
+            "status": "400",
+            "title": "Invalid linkage for relationship",
+            "detail": "Expected an array, object, or null for linkage, but got String",
+            "source": { 
+                "pointer": "/data/relationships/author/data"
+            }
         }
     ]
 }

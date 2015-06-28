@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
 using JSONAPI.Core;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.ActionFilters
 {
@@ -13,15 +14,15 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class DefaultSortingTransformer : IQueryableSortingTransformer
     {
-        private readonly IModelManager _modelManager;
+        private readonly IResourceTypeRegistry _resourceTypeRegistry;
 
         /// <summary>
         /// Creates a new SortingQueryableTransformer
         /// </summary>
-        /// <param name="modelManager">The model manager used to look up registered type information.</param>
-        public DefaultSortingTransformer(IModelManager modelManager)
+        /// <param name="resourceTypeRegistry">The model manager used to look up registered type information.</param>
+        public DefaultSortingTransformer(IResourceTypeRegistry resourceTypeRegistry)
         {
-            _modelManager = modelManager;
+            _resourceTypeRegistry = resourceTypeRegistry;
         }
         
         private const string SortQueryParamKey = "sort";
@@ -43,31 +44,46 @@ namespace JSONAPI.ActionFilters
 
             var selectors = new List<Tuple<bool, Expression<Func<T, object>>>>();
             var usedProperties = new Dictionary<PropertyInfo, object>();
+            
+            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
 
             foreach (var sortExpression in sortExpressions)
             {
                 if (string.IsNullOrWhiteSpace(sortExpression))
-                    throw new QueryableTransformException(string.Format("The sort expression \"{0}\" is invalid.", sortExpression));
+                    throw JsonApiException.CreateForParameterError("Invalid sort expression", string.Format("The sort expression \"{0}\" is invalid.", sortExpression), "sort");
 
                 var ascending = sortExpression[0] == '+';
                 var descending = sortExpression[0] == '-';
                 if (!ascending && !descending)
-                    throw new QueryableTransformException(string.Format("The sort expression \"{0}\" does not begin with a direction indicator (+ or -).", sortExpression));
+                    throw JsonApiException.CreateForParameterError("Cannot determine sort direction",
+                        string.Format(
+                            "The sort expression \"{0}\" does not begin with a direction indicator (+ or -).",
+                            sortExpression), "sort");
 
                 var propertyName = sortExpression.Substring(1);
                 if (string.IsNullOrWhiteSpace(propertyName))
-                    throw new QueryableTransformException("The property name is missing.");
+                    throw JsonApiException.CreateForParameterError("Empty sort expression", "One of the sort expressions is empty.", "sort");
 
-                var modelProperty = _modelManager.GetPropertyForJsonKey(typeof(T), propertyName);
+                PropertyInfo property;
+                if (propertyName == "id")
+                {
+                    property = registration.IdProperty;
+                }
+                else
+                {
+                    var modelProperty = registration.GetFieldByName(propertyName);
+                    if (modelProperty == null)
+                        throw JsonApiException.CreateForParameterError("Attribute not found",
+                            string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
+                                propertyName, registration.ResourceTypeName), "sort");
 
-                if (modelProperty == null)
-                    throw new QueryableTransformException(string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
-                        propertyName, _modelManager.GetResourceTypeNameForType(typeof (T))));
+                    property = modelProperty.Property;
+                }
 
-                var property = modelProperty.Property;
                 
                 if (usedProperties.ContainsKey(property))
-                    throw new QueryableTransformException(string.Format("The attribute \"{0}\" was specified more than once.", propertyName));
+                    throw JsonApiException.CreateForParameterError("Attribute specified more than once",
+                        string.Format("The attribute \"{0}\" was specified more than once.", propertyName), "sort");
 
                 usedProperties[property] = null;
 

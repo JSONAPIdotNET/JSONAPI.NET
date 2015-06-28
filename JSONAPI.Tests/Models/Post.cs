@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using JSONAPI.Core;
+﻿using System.Collections.Generic;
 using JSONAPI.Attributes;
 using Newtonsoft.Json;
 
@@ -13,10 +9,12 @@ namespace JSONAPI.Tests.Models
         public int Id { get; set; }
         public string Title { get; set; }
 
-        [IncludeInPayload(true)]
-        public IList<Comment> Comments { get; set; }
+        [JsonIgnore]
+        public string AuthorId { get; set; }
 
-        [IncludeInPayload(true)]
+        [RelationshipLinkTemplate("/posts/{1}/relationships/comments")]
+        [RelatedResourceLinkTemplate("/posts/{1}/comments")]
+        public IList<Comment> Comments { get; set; }
         public Author Author { get; set; }
     }
 }

@@ -14,15 +14,15 @@ namespace JSONAPI.ActionFilters
     /// </summary>
     public class DefaultFilteringTransformer : IQueryableFilteringTransformer
     {
-        private readonly IModelManager _modelManager;
+        private readonly IResourceTypeRegistry _resourceTypeRegistry;
 
         /// <summary>
         /// Creates a new FilteringQueryableTransformer
         /// </summary>
-        /// <param name="modelManager">The model manager used to look up registered type information.</param>
-        public DefaultFilteringTransformer(IModelManager modelManager)
+        /// <param name="resourceTypeRegistry">The model manager used to look up registered type information.</param>
+        public DefaultFilteringTransformer(IResourceTypeRegistry resourceTypeRegistry)
         {
-            _modelManager = modelManager;
+            _resourceTypeRegistry = resourceTypeRegistry;
         }
 
         public IQueryable<T> Filter<T>(IQueryable<T> query, HttpRequestMessage request)
@@ -70,15 +70,17 @@ namespace JSONAPI.ActionFilters
 
                 var filterField = queryPair.Key.Substring(7); // Skip "filter."
 
-                ModelProperty modelProperty;
+                IResourceTypeRegistration registration;
                 try
                 {
-                    modelProperty = _modelManager.GetPropertyForJsonKey(type, filterField);
+                    registration = _resourceTypeRegistry.GetRegistrationForType(type);
                 }
-                catch (InvalidOperationException)
+                catch (TypeRegistrationNotFoundException)
                 {
                     throw new HttpResponseException(HttpStatusCode.BadRequest);
                 }
+
+                var resourceTypeField = registration.GetFieldByName(filterField);
                 
                 var queryValue = queryPair.Value;
                 if (string.IsNullOrWhiteSpace(queryValue))
@@ -86,15 +88,13 @@ namespace JSONAPI.ActionFilters
 
                 Expression expr = null;
 
-                if (modelProperty.IgnoreByDefault) continue;
-
                 // See if it is a field property
-                var fieldModelProperty = modelProperty as FieldModelProperty;
+                var fieldModelProperty = resourceTypeField as ResourceTypeAttribute;
                 if (fieldModelProperty != null)
                     expr = GetPredicateBodyForField(fieldModelProperty, queryValue, param);
 
                 // See if it is a relationship property
-                var relationshipModelProperty = modelProperty as RelationshipModelProperty;
+                var relationshipModelProperty = resourceTypeField as ResourceTypeRelationship;
                 if (relationshipModelProperty != null)
                     expr = GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
 
@@ -108,9 +108,9 @@ namespace JSONAPI.ActionFilters
 
         // ReSharper disable once FunctionComplexityOverflow
         // TODO: should probably break this method up
-        private Expression GetPredicateBodyForField(FieldModelProperty modelProperty, string queryValue, ParameterExpression param)
+        private Expression GetPredicateBodyForField(ResourceTypeAttribute resourceTypeAttribute, string queryValue, ParameterExpression param)
         {
-            var prop = modelProperty.Property;
+            var prop = resourceTypeAttribute.Property;
             var propertyType = prop.PropertyType;
 
             Expression expr;
@@ -331,22 +331,23 @@ namespace JSONAPI.ActionFilters
             return expr;
         }
 
-        private Expression GetPredicateBodyForRelationship(RelationshipModelProperty modelProperty, string queryValue, ParameterExpression param)
+        private Expression GetPredicateBodyForRelationship(ResourceTypeRelationship resourceTypeProperty, string queryValue, ParameterExpression param)
         {
-            var relatedType = modelProperty.RelatedType;
+            var relatedType = resourceTypeProperty.RelatedType;
             PropertyInfo relatedIdProperty;
             try
             {
-                relatedIdProperty = _modelManager.GetIdProperty(relatedType);
+                var registration = _resourceTypeRegistry.GetRegistrationForType(relatedType);
+                relatedIdProperty = registration.IdProperty;
             }
-            catch (InvalidOperationException)
+            catch (TypeRegistrationNotFoundException)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
-            var prop = modelProperty.Property;
+            var prop = resourceTypeProperty.Property;
 
-            if (modelProperty.IsToMany)
+            if (resourceTypeProperty.IsToMany)
             {
                 var propertyExpr = Expression.Property(param, prop);
 

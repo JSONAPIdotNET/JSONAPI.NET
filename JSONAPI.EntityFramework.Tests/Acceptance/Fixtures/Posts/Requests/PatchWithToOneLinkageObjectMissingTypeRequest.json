@@ -1,13 +1,11 @@
 ﻿{
-    "data": [
-        {
-            "type": "posts",
-            "id": "202",
-            "relationships": {
-                "author": {
-                    "data": { "id": "403" }
-                }
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "relationships": {
+            "author": {
+                "data": { "id": "403" }
             }
         }
-    ]
+    }
 }

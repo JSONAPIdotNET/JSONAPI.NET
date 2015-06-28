@@ -1,0 +1,6 @@
+﻿{
+    "links": {
+        "self": "some self link",
+        "related": "some related link"
+    }
+}

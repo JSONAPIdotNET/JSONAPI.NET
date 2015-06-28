@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using JSONAPI.Core;
-using JSONAPI.Attributes;
+﻿using System.Collections.Generic;
 
 namespace JSONAPI.Tests.Models
 {
@@ -11,7 +6,6 @@ namespace JSONAPI.Tests.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        [IncludeInPayload(true)]
         public IList<Post> Posts { get; set; }
     }
 }

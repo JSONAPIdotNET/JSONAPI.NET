@@ -1,0 +1,14 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "500",
+            "title": "Unhandled exception",
+            "detail": "An unhandled exception was thrown while processing the request.",
+            "meta": {
+                "exceptionMessage": "Something bad happened!",
+                "stackTrace": "{{STACK_TRACE}}"
+            }
+        }
+    ]
+}

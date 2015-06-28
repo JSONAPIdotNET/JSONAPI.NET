@@ -40,6 +40,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
@@ -120,6 +123,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Autofac\JSONAPI.Autofac.csproj">
+      <Project>{af7861f3-550b-4f70-a33e-1e5f48d39333}</Project>
+      <Name>JSONAPI.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI.EntityFramework\JSONAPI.EntityFramework.csproj">
       <Project>{E906356C-93F6-41F6-9A0D-73B8A99AA53C}</Project>
       <Name>JSONAPI.EntityFramework</Name>

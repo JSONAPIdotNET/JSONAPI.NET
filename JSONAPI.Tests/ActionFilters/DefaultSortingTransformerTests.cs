@@ -5,6 +5,7 @@ using System.Net.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters
@@ -50,9 +51,9 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 {"Dummy", "Dummies"}
             });
-            var modelManager = new ModelManager(pluralizationService);
-            modelManager.RegisterResourceType(typeof(Dummy));
-            return new DefaultSortingTransformer(modelManager);
+            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(pluralizationService));
+            registry.RegisterResourceType(typeof(Dummy));
+            return new DefaultSortingTransformer(registry);
         }
 
         private Dummy[] GetArray(string uri)
@@ -70,34 +71,34 @@ namespace JSONAPI.Tests.ActionFilters
                 // ReSharper disable once UnusedVariable
                 var result = GetTransformer().Sort(_fixturesQuery, request).ToArray();
             };
-            action.ShouldThrow<QueryableTransformException>().Which.Message.Should().Be(expectedMessage);
+            action.ShouldThrow<JsonApiException>().Which.Error.Detail.Should().Be(expectedMessage);
         }
 
         [TestMethod]
         public void Sorts_by_attribute_ascending()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=%2BfirstName");
+            var array = GetArray("http://api.example.com/dummies?sort=%2Bfirst-name");
             array.Should().BeInAscendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_attribute_descending()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=-firstName");
+            var array = GetArray("http://api.example.com/dummies?sort=-first-name");
             array.Should().BeInDescendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_two_ascending_attributes()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=%2BlastName,%2BfirstName");
+            var array = GetArray("http://api.example.com/dummies?sort=%2Blast-name,%2Bfirst-name");
             array.Should().ContainInOrder(_fixtures.OrderBy(d => d.LastName + d.FirstName));
         }
 
         [TestMethod]
         public void Sorts_by_two_descending_attributes()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=-lastName,-firstName");
+            var array = GetArray("http://api.example.com/dummies?sort=-last-name,-first-name");
             array.Should().ContainInOrder(_fixtures.OrderByDescending(d => d.LastName + d.FirstName));
         }
 
@@ -116,13 +117,13 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Returns_400_if_property_name_is_missing()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B", "The property name is missing.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_property_name_is_whitespace()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B ", "The property name is missing.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B ", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
@@ -134,13 +135,13 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Returns_400_if_the_same_property_is_specified_more_than_once()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2BlastName,%2BlastName", "The attribute \"lastName\" was specified more than once.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2Blast-name,%2Blast-name", "The attribute \"last-name\" was specified more than once.");
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_doesnt_start_with_plus_or_minus()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=lastName", "The sort expression \"lastName\" does not begin with a direction indicator (+ or -).");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name", "The sort expression \"last-name\" does not begin with a direction indicator (+ or -).");
         }
     }
 }

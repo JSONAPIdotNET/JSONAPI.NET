@@ -7,7 +7,12 @@
                 "name": "Admin users"
             },
             "relationships": {
-                "users": { "data": [ ] }
+                "users": {
+                    "links": {
+                        "self": "https://www.example.com/user-groups/501/relationships/users",
+                        "related": "https://www.example.com/user-groups/501/users"
+                    }
+                }
             }
         }
     ]

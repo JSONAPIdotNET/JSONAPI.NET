@@ -1,58 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using System.Web.Http.Dispatcher;
+﻿using System.Web.Http;
 using JSONAPI.ActionFilters;
-using JSONAPI.Http;
 using JSONAPI.Json;
 using JSONAPI.Payload;
+using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.Core
 {
     /// <summary>
-    /// Configuration API for JSONAPI.NET
+    /// This is a convenience class for configuring JSONAPI.NET in the simplest way possible.
     /// </summary>
     public class JsonApiConfiguration
     {
-        private readonly IModelManager _modelManager;
-        private Func<IQueryablePayloadBuilder> _payloadBuilderFactory;
+        private readonly IResourceTypeRegistry _resourceTypeRegistry;
+        private readonly ILinkConventions _linkConventions;
+        private IQueryableEnumerationTransformer _queryableEnumerationTransformer;
 
         /// <summary>
         /// Creates a new configuration
         /// </summary>
-        public JsonApiConfiguration(IModelManager modelManager)
+        public JsonApiConfiguration(IResourceTypeRegistry resourceTypeRegistry)
         {
-            if (modelManager == null) throw new Exception("You must provide a model manager to begin configuration.");
-
-            _modelManager = modelManager;
-            _payloadBuilderFactory = () => new DefaultQueryablePayloadBuilderConfiguration().GetBuilder(modelManager);
+            _resourceTypeRegistry = resourceTypeRegistry;
         }
 
         /// <summary>
-        /// Allows configuring the default queryable payload builder
+        /// Creates a new configuration
         /// </summary>
-        /// <param name="configurationAction">Provides access to a fluent DefaultQueryablePayloadBuilderConfiguration object</param>
-        /// <returns>The same configuration object the method was called on.</returns>
-        public JsonApiConfiguration UsingDefaultQueryablePayloadBuilder(Action<DefaultQueryablePayloadBuilderConfiguration> configurationAction)
+        public JsonApiConfiguration(IResourceTypeRegistry resourceTypeRegistry, ILinkConventions linkConventions)
         {
-            _payloadBuilderFactory = () =>
-            {
-                var configuration = new DefaultQueryablePayloadBuilderConfiguration();
-                configurationAction(configuration);
-                return configuration.GetBuilder(_modelManager);
-            };
-            return this;
+            _resourceTypeRegistry = resourceTypeRegistry;
+            _linkConventions = linkConventions;
         }
 
         /// <summary>
-        /// Allows overriding the default queryable payload builder
+        /// Allows overriding the queryable payload builder to use. This is useful for 
         /// </summary>
-        /// <param name="queryablePayloadBuilder">The custom queryable payload builder to use</param>
-        /// <returns></returns>
-        public JsonApiConfiguration UseCustomQueryablePayloadBuilder(IQueryablePayloadBuilder queryablePayloadBuilder)
+        /// <param name="queryableEnumerationTransformer"></param>
+        public void UseQueryableEnumeration(IQueryableEnumerationTransformer queryableEnumerationTransformer)
         {
-            _payloadBuilderFactory = () => queryablePayloadBuilder;
-            return this;
+            _queryableEnumerationTransformer = queryableEnumerationTransformer;
         }
 
         /// <summary>
@@ -61,16 +47,40 @@ namespace JSONAPI.Core
         /// <param name="httpConfig">The HttpConfiguration to apply this JsonApiConfiguration to</param>
         public void Apply(HttpConfiguration httpConfig)
         {
-            var formatter = new JsonApiFormatter(_modelManager);
+            var linkConventions = _linkConventions ?? new DefaultLinkConventions();
 
-            httpConfig.Formatters.Clear();
-            httpConfig.Formatters.Add(formatter);
+            // Serialization
+            var metadataSerializer = new MetadataSerializer();
+            var linkSerializer = new LinkSerializer(metadataSerializer);
+            var resourceLinkageSerializer = new ResourceLinkageSerializer();
+            var relationshipObjectSerializer = new RelationshipObjectSerializer(linkSerializer, resourceLinkageSerializer, metadataSerializer);
+            var resourceObjectSerializer = new ResourceObjectSerializer(relationshipObjectSerializer, linkSerializer, metadataSerializer);
+            var errorSerializer = new ErrorSerializer(linkSerializer, metadataSerializer);
+            var singleResourcePayloadSerializer = new SingleResourcePayloadSerializer(resourceObjectSerializer, metadataSerializer);
+            var resourceCollectionPayloadSerializer = new ResourceCollectionPayloadSerializer(resourceObjectSerializer, metadataSerializer);
+            var errorPayloadSerializer = new ErrorPayloadSerializer(errorSerializer, metadataSerializer);
 
-            var queryablePayloadBuilder = _payloadBuilderFactory();
-            httpConfig.Filters.Add(new JsonApiQueryableAttribute(queryablePayloadBuilder));
+            // Queryable transforms
+            var queryableEnumerationTransformer = _queryableEnumerationTransformer ?? new SynchronousEnumerationTransformer();
+            var filteringTransformer = new DefaultFilteringTransformer(_resourceTypeRegistry);
+            var sortingTransformer = new DefaultSortingTransformer(_resourceTypeRegistry);
+            var paginationTransformer = new DefaultPaginationTransformer();
 
-            httpConfig.Services.Replace(typeof (IHttpControllerSelector),
-                new PascalizedControllerSelector(httpConfig));
+            // Builders
+            var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, linkConventions);
+            var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry, linkConventions);
+            var queryableResourcePayloadBuilder = new DefaultQueryableResourceCollectionPayloadBuilder(resourceCollectionPayloadBuilder,
+                queryableEnumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
+            var errorPayloadBuilder = new ErrorPayloadBuilder();
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder, queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder);
+
+            // Dependencies for JsonApiHttpConfiguration
+            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer, resourceCollectionPayloadSerializer, errorPayloadSerializer, errorPayloadBuilder);
+            var fallbackPayloadBuilderAttribute = new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder);
+            var exceptionFilterAttribute = new JsonApiExceptionFilterAttribute(errorPayloadBuilder, formatter);
+
+            var jsonApiHttpConfiguration = new JsonApiHttpConfiguration(formatter, fallbackPayloadBuilderAttribute, exceptionFilterAttribute);
+            jsonApiHttpConfiguration.Apply(httpConfig);
         }
     }
 }

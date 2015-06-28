@@ -1,6 +1,9 @@
 ﻿using System.Web.Http;
+using Autofac;
+using JSONAPI.Autofac;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework;
+using JSONAPI.EntityFramework.Http;
+using JSONAPI.Http;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 using PluralizationService = JSONAPI.Core.PluralizationService;
@@ -19,15 +22,18 @@ namespace JSONAPI.TodoMVC.API
         {
             var pluralizationService = new PluralizationService();
             pluralizationService.AddMapping("todo", "todos");
-            var modelManager = new ModelManager(pluralizationService);
-            modelManager.RegisterResourceType(typeof (Todo));
+            var namingConventions = new DefaultNamingConventions(pluralizationService);
 
             var httpConfig = new HttpConfiguration();
-
-            // Configure JSON API
-            new JsonApiConfiguration(modelManager)
-                .UsingDefaultQueryablePayloadBuilder(c => c.EnumerateQueriesAsynchronously())
-                .Apply(httpConfig);
+            var configuration = new JsonApiAutofacConfiguration(namingConventions);
+            configuration.RegisterResourceType(typeof(Todo));
+            configuration.OnContainerBuilding(builder =>
+            {
+                builder.RegisterType<EntityFrameworkPayloadMaterializer>()
+                    .WithParameter("apiBaseUrl", "https://www.example.com")
+                    .As<IPayloadMaterializer>();
+            });
+            configuration.Apply(httpConfig);
 
             // Web API routes
             httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });

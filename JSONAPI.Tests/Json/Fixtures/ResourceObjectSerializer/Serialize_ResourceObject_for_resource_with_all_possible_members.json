@@ -1,0 +1,17 @@
+﻿{
+    "type": "states",
+    "id": "1400",
+    "attributes": {
+        "name": "New York",
+        "population": 19746227,
+        "foo": null
+    },
+    "relationships": {
+        "capital": "IRelationship Placeholder - capital",
+        "neighbors": "IRelationship Placeholder - neighbors"
+    },
+    "links": {
+        "self": "ILink placeholder 1"
+    },
+    "meta": "IMetadata placeholder 1"
+}

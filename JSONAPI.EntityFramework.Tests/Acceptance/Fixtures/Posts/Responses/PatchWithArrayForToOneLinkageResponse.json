@@ -2,11 +2,12 @@
     "errors": [
         {
             "id": "{{SOME_GUID}}",
-            "status": "500",
-            "title": "JSONAPI.Json.JsonApiFormatter+BadRequestException",
-            "detail": "Expected an object value for `linkage` but got Array.",
-            "stackTrace": "{{STACK_TRACE}}",
-            "inner": null
+            "status": "400",
+            "title": "Invalid linkage for to-one relationship",
+            "detail": "Expected an object for to-one linkage, but got Array",
+            "source": { 
+                "pointer": "/data/relationships/author/data"
+            }
         }
     ]
 }

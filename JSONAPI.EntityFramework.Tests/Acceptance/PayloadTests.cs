@@ -8,13 +8,13 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
     public class PayloadTests : AcceptanceTestsBase
     {
         [TestMethod]
-        public async Task Get_returns_IPayload()
+        public async Task Get_returns_IResourceCollectionPayload()
         {
             using (var effortConnection = GetEffortConnection())
             {
                 var response = await SubmitGet(effortConnection, "presidents");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Payload\Responses\GetReturnsIPayloadResponse.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Acceptance\Fixtures\Payload\Responses\Get_returns_IResourceCollectionPayload.json", HttpStatusCode.OK);
             }
         }
     }

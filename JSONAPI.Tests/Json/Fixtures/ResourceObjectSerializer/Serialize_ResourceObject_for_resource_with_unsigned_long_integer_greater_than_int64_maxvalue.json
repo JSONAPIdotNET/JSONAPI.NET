@@ -1,0 +1,8 @@
+﻿{
+    "type": "samples",
+    "id": "2010",
+    "attributes": {
+        "uInt64Field": 9223372036854775808,
+        "nullableUInt64Field": 9223372036854775808
+    }
+}

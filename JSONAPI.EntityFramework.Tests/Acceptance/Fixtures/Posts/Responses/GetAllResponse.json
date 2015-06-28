@@ -4,29 +4,28 @@
             "type": "posts",
             "id": "201",
             "attributes": {
-                "title": "Post 1",
                 "content": "Post 1 content",
-                "created": "2015-01-31T14:00:00+00:00"
+                "created": "2015-01-31T14:00:00.0000000+00:00",
+                "title": "Post 1"
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "401"
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/author",
+                        "related": "https://www.example.com/posts/201/author"
                     }
                 },
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "101" },
-                        { "type": "comments", "id": "102" },
-                        { "type": "comments", "id": "103" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/comments",
+                        "related": "https://www.example.com/posts/201/comments"
+                    }
                 },
                 "tags": {
-                    "data": [
-                        { "type": "tags", "id": "301" },
-                        { "type": "tags", "id": "302" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/tags",
+                        "related": "https://www.example.com/posts/201/tags"
+                    }
                 }
             }
         },
@@ -34,27 +33,28 @@
             "type": "posts",
             "id": "202",
             "attributes": {
-                "title": "Post 2",
                 "content": "Post 2 content",
-                "created": "2015-02-05T08:10:00+00:00"
+                "created": "2015-02-05T08:10:00.0000000+00:00",
+                "title": "Post 2"
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "401"
+                    "links": {
+                        "self": "https://www.example.com/posts/202/relationships/author",
+                        "related": "https://www.example.com/posts/202/author"
                     }
                 },
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "104" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/202/relationships/comments",
+                        "related": "https://www.example.com/posts/202/comments"
+                    }
                 },
                 "tags": {
-                    "data": [
-                        { "type": "tags", "id": "302" },
-                        { "type": "tags", "id": "303" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/202/relationships/tags",
+                        "related": "https://www.example.com/posts/202/tags"
+                    }
                 }
             }
         },
@@ -62,26 +62,28 @@
             "type": "posts",
             "id": "203",
             "attributes": {
-                "title": "Post 3",
                 "content": "Post 3 content",
-                "created": "2015-02-07T11:11:00+00:00"
+                "created": "2015-02-07T11:11:00.0000000+00:00",
+                "title": "Post 3"
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "401"
+                    "links": {
+                        "self": "https://www.example.com/posts/203/relationships/author",
+                        "related": "https://www.example.com/posts/203/author"
                     }
                 },
                 "comments": {
-                    "data": [
-                        { "type": "comments", "id": "105" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/203/relationships/comments",
+                        "related": "https://www.example.com/posts/203/comments"
+                    }
                 },
                 "tags": {
-                    "data": [
-                        { "type": "tags", "id": "303" }
-                    ]
+                    "links": {
+                        "self": "https://www.example.com/posts/203/relationships/tags",
+                        "related": "https://www.example.com/posts/203/tags"
+                    }
                 }
             }
         },
@@ -89,19 +91,29 @@
             "type": "posts",
             "id": "204",
             "attributes": {
-                "title": "Post 4",
                 "content": "Post 4 content",
-                "created": "2015-02-08T06:59:00+00:00"
+                "created": "2015-02-08T06:59:00.0000000+00:00",
+                "title": "Post 4"
             },
             "relationships": {
                 "author": {
-                    "data": {
-                        "type": "users",
-                        "id": "402"
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/author",
+                        "related": "https://www.example.com/posts/204/author"
                     }
                 },
-                "comments": { "data": [ ] },
-                "tags": { "data": [ ] }
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/comments",
+                        "related": "https://www.example.com/posts/204/comments"
+                    }
+                },
+                "tags": {
+                    "links": {
+                        "self": "https://www.example.com/posts/204/relationships/tags",
+                        "related": "https://www.example.com/posts/204/tags"
+                    }
+                }
             }
         }
     ]
