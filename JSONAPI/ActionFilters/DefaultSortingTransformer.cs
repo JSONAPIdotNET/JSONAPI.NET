@@ -35,7 +35,7 @@ namespace JSONAPI.ActionFilters
             string[] sortExpressions;
             if (sortParam.Key != SortQueryParamKey)
             {
-                sortExpressions = new[] { "+id" }; // We have to sort by something, so make it the ID.
+                sortExpressions = new[] { "id" }; // We have to sort by something, so make it the ID.
             }
             else
             {
@@ -49,41 +49,45 @@ namespace JSONAPI.ActionFilters
 
             foreach (var sortExpression in sortExpressions)
             {
-                if (string.IsNullOrWhiteSpace(sortExpression))
-                    throw JsonApiException.CreateForParameterError("Invalid sort expression", string.Format("The sort expression \"{0}\" is invalid.", sortExpression), "sort");
+                if (string.IsNullOrEmpty(sortExpression))
+                    throw JsonApiException.CreateForParameterError("Empty sort expression", "One of the sort expressions is empty.", "sort");
 
-                var ascending = sortExpression[0] == '+';
-                var descending = sortExpression[0] == '-';
-                if (!ascending && !descending)
-                    throw JsonApiException.CreateForParameterError("Cannot determine sort direction",
-                        string.Format(
-                            "The sort expression \"{0}\" does not begin with a direction indicator (+ or -).",
-                            sortExpression), "sort");
+                bool ascending;
+                string fieldName;
+                if (sortExpression[0] == '-')
+                {
+                    ascending = false;
+                    fieldName = sortExpression.Substring(1);
+                }
+                else
+                {
+                    ascending = true;
+                    fieldName = sortExpression;
+                }
 
-                var propertyName = sortExpression.Substring(1);
-                if (string.IsNullOrWhiteSpace(propertyName))
+                if (string.IsNullOrWhiteSpace(fieldName))
                     throw JsonApiException.CreateForParameterError("Empty sort expression", "One of the sort expressions is empty.", "sort");
 
                 var paramExpr = Expression.Parameter(typeof(T));
                 Expression sortValueExpression;
 
-                if (propertyName == "id")
+                if (fieldName == "id")
                 {
                     sortValueExpression = registration.GetSortByIdExpression(paramExpr);
                 }
                 else
                 {
-                    var modelProperty = registration.GetFieldByName(propertyName);
+                    var modelProperty = registration.GetFieldByName(fieldName);
                     if (modelProperty == null)
                         throw JsonApiException.CreateForParameterError("Attribute not found",
                             string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
-                                propertyName, registration.ResourceTypeName), "sort");
+                                fieldName, registration.ResourceTypeName), "sort");
 
                     var property = modelProperty.Property;
                     
                     if (usedProperties.ContainsKey(property))
                         throw JsonApiException.CreateForParameterError("Attribute specified more than once",
-                            string.Format("The attribute \"{0}\" was specified more than once.", propertyName), "sort");
+                            string.Format("The attribute \"{0}\" was specified more than once.", fieldName), "sort");
 
                     usedProperties[property] = null;
 

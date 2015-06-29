@@ -77,7 +77,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Sorts_by_attribute_ascending()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=%2Bfirst-name");
+            var array = GetArray("http://api.example.com/dummies?sort=first-name");
             array.Should().BeInAscendingOrder(d => d.FirstName);
         }
 
@@ -91,7 +91,7 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Sorts_by_two_ascending_attributes()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=%2Blast-name,%2Bfirst-name");
+            var array = GetArray("http://api.example.com/dummies?sort=last-name,first-name");
             array.Should().ContainInOrder(_fixtures.OrderBy(d => d.LastName + d.FirstName));
         }
 
@@ -105,43 +105,37 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Returns_400_if_sort_argument_is_empty()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=", "The sort expression \"\" is invalid.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_is_whitespace()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort= ", "The sort expression \"\" is invalid.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort= ", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
-        public void Returns_400_if_property_name_is_missing()
+        public void Returns_400_if_sort_argument_is_empty_descending()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=-", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
-        public void Returns_400_if_property_name_is_whitespace()
+        public void Returns_400_if_sort_argument_is_whitespace_descending()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2B ", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=- ", "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_no_property_exists()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2Bfoobar", "The attribute \"foobar\" does not exist on type \"dummies\".");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=foobar", "The attribute \"foobar\" does not exist on type \"dummies\".");
         }
 
         [TestMethod]
         public void Returns_400_if_the_same_property_is_specified_more_than_once()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=%2Blast-name,%2Blast-name", "The attribute \"last-name\" was specified more than once.");
-        }
-
-        [TestMethod]
-        public void Returns_400_if_sort_argument_doesnt_start_with_plus_or_minus()
-        {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name", "The sort expression \"last-name\" does not begin with a direction indicator (+ or -).");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name,last-name", "The attribute \"last-name\" was specified more than once.");
         }
     }
 }

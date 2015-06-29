@@ -142,7 +142,6 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByMixedDirectionResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByColumnMissingDirectionResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithAttributeUpdateRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithMissingToManyLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithToManyLinkageObjectMissingTypeRequest.json" />
