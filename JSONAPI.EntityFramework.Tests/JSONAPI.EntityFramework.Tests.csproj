@@ -120,8 +120,6 @@
     <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformerTests.cs" />
     <Compile Include="DbContextExtensionsTests.cs" />
-    <Compile Include="Http\EntityFrameworkMaterializerTests.cs" />
-    <Compile Include="EntityFrameworkPayloadMaterializerTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
     <Compile Include="Helpers\WaitsUntilCancellationDbAsyncEnumerator.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerator.cs" />

@@ -82,14 +82,11 @@
     <Compile Include="Attributes\SerializeAsComplexAttribute.cs" />
     <Compile Include="Attributes\UseAsIdAttribute.cs" />
     <Compile Include="Core\IAttributeValueConverter.cs" />
-    <Compile Include="Core\IMetadataManager.cs" />
     <Compile Include="Core\IResourceTypeRegistry.cs" />
     <Compile Include="Core\IResourceTypeRegistration.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
-    <Compile Include="Core\IMaterializer.cs" />
     <Compile Include="Core\JsonApiHttpConfiguration.cs" />
     <Compile Include="Core\JsonApiConfiguration.cs" />
-    <Compile Include="Core\MetadataManager.cs" />
     <Compile Include="Core\ResourceTypeRegistry.cs" />
     <Compile Include="Core\ResourceTypeField.cs" />
     <Compile Include="Core\TypeRegistrationNotFoundException.cs" />
