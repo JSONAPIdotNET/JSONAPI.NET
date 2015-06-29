@@ -27,10 +27,6 @@ namespace JSONAPI.Payload.Builders
         /// <summary>
         /// Creates a JsonApiException indicating a problem with a supplied query parameter
         /// </summary>
-        /// <param name="title"></param>
-        /// <param name="detail"></param>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
         public static JsonApiException CreateForParameterError(string title, string detail, string parameter)
         {
             var error = new Error
@@ -40,6 +36,36 @@ namespace JSONAPI.Payload.Builders
                 Title = title,
                 Detail = detail,
                 Parameter = parameter
+            };
+            return new JsonApiException(error);
+        }
+
+        /// <summary>
+        /// Creates a JsonApiException with a title and detail
+        /// </summary>
+        public static JsonApiException Create(string title, string detail, HttpStatusCode status)
+        {
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Status = status,
+                Title = title,
+                Detail = detail
+            };
+            return new JsonApiException(error);
+        }
+
+        /// <summary>
+        /// Creates a JsonApiException to send a 404 Not Found error.
+        /// </summary>
+        public static JsonApiException CreateForNotFound(string detail)
+        {
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Status = HttpStatusCode.NotFound,
+                Title = "Resource not found",
+                Detail = detail
             };
             return new JsonApiException(error);
         }
