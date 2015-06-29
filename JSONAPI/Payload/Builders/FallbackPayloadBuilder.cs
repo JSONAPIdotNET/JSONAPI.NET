@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using JSONAPI.Http;
 
 namespace JSONAPI.Payload.Builders
 {
@@ -16,6 +17,7 @@ namespace JSONAPI.Payload.Builders
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly IResourceCollectionPayloadBuilder _resourceCollectionPayloadBuilder;
+        private readonly IBaseUrlService _baseUrlService;
         private readonly Lazy<MethodInfo> _openBuildPayloadFromQueryableMethod;
         private readonly Lazy<MethodInfo> _openBuildPayloadFromEnumerableMethod;
 
@@ -25,13 +27,16 @@ namespace JSONAPI.Payload.Builders
         /// <param name="singleResourcePayloadBuilder"></param>
         /// <param name="queryableResourceCollectionPayloadBuilder"></param>
         /// <param name="resourceCollectionPayloadBuilder"></param>
+        /// <param name="baseUrlService"></param>
         public FallbackPayloadBuilder(ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
             IQueryableResourceCollectionPayloadBuilder queryableResourceCollectionPayloadBuilder,
-            IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder)
+            IResourceCollectionPayloadBuilder resourceCollectionPayloadBuilder,
+            IBaseUrlService baseUrlService)
         {
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
             _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
             _resourceCollectionPayloadBuilder = resourceCollectionPayloadBuilder;
+            _baseUrlService = baseUrlService;
 
             _openBuildPayloadFromQueryableMethod =
                 new Lazy<MethodInfo>(
@@ -72,7 +77,7 @@ namespace JSONAPI.Payload.Builders
                 isCollection = true;
             }
 
-            var linkBaseUrl = new Uri(requestMessage.RequestUri.AbsoluteUri.Replace(requestMessage.RequestUri.PathAndQuery, String.Empty)).ToString();
+            var linkBaseUrl = _baseUrlService.GetBaseUrl(requestMessage);
 
             if (isCollection)
             {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using FluentAssertions;
 using JSONAPI.Core;
+using JSONAPI.Http;
 using JSONAPI.Payload;
 using JSONAPI.Payload.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,13 +46,12 @@ namespace JSONAPI.Tests.Payload.Builders
             var cancellationTokenSource = new CancellationTokenSource();
 
             var request = new HttpRequestMessage(HttpMethod.Get, "https://www.example.com/fruits");
-            var mockRequestContext = new Mock<HttpRequestContext>();
-            mockRequestContext.Setup(c => c.VirtualPathRoot).Returns("https://www.example.com/fruits");
-            request.SetRequestContext(mockRequestContext.Object);
+            var mockBaseUrlService = new Mock<IBaseUrlService>(MockBehavior.Strict);
+            mockBaseUrlService.Setup(s => s.GetBaseUrl(request)).Returns("https://www.example.com");
 
             // Act
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
-                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object, mockBaseUrlService.Object);
             var resultPayload = await fallbackPayloadBuilder.BuildPayload(objectContent, request, cancellationTokenSource.Token);
 
             // Assert
@@ -73,6 +73,9 @@ namespace JSONAPI.Tests.Payload.Builders
             var singleResourcePayloadBuilder = new Mock<ISingleResourcePayloadBuilder>(MockBehavior.Strict);
 
             var request = new HttpRequestMessage();
+
+            var mockBaseUrlService = new Mock<IBaseUrlService>(MockBehavior.Strict);
+            mockBaseUrlService.Setup(s => s.GetBaseUrl(request)).Returns("https://www.example.com/");
             
             var cancellationTokenSource = new CancellationTokenSource();
 
@@ -85,7 +88,7 @@ namespace JSONAPI.Tests.Payload.Builders
 
             // Act
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
-                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object, mockBaseUrlService.Object);
             var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, request, cancellationTokenSource.Token);
 
             // Assert
@@ -110,6 +113,9 @@ namespace JSONAPI.Tests.Payload.Builders
 
             var request = new HttpRequestMessage(HttpMethod.Get, "https://www.example.com/fruits");
 
+            var mockBaseUrlService = new Mock<IBaseUrlService>(MockBehavior.Strict);
+            mockBaseUrlService.Setup(s => s.GetBaseUrl(request)).Returns("https://www.example.com/");
+            
             var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             mockResourceCollectionPayloadBuilder
@@ -118,7 +124,7 @@ namespace JSONAPI.Tests.Payload.Builders
 
             // Act
             var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder.Object,
-                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object);
+                mockQueryablePayloadBuilder.Object, mockResourceCollectionPayloadBuilder.Object, mockBaseUrlService.Object);
             var resultPayload = await fallbackPayloadBuilder.BuildPayload(items, request, cancellationTokenSource.Token);
 
             // Assert

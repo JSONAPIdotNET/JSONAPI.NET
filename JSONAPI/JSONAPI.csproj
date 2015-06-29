@@ -93,6 +93,8 @@
     <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Http\BaseUrlService.cs" />
+    <Compile Include="Http\IBaseUrlService.cs" />
     <Compile Include="Http\IPayloadMaterializer.cs" />
     <Compile Include="Http\JsonApiController.cs" />
     <Compile Include="Http\PascalizedControllerSelector.cs" />

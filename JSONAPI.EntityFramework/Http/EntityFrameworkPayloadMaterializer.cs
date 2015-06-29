@@ -23,6 +23,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
+        private readonly IBaseUrlService _baseUrlService;
         private readonly MethodInfo _getRelatedToManyMethod;
         private readonly MethodInfo _getRelatedToOneMethod;
 
@@ -33,16 +34,19 @@ namespace JSONAPI.EntityFramework.Http
         /// <param name="resourceTypeRegistry"></param>
         /// <param name="queryableResourceCollectionPayloadBuilder"></param>
         /// <param name="singleResourcePayloadBuilder"></param>
+        /// <param name="baseUrlService"></param>
         public EntityFrameworkPayloadMaterializer(
             DbContext dbContext,
             IResourceTypeRegistry resourceTypeRegistry,
             IQueryableResourceCollectionPayloadBuilder queryableResourceCollectionPayloadBuilder,
-            ISingleResourcePayloadBuilder singleResourcePayloadBuilder)
+            ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+            IBaseUrlService baseUrlService)
         {
             _dbContext = dbContext;
             _resourceTypeRegistry = resourceTypeRegistry;
             _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
+            _baseUrlService = baseUrlService;
             _getRelatedToManyMethod = GetType()
                 .GetMethod("GetRelatedToMany", BindingFlags.NonPublic | BindingFlags.Instance);
             _getRelatedToOneMethod = GetType()
@@ -116,11 +120,9 @@ namespace JSONAPI.EntityFramework.Http
         /// <summary>
         /// Gets the base URL for link creation from the current request
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        protected static string GetBaseUrlFromRequest(HttpRequestMessage request)
+        protected string GetBaseUrlFromRequest(HttpRequestMessage request)
         {
-            return new Uri(request.RequestUri.AbsoluteUri.Replace(request.RequestUri.PathAndQuery, String.Empty)).ToString();
+            return _baseUrlService.GetBaseUrl(request);
         }
 
         /// <summary>

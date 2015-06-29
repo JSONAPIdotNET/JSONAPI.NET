@@ -1,5 +1,6 @@
 ﻿using System.Web.Http;
 using JSONAPI.ActionFilters;
+using JSONAPI.Http;
 using JSONAPI.Json;
 using JSONAPI.Payload;
 using JSONAPI.Payload.Builders;
@@ -67,12 +68,14 @@ namespace JSONAPI.Core
             var paginationTransformer = new DefaultPaginationTransformer();
 
             // Builders
+            var baseUrlService = new BaseUrlService();
             var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, linkConventions);
             var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry, linkConventions);
             var queryableResourcePayloadBuilder = new DefaultQueryableResourceCollectionPayloadBuilder(resourceCollectionPayloadBuilder,
-                queryableEnumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer);
+                queryableEnumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer, baseUrlService);
             var errorPayloadBuilder = new ErrorPayloadBuilder();
-            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder, queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder);
+            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder,
+                queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder, baseUrlService);
 
             // Dependencies for JsonApiHttpConfiguration
             var formatter = new JsonApiFormatter(singleResourcePayloadSerializer, resourceCollectionPayloadSerializer, errorPayloadSerializer, errorPayloadBuilder);

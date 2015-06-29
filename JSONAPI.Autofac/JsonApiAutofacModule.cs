@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autofac;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Http;
 using JSONAPI.Json;
 using JSONAPI.Payload;
 using JSONAPI.Payload.Builders;
@@ -36,6 +37,7 @@ namespace JSONAPI.Autofac
             }).As<IResourceTypeRegistry>().SingleInstance();
 
             builder.RegisterType<JsonApiHttpConfiguration>();
+            builder.RegisterType<BaseUrlService>().As<IBaseUrlService>();
 
             // Serialization
             builder.RegisterType<MetadataSerializer>().As<IMetadataSerializer>().SingleInstance();
