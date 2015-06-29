@@ -14,8 +14,9 @@ namespace JSONAPI.Payload.Builders
         /// <param name="linkBaseUrl">The string to prepend to link URLs.</param>
         /// <param name="includePathExpressions">A list of dot-separated paths to include in the compound document.
         /// If this collection is null or empty, no linkage will be included.</param>
+        /// <param name="metadata">Metadata for the top-level</param>
         /// <typeparam name="TModel"></typeparam>
         /// <returns></returns>
-        IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions);
+        IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata);
     }
 }

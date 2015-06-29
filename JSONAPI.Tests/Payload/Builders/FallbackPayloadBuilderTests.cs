@@ -113,7 +113,7 @@ namespace JSONAPI.Tests.Payload.Builders
             var mockQueryablePayloadBuilder = new Mock<IQueryableResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             var mockResourceCollectionPayloadBuilder = new Mock<IResourceCollectionPayloadBuilder>(MockBehavior.Strict);
             mockResourceCollectionPayloadBuilder
-                .Setup(b => b.BuildPayload(items, "https://www.example.com/", It.IsAny<string[]>()))
+                .Setup(b => b.BuildPayload(items, "https://www.example.com/", It.IsAny<string[]>(), It.IsAny<IMetadata>()))
                 .Returns(() => (mockPayload.Object));
 
             // Act

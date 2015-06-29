@@ -57,7 +57,7 @@ namespace JSONAPI.Payload.Builders
             var linkBaseUrl = new Uri(request.RequestUri.AbsoluteUri.Replace(request.RequestUri.PathAndQuery, String.Empty)).ToString();
 
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
-            return _resourceCollectionPayloadBuilder.BuildPayload(results, linkBaseUrl, null);
+            return _resourceCollectionPayloadBuilder.BuildPayload(results, linkBaseUrl, null, null);
         }
     }
 }

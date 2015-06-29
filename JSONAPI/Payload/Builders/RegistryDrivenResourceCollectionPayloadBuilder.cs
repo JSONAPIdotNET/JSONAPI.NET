@@ -19,7 +19,7 @@ namespace JSONAPI.Payload.Builders
         {
         }
 
-        public IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions)
+        public IResourceCollectionPayload BuildPayload<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata)
         {
             var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
             var primaryDataResources =
@@ -27,7 +27,7 @@ namespace JSONAPI.Payload.Builders
                     .ToArray();
 
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
-            var payload = new ResourceCollectionPayload(primaryDataResources, relatedData, null);
+            var payload = new ResourceCollectionPayload(primaryDataResources, relatedData, metadata);
             return payload;
         }
     }

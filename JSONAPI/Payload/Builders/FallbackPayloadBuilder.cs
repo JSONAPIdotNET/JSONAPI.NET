@@ -79,7 +79,7 @@ namespace JSONAPI.Payload.Builders
                 var buildPayloadMethod =
                     _openBuildPayloadFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
                 return
-                    (dynamic)buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] { obj, linkBaseUrl, new string[] { } });
+                    (dynamic)buildPayloadMethod.Invoke(_resourceCollectionPayloadBuilder, new[] { obj, linkBaseUrl, new string[] { }, null });
             }
 
             // Single resource object
