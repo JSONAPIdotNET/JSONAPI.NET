@@ -120,12 +120,15 @@
     <Compile Include="Controllers\SamplesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
+    <Compile Include="Controllers\LanguageUserLinksController.cs" />
     <Compile Include="Controllers\TreesController.cs" />
     <Compile Include="Controllers\UserGroupsController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Controllers\TagsController.cs" />
     <Compile Include="Controllers\PostsController.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\Language.cs" />
+    <Compile Include="Models\LanguageUserLink.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\State.cs" />

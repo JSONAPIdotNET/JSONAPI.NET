@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace JSONAPI.Core
@@ -48,6 +49,19 @@ namespace JSONAPI.Core
         /// <param name="resource"></param>
         /// <param name="id"></param>
         void SetIdForResource(object resource, string id);
+
+        /// <summary>
+        /// Returns an expression that can be used to allow getting an instance of this resource
+        /// by ID
+        /// </summary>
+        /// <returns></returns>
+        BinaryExpression GetFilterByIdExpression(ParameterExpression parameter, string id);
+
+        /// <summary>
+        /// Returns an expression that can be used to allow sorting this resource by ID.
+        /// </summary>
+        /// <returns></returns>
+        Expression GetSortByIdExpression(ParameterExpression parameter);
 
         /// <summary>
         /// Gets a field by its JSON API-normalized name

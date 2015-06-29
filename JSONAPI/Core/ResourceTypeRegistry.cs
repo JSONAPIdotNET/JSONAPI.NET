@@ -3,6 +3,7 @@ using JSONAPI.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using JSONAPI.Extensions;
 using Newtonsoft.Json;
@@ -106,12 +107,19 @@ namespace JSONAPI.Core
         protected sealed class ResourceTypeRegistration : IResourceTypeRegistration
         {
             private readonly IReadOnlyDictionary<string, ResourceTypeField> _fields;
+            private readonly Func<ParameterExpression, string, BinaryExpression> _filterByIdExpressionFactory;
+            private readonly Func<ParameterExpression, Expression> _sortByIdExpressionFactory;
 
-            internal ResourceTypeRegistration(Type type, PropertyInfo idProperty, string resourceTypeName, IDictionary<string, ResourceTypeField> fields)
+            internal ResourceTypeRegistration(Type type, PropertyInfo idProperty, string resourceTypeName,
+                IDictionary<string, ResourceTypeField> fields,
+                Func<ParameterExpression, string, BinaryExpression> filterByIdExpressionFactory,
+                Func<ParameterExpression, Expression> sortByIdExpressionFactory)
             {
                 IdProperty = idProperty;
                 Type = type;
                 ResourceTypeName = resourceTypeName;
+                _filterByIdExpressionFactory = filterByIdExpressionFactory;
+                _sortByIdExpressionFactory = sortByIdExpressionFactory;
                 Attributes = fields.Values.OfType<ResourceTypeAttribute>().ToArray();
                 Relationships = fields.Values.OfType<ResourceTypeRelationship>().ToArray();
                 _fields = new ReadOnlyDictionary<string, ResourceTypeField>(fields);
@@ -135,6 +143,16 @@ namespace JSONAPI.Core
             public void SetIdForResource(object resource, string id)
             {
                 IdProperty.SetValue(resource, id); // TODO: handle classes with non-string ID types
+            }
+
+            public BinaryExpression GetFilterByIdExpression(ParameterExpression parameter, string id)
+            {
+                return _filterByIdExpressionFactory(parameter, id);
+            }
+
+            public Expression GetSortByIdExpression(ParameterExpression parameter)
+            {
+                return _sortByIdExpressionFactory(parameter);
             }
 
             public ResourceTypeField GetFieldByName(string name)
@@ -193,26 +211,22 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Registers a type with this ModelManager.
-        /// </summary>
-        /// <param name="type">The type to register.</param>
-        public ResourceTypeRegistry RegisterResourceType(Type type)
-        {
-            var resourceTypeName = _namingConventions.GetResourceTypeNameForType(type);
-            return RegisterResourceType(type, resourceTypeName);
-        }
-
-        /// <summary>
         /// Registeres a type with this ModelManager, using a default resource type name.
         /// </summary>
         /// <param name="type">The type to register.</param>
         /// <param name="resourceTypeName">The resource type name to use</param>
-        public ResourceTypeRegistry RegisterResourceType(Type type, string resourceTypeName)
+        /// <param name="filterByIdFactory">The factory to use to build an expression that </param>
+        /// <param name="sortByIdFactory"></param>
+        public ResourceTypeRegistry RegisterResourceType(Type type, string resourceTypeName = null,
+            Func<ParameterExpression, string, BinaryExpression> filterByIdFactory = null, Func<ParameterExpression, Expression> sortByIdFactory = null)
         {
             lock (RegistrationsByType)
             {
                 lock (RegistrationsByName)
                 {
+                    if (resourceTypeName == null)
+                        resourceTypeName = _namingConventions.GetResourceTypeNameForType(type);
+
                     if (RegistrationsByType.ContainsKey(type))
                         throw new InvalidOperationException(String.Format("The type `{0}` has already been registered.",
                             type.FullName));
@@ -255,7 +269,22 @@ namespace JSONAPI.Core
                         fieldMap[jsonKey] = property;
                     }
 
-                    var registration = new ResourceTypeRegistration(type, idProperty, resourceTypeName, fieldMap);
+                    if (filterByIdFactory == null)
+                    {
+                        filterByIdFactory = (param, id) =>
+                        {
+                            var propertyExpr = Expression.Property(param, idProperty);
+                            var idExpr = Expression.Constant(id);
+                            return Expression.Equal(propertyExpr, idExpr);
+                        };
+                    }
+
+                    if (sortByIdFactory == null)
+                    {
+                        sortByIdFactory = param => Expression.Property(param, idProperty);
+                    }
+
+                    var registration = new ResourceTypeRegistration(type, idProperty, resourceTypeName, fieldMap, filterByIdFactory, sortByIdFactory);
 
                     RegistrationsByType.Add(type, registration);
                     RegistrationsByName.Add(resourceTypeName, registration);

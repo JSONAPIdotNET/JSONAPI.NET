@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Web;
 using System.Web.Http;
@@ -50,6 +51,10 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             var configuration = new JsonApiAutofacConfiguration(namingConventions);
             configuration.RegisterResourceType(typeof(City));
             configuration.RegisterResourceType(typeof(Comment));
+            configuration.RegisterResourceType(typeof(Language));
+            configuration.RegisterResourceType(typeof(LanguageUserLink),
+                sortByIdFactory: LanguageUserLinkSortByIdFactory,
+                filterByIdFactory: LanguageUserLinkFilterByIdFactory);
             configuration.RegisterResourceType(typeof(Post));
             configuration.RegisterResourceType(typeof(Sample));
             configuration.RegisterResourceType(typeof(State));
@@ -82,6 +87,30 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             app.UseWebApi(httpConfig);
             app.UseAutofacWebApi(httpConfig);
+        }
+
+        private BinaryExpression LanguageUserLinkFilterByIdFactory(ParameterExpression param, string id)
+        {
+            var split = id.Split('_');
+            var languageId = Expression.Constant(split[0]);
+            var userId = Expression.Constant(split[1]);
+
+            var languageIdPropertyExpr = Expression.Property(param, "LanguageId");
+            var languageIdPropertyEqualsExpr = Expression.Equal(languageIdPropertyExpr, languageId);
+
+            var userIdPropertyExpr = Expression.Property(param, "UserId");
+            var userIdPropertyEqualsExpr = Expression.Equal(userIdPropertyExpr, userId);
+
+            return Expression.AndAlso(languageIdPropertyEqualsExpr, userIdPropertyEqualsExpr);
+        }
+
+        private Expression LanguageUserLinkSortByIdFactory(ParameterExpression param)
+        {
+            var concatMethod = typeof(string).GetMethod("Concat", new[] { typeof(object), typeof(object) });
+
+            var languageIdExpr = Expression.Property(param, "LanguageId");
+            var userIdExpr = Expression.Property(param, "UserId");
+            return Expression.Call(concatMethod, languageIdExpr, userIdExpr);
         }
     }
 }

@@ -115,6 +115,7 @@
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\PayloadTests.cs" />
     <Compile Include="Acceptance\RelatedResourcesTests.cs" />
+    <Compile Include="Acceptance\ComputedIdTests.cs" />
     <Compile Include="Acceptance\UserGroupsTests.cs" />
     <Compile Include="Acceptance\PostsTests.cs" />
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
@@ -188,6 +189,14 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_many_response.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_one_response.json" />
+    <None Include="Acceptance\Data\LanguageUserLink.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Acceptance\Data\Language.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="Acceptance\Fixtures\ComputedId\Responses\Get_all_of_resource_with_computed_id_Response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\ComputedId\Responses\Get_resource_with_computed_id_by_id_Response.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

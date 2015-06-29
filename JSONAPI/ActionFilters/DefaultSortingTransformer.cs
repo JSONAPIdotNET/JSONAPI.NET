@@ -64,10 +64,12 @@ namespace JSONAPI.ActionFilters
                 if (string.IsNullOrWhiteSpace(propertyName))
                     throw JsonApiException.CreateForParameterError("Empty sort expression", "One of the sort expressions is empty.", "sort");
 
-                PropertyInfo property;
+                var paramExpr = Expression.Parameter(typeof(T));
+                Expression sortValueExpression;
+
                 if (propertyName == "id")
                 {
-                    property = registration.IdProperty;
+                    sortValueExpression = registration.GetSortByIdExpression(paramExpr);
                 }
                 else
                 {
@@ -77,20 +79,18 @@ namespace JSONAPI.ActionFilters
                             string.Format("The attribute \"{0}\" does not exist on type \"{1}\".",
                                 propertyName, registration.ResourceTypeName), "sort");
 
-                    property = modelProperty.Property;
+                    var property = modelProperty.Property;
+                    
+                    if (usedProperties.ContainsKey(property))
+                        throw JsonApiException.CreateForParameterError("Attribute specified more than once",
+                            string.Format("The attribute \"{0}\" was specified more than once.", propertyName), "sort");
+
+                    usedProperties[property] = null;
+
+                    sortValueExpression = Expression.Property(paramExpr, property);
                 }
 
-                
-                if (usedProperties.ContainsKey(property))
-                    throw JsonApiException.CreateForParameterError("Attribute specified more than once",
-                        string.Format("The attribute \"{0}\" was specified more than once.", propertyName), "sort");
-
-                usedProperties[property] = null;
-
-                var paramExpr = Expression.Parameter(typeof (T));
-                var propertyExpr = Expression.Property(paramExpr, property);
-                var selector = Expression.Lambda<Func<T, object>>(propertyExpr, paramExpr);
-
+                var selector = Expression.Lambda<Func<T, object>>(sortValueExpression, paramExpr);
                 selectors.Add(Tuple.Create(ascending, selector));
             }
 

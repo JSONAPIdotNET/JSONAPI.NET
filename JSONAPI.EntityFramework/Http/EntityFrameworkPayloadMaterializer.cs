@@ -62,7 +62,8 @@ namespace JSONAPI.EntityFramework.Http
         public virtual async Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
+            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
+            var singleResource = await FilterById<T>(id, registration).FirstOrDefaultAsync(cancellationToken);
             return _singleResourcePayloadBuilder.BuildPayload(singleResource, apiBaseUrl, null);
         }
 
@@ -141,11 +142,12 @@ namespace JSONAPI.EntityFramework.Http
         protected async Task<IResourceCollectionPayload> GetRelatedToMany<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var primaryEntityRegistration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
             var param = Expression.Parameter(typeof(T));
             var accessorExpr = Expression.Property(param, relationship.Property);
             var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
 
-            var primaryEntityQuery = FilterById<T>(id);
+            var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
 
             return await _queryableResourceCollectionPayloadBuilder.BuildPayload(relatedResourceQuery, request, cancellationToken);
@@ -157,11 +159,12 @@ namespace JSONAPI.EntityFramework.Http
         protected async Task<ISingleResourcePayload> GetRelatedToOne<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var primaryEntityRegistration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
             var param = Expression.Parameter(typeof(T));
             var accessorExpr = Expression.Property(param, relationship.Property);
             var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
 
-            var primaryEntityQuery = FilterById<T>(id);
+            var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
             var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
             return _singleResourcePayloadBuilder.BuildPayload(relatedResource, GetBaseUrlFromRequest(request), null);
         }
@@ -179,40 +182,13 @@ namespace JSONAPI.EntityFramework.Http
             return query.AsQueryable();
         }
 
-        private IQueryable<TResource> FilterById<TResource>(string id, params Expression<Func<TResource, object>>[] includes) where TResource : class
+        private IQueryable<TResource> FilterById<TResource>(string id, IResourceTypeRegistration resourceTypeRegistration,
+            params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
-            var keyProp = GetKeyProp(typeof(TResource));
             var param = Expression.Parameter(typeof(TResource));
-            var pkPropExpr = Expression.Property(param, keyProp);
-            var idExpr = Expression.Constant(id);
-            var equalsExpr = Expression.Equal(pkPropExpr, idExpr);
-            var predicate = Expression.Lambda<Func<TResource, bool>>(equalsExpr, param);
+            var filterByIdExpression = resourceTypeRegistration.GetFilterByIdExpression(param, id);
+            var predicate = Expression.Lambda<Func<TResource, bool>>(filterByIdExpression, param);
             return Filter(predicate, includes);
-        }
-
-        private PropertyInfo GetKeyProp(Type t)
-        {
-            IEnumerable<string> propertyNames = null;
-            while (t != null && t != typeof(Object))
-            {
-                var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric",
-                    BindingFlags.Public | BindingFlags.Static);
-                var method = openMethod.MakeGenericMethod(t);
-                try
-                {
-                    propertyNames = (IEnumerable<string>)method.Invoke(null, new object[] { _dbContext });
-                    break;
-                }
-                catch (TargetInvocationException)
-                {
-                    t = t.BaseType;
-                }
-            }
-
-            if (propertyNames == null)
-                throw new Exception(String.Format("Unable to detect key property for type {0}.", t.Name));
-
-            return typeof(T).GetProperty(propertyNames.First());
         }
     }
 }

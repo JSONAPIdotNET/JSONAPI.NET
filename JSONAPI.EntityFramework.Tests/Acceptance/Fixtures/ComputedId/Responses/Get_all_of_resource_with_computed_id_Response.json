@@ -1,0 +1,130 @@
+﻿{
+    "data": [
+        {
+            "type": "language-user-links",
+            "id": "9000_401",
+            "attributes": {
+                "fluency-level": "Native"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9000_401/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9000_401/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9000_401/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9000_401/user"
+                    }
+                }
+            }
+        },
+        {
+            "type": "language-user-links",
+            "id": "9001_401",
+            "attributes": {
+                "fluency-level": "Conversational"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9001_401/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9001_401/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9001_401/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9001_401/user"
+                    }
+                }
+            }
+        },
+        {
+            "type": "language-user-links",
+            "id": "9001_402",
+            "attributes": {
+                "fluency-level": "Native"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9001_402/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9001_402/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9001_402/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9001_402/user"
+                    }
+                }
+            }
+        },
+        {
+            "type": "language-user-links",
+            "id": "9002_401",
+            "attributes": {
+                "fluency-level": "Fluent"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9002_401/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9002_401/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9002_401/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9002_401/user"
+                    }
+                }
+            }
+        },
+        {
+            "type": "language-user-links",
+            "id": "9002_403",
+            "attributes": {
+                "fluency-level": "Native"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9002_403/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9002_403/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9002_403/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9002_403/user"
+                    }
+                }
+            }
+        },
+        {
+            "type": "language-user-links",
+            "id": "9003_404",
+            "attributes": {
+                "fluency-level": "Native"
+            },
+            "relationships": {
+                "language": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9003_404/relationships/language",
+                        "related": "https://www.example.com/language-user-links/9003_404/language"
+                    }
+                },
+                "user": {
+                    "links": {
+                        "self": "https://www.example.com/language-user-links/9003_404/relationships/user",
+                        "related": "https://www.example.com/language-user-links/9003_404/user"
+                    }
+                }
+            }
+        }
+    ]
+}

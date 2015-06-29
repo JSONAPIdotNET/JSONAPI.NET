@@ -14,13 +14,14 @@ namespace JSONAPI.Autofac
     {
         private readonly INamingConventions _namingConventions;
         private readonly ILinkConventions _linkConventions;
-        private readonly IEnumerable<Type> _typesToRegister;
+        private readonly IEnumerable<Action<ResourceTypeRegistry>> _registrationActions;
 
-        public JsonApiAutofacModule(INamingConventions namingConventions, ILinkConventions linkConventions, IEnumerable<Type> typesToRegister)
+        public JsonApiAutofacModule(INamingConventions namingConventions, ILinkConventions linkConventions,
+            IEnumerable<Action<ResourceTypeRegistry>> registrationActions)
         {
             _namingConventions = namingConventions;
             _linkConventions = linkConventions;
-            _typesToRegister = typesToRegister;
+            _registrationActions = registrationActions;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -31,8 +32,8 @@ namespace JSONAPI.Autofac
             builder.Register(c =>
             {
                 var registry = c.Resolve<ResourceTypeRegistry>();
-                foreach (var type in _typesToRegister)
-                    registry.RegisterResourceType(type);
+                foreach (var registrationAction in _registrationActions)
+                    registrationAction(registry);
                 return registry;
             }).As<IResourceTypeRegistry>().SingleInstance();
 
