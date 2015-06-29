@@ -26,5 +26,21 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 await AssertResponseContent(response, @"Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_many_response.json", HttpStatusCode.OK);
             }
         }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Get_related_to_one()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/201/author");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_one_response.json", HttpStatusCode.OK);
+            }
+        }
     }
 }

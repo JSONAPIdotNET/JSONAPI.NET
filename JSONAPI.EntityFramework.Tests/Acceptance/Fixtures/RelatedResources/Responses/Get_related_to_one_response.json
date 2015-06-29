@@ -1,0 +1,30 @@
+﻿{
+    "data": {
+        "type": "users",
+        "id": "401",
+        "attributes": {
+            "first-name": "Alice",
+            "last-name": "Smith"
+        },
+        "relationships": {
+            "comments": {
+                "links": {
+                    "self": "https://www.example.com/users/401/relationships/comments",
+                    "related": "https://www.example.com/users/401/comments"
+                }
+            },
+            "posts": {
+                "links": {
+                    "self": "https://www.example.com/users/401/relationships/posts",
+                    "related": "https://www.example.com/users/401/posts"
+                }
+            },
+            "user-groups": { 
+                "links": {
+                    "self": "https://www.example.com/users/401/relationships/user-groups",
+                    "related": "https://www.example.com/users/401/user-groups"
+                }
+            }
+        }
+    }
+}

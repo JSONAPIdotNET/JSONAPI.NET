@@ -24,6 +24,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
         private readonly MethodInfo _getRelatedToManyMethod;
+        private readonly MethodInfo _getRelatedToOneMethod;
 
         /// <summary>
         /// Creates a new EntityFrameworkPayloadMaterializer
@@ -44,6 +45,8 @@ namespace JSONAPI.EntityFramework.Http
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
             _getRelatedToManyMethod = GetType()
                 .GetMethod("GetRelatedToMany", BindingFlags.NonPublic | BindingFlags.Instance);
+            _getRelatedToOneMethod = GetType()
+                .GetMethod("GetRelatedToOne", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public virtual Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -62,7 +65,6 @@ namespace JSONAPI.EntityFramework.Http
         public virtual async Task<IJsonApiPayload> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            var apiBaseUrl = GetBaseUrlFromRequest(request);
             var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
             var relationship = (ResourceTypeRelationship) registration.GetFieldByName(relationshipKey);
 
@@ -74,7 +76,9 @@ namespace JSONAPI.EntityFramework.Http
             }
             else
             {
-                throw new NotImplementedException();
+                var method = _getRelatedToOneMethod.MakeGenericMethod(relationship.RelatedType);
+                var result = (Task<ISingleResourcePayload>)method.Invoke(this, new object[] { id, relationship, request, cancellationToken });
+                return await result;
             }
         }
 
@@ -141,6 +145,19 @@ namespace JSONAPI.EntityFramework.Http
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
 
             return await _queryableResourceCollectionPayloadBuilder.BuildPayload(relatedResourceQuery, request, cancellationToken);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private async Task<ISingleResourcePayload> GetRelatedToOne<TRelated>(string id,
+            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var param = Expression.Parameter(typeof(T));
+            var accessorExpr = Expression.Property(param, relationship.Property);
+            var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
+
+            var primaryEntityQuery = FilterById<T>(id);
+            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
+            return _singleResourcePayloadBuilder.BuildPayload(relatedResource, GetBaseUrlFromRequest(request), null);
         }
 
         private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,

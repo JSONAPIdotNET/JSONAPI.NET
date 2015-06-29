@@ -187,6 +187,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Requests\PatchWithMissingToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\Posts\Responses\PatchWithMissingToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_many_response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_one_response.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

@@ -21,7 +21,7 @@ namespace JSONAPI.EntityFramework
         /// <returns></returns>
         public static IEnumerable<string> GetKeyNames(this DbContext dbContext, Type type)
         {
-            var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
+            var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.Public | BindingFlags.Static);
             var method = openMethod.MakeGenericMethod(type);
             try
             {
