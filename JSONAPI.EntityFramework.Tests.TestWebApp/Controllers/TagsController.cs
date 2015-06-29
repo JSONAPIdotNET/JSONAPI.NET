@@ -5,7 +5,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class TagsController : JsonApiController<Tag>
     {
-        public TagsController(IPayloadMaterializer payloadMaterializer) : base(payloadMaterializer)
+        public TagsController(IPayloadMaterializer<Tag> payloadMaterializer) : base(payloadMaterializer)
         {
         }
     }

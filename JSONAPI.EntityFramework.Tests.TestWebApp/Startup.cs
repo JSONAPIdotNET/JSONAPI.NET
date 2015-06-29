@@ -61,9 +61,9 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
-            containerBuilder.RegisterType<EntityFrameworkPayloadMaterializer>()
+            containerBuilder.RegisterGeneric(typeof (EntityFrameworkPayloadMaterializer<>))
                 .WithParameter("apiBaseUrl", "https://www.example.com")
-                .As<IPayloadMaterializer>();
+                .AsImplementedInterfaces();
             containerBuilder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
             containerBuilder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());

@@ -1,10 +1,8 @@
 ﻿using System.Web.Http;
 using Autofac;
-using Autofac.Integration.WebApi;
 using JSONAPI.Autofac;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.Http;
-using JSONAPI.Http;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 
@@ -32,9 +30,9 @@ namespace JSONAPI.TodoMVC.API
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
-            containerBuilder.RegisterType<EntityFrameworkPayloadMaterializer>()
+            containerBuilder.RegisterGeneric(typeof(EntityFrameworkPayloadMaterializer<>))
                 .WithParameter("apiBaseUrl", "https://www.example.com")
-                .As<IPayloadMaterializer>();
+                .AsImplementedInterfaces();
             var container = containerBuilder.Build();
             httpConfig.UseJsonApiWithAutofac(container);
 

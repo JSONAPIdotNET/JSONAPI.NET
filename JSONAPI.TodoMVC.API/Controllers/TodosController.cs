@@ -5,7 +5,7 @@ namespace JSONAPI.TodoMVC.API.Controllers
 {
     public class TodosController : JsonApiController<Todo>
     {
-        public TodosController(IPayloadMaterializer payloadMaterializer) : base(payloadMaterializer)
+        public TodosController(IPayloadMaterializer<Todo> payloadMaterializer) : base(payloadMaterializer)
         {
         }
     }

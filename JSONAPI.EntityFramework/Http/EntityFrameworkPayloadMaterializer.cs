@@ -11,9 +11,9 @@ using JSONAPI.Payload.Builders;
 namespace JSONAPI.EntityFramework.Http
 {
     /// <summary>
-    /// Implementation of <see cref="IPayloadMaterializer"/> for use with Entity Framework.
+    /// Implementation of IPayloadMaterializer for use with Entity Framework.
     /// </summary>
-    public class EntityFrameworkPayloadMaterializer : IPayloadMaterializer
+    public class EntityFrameworkPayloadMaterializer<T> : IPayloadMaterializer<T> where T : class
     {
         private readonly string _apiBaseUrl;
         private readonly DbContext _dbContext;
@@ -43,19 +43,20 @@ namespace JSONAPI.EntityFramework.Http
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
         }
 
-        public Task<IResourceCollectionPayload> GetRecords<T>(HttpRequestMessage request, CancellationToken cancellationToken) where T : class
+        public Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var query = _dbContext.Set<T>().AsQueryable();
             return _queryableResourceCollectionPayloadBuilder.BuildPayload(query, request, cancellationToken);
         }
 
-        public async Task<ISingleResourcePayload> GetRecordById<T>(string id, HttpRequestMessage request, CancellationToken cancellationToken) where T : class
+        public async Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
             return _singleResourcePayloadBuilder.BuildPayload(singleResource, _apiBaseUrl, null);
         }
 
-        public async Task<ISingleResourcePayload> CreateRecord<T>(ISingleResourcePayload requestPayload, HttpRequestMessage request, CancellationToken cancellationToken) where T : class
+        public async Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload,
+            HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
             var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, _apiBaseUrl, null);
@@ -64,7 +65,8 @@ namespace JSONAPI.EntityFramework.Http
             return returnPayload;
         }
 
-        public async Task<ISingleResourcePayload> UpdateRecord<T>(string id, ISingleResourcePayload requestPayload, HttpRequestMessage request, CancellationToken cancellationToken) where T : class
+        public async Task<ISingleResourcePayload> UpdateRecord(string id, ISingleResourcePayload requestPayload,
+            HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
             var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, _apiBaseUrl, null);
@@ -73,7 +75,7 @@ namespace JSONAPI.EntityFramework.Http
             return returnPayload;
         }
 
-        public async Task<IJsonApiPayload> DeleteRecord<T>(string id, CancellationToken cancellationToken) where T : class
+        public async Task<IJsonApiPayload> DeleteRecord(string id, CancellationToken cancellationToken)
         {
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
             _dbContext.Set<T>().Remove(singleResource);

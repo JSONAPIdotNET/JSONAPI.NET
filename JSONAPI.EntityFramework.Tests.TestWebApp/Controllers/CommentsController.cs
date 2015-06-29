@@ -5,7 +5,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class CommentsController : JsonApiController<Comment>
     {
-        public CommentsController(IPayloadMaterializer payloadMaterializer) : base(payloadMaterializer)
+        public CommentsController(IPayloadMaterializer<Comment> payloadMaterializer) : base(payloadMaterializer)
         {
         }
     }

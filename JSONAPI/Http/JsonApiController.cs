@@ -11,13 +11,13 @@ namespace JSONAPI.Http
     /// </summary>
     public class JsonApiController<T> : ApiController where T : class
     {
-        private readonly IPayloadMaterializer _payloadMaterializer;
+        private readonly IPayloadMaterializer<T> _payloadMaterializer;
 
         /// <summary>
         /// Creates a new ApiController
         /// </summary>
         /// <param name="payloadMaterializer"></param>
-        public JsonApiController(IPayloadMaterializer payloadMaterializer)
+        public JsonApiController(IPayloadMaterializer<T> payloadMaterializer)
         {
             _payloadMaterializer = payloadMaterializer;
         }
@@ -28,7 +28,7 @@ namespace JSONAPI.Http
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Get(CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.GetRecords<T>(Request, cancellationToken);
+            var payload = await _payloadMaterializer.GetRecords(Request, cancellationToken);
             return Ok(payload);
         }
 
@@ -40,7 +40,7 @@ namespace JSONAPI.Http
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Get(string id, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.GetRecordById<T>(id, Request, cancellationToken);
+            var payload = await _payloadMaterializer.GetRecordById(id, Request, cancellationToken);
             return Ok(payload);
         }
 
@@ -52,7 +52,7 @@ namespace JSONAPI.Http
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Post([FromBody]ISingleResourcePayload requestPayload, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.CreateRecord<T>(requestPayload, Request, cancellationToken);
+            var payload = await _payloadMaterializer.CreateRecord(requestPayload, Request, cancellationToken);
             return Ok(payload);
         }
 
@@ -65,7 +65,7 @@ namespace JSONAPI.Http
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Patch(string id, [FromBody]ISingleResourcePayload requestPayload, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.UpdateRecord<T>(id, requestPayload, Request, cancellationToken);
+            var payload = await _payloadMaterializer.UpdateRecord(id, requestPayload, Request, cancellationToken);
             return Ok(payload);
         }
 
@@ -76,7 +76,7 @@ namespace JSONAPI.Http
         /// <param name="cancellationToken"></param>
         public virtual async Task<IHttpActionResult> Delete(string id, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.DeleteRecord<T>(id, cancellationToken);
+            var payload = await _payloadMaterializer.DeleteRecord(id, cancellationToken);
             return Ok(payload);
         }
     }
