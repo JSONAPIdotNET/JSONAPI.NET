@@ -43,19 +43,19 @@ namespace JSONAPI.EntityFramework.Http
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
         }
 
-        public Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
+        public virtual Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var query = _dbContext.Set<T>().AsQueryable();
             return _queryableResourceCollectionPayloadBuilder.BuildPayload(query, request, cancellationToken);
         }
 
-        public async Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
+        public virtual async Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
             return _singleResourcePayloadBuilder.BuildPayload(singleResource, _apiBaseUrl, null);
         }
 
-        public async Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload,
+        public virtual async Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
@@ -65,7 +65,7 @@ namespace JSONAPI.EntityFramework.Http
             return returnPayload;
         }
 
-        public async Task<ISingleResourcePayload> UpdateRecord(string id, ISingleResourcePayload requestPayload,
+        public virtual async Task<ISingleResourcePayload> UpdateRecord(string id, ISingleResourcePayload requestPayload,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
@@ -75,7 +75,7 @@ namespace JSONAPI.EntityFramework.Http
             return returnPayload;
         }
 
-        public async Task<IJsonApiPayload> DeleteRecord(string id, CancellationToken cancellationToken)
+        public virtual async Task<IJsonApiPayload> DeleteRecord(string id, CancellationToken cancellationToken)
         {
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
             _dbContext.Set<T>().Remove(singleResource);
