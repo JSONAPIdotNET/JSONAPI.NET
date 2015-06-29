@@ -133,8 +133,10 @@ namespace JSONAPI.EntityFramework.Http
             return await materializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private async Task<IResourceCollectionPayload> GetRelatedToMany<TRelated>(string id,
+        /// <summary>
+        /// Generic method for getting the related resources for a to-many relationship
+        /// </summary>
+        protected async Task<IResourceCollectionPayload> GetRelatedToMany<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var param = Expression.Parameter(typeof(T));
@@ -147,8 +149,10 @@ namespace JSONAPI.EntityFramework.Http
             return await _queryableResourceCollectionPayloadBuilder.BuildPayload(relatedResourceQuery, request, cancellationToken);
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private async Task<ISingleResourcePayload> GetRelatedToOne<TRelated>(string id,
+        /// <summary>
+        /// Generic method for getting the related resources for a to-one relationship
+        /// </summary>
+        protected async Task<ISingleResourcePayload> GetRelatedToOne<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var param = Expression.Parameter(typeof(T));
