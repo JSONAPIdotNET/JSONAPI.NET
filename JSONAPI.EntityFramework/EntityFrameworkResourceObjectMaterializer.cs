@@ -16,7 +16,7 @@ namespace JSONAPI.EntityFramework
     /// This class manages converting IResourceObject instances from a request into records managed
     /// by Entity Framework.
     /// </summary>
-    public class EntityFrameworkEntityFrameworkResourceObjectMaterializer
+    public class EntityFrameworkResourceObjectMaterializer
     {
         private readonly DbContext _dbContext;
         private readonly IResourceTypeRegistry _registry;
@@ -27,7 +27,7 @@ namespace JSONAPI.EntityFramework
         /// </summary>
         /// <param name="dbContext"></param>
         /// <param name="registry"></param>
-        public EntityFrameworkEntityFrameworkResourceObjectMaterializer(DbContext dbContext, IResourceTypeRegistry registry)
+        public EntityFrameworkResourceObjectMaterializer(DbContext dbContext, IResourceTypeRegistry registry)
         {
             _dbContext = dbContext;
             _registry = registry;

@@ -90,7 +90,7 @@ namespace JSONAPI.EntityFramework.Http
         /// <returns></returns>
         protected virtual async Task<object> MaterializeAsync(IResourceObject resourceObject, CancellationToken cancellationToken)
         {
-            var materializer = new EntityFrameworkEntityFrameworkResourceObjectMaterializer(_dbContext, _resourceTypeRegistry);
+            var materializer = new EntityFrameworkResourceObjectMaterializer(_dbContext, _resourceTypeRegistry);
             return await materializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
     }
