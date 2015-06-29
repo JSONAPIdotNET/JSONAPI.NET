@@ -33,7 +33,7 @@ namespace JSONAPI.Http
         }
 
         /// <summary>
-        /// Gets a single records matching the ID.
+        /// Returns a payload corresponding to the single record matching the ID.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
@@ -45,7 +45,22 @@ namespace JSONAPI.Http
         }
 
         /// <summary>
-        /// Creates a new records corresponding to the data in the request payload.
+        /// Returns a payload corresponding to the resource(s) related to the resource identified by the ID,
+        /// and the relationship name.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="relationshipName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public virtual async Task<IHttpActionResult> GetRelatedResource(string id, string relationshipName, CancellationToken cancellationToken)
+        {
+            var payload = await _payloadMaterializer.GetRelated(id, relationshipName, Request, cancellationToken);
+            return Ok(payload);
+        }
+
+
+        /// <summary>
+        /// Creates a new record corresponding to the data in the request payload.
         /// </summary>
         /// <param name="requestPayload"></param>
         /// <param name="cancellationToken"></param>
@@ -70,7 +85,7 @@ namespace JSONAPI.Http
         }
 
         /// <summary>
-        /// A no-op method. This should be overriden in subclasses if Delete is to be supported.
+        /// Deletes the record corresponding to the ID.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>

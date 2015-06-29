@@ -74,7 +74,9 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             httpConfig.UseJsonApiWithAutofac(container);
 
             // Web API routes
-            httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+            httpConfig.Routes.MapHttpRoute("ResourceCollection", "{controller}");
+            httpConfig.Routes.MapHttpRoute("Resource", "{controller}/{id}");
+            httpConfig.Routes.MapHttpRoute("RelatedResource", "{controller}/{id}/{relationshipName}");
 
             app.UseAutofacMiddleware(container);
 

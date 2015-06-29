@@ -33,8 +33,14 @@ namespace JSONAPI.EntityFramework
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private static IEnumerable<string> GetKeyNamesFromGeneric<T>(this DbContext dbContext) where T : class
+        /// <summary>
+        /// Gets the ID key names for an entity type
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static IEnumerable<string> GetKeyNamesFromGeneric<T>(this DbContext dbContext) where T : class
         {
             var objectContext = ((IObjectContextAdapter)dbContext).ObjectContext;
             ObjectSet<T> objectSet;

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
@@ -20,6 +23,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
+        private readonly MethodInfo _getRelatedToManyMethod;
 
         /// <summary>
         /// Creates a new EntityFrameworkPayloadMaterializer
@@ -38,6 +42,8 @@ namespace JSONAPI.EntityFramework.Http
             _resourceTypeRegistry = resourceTypeRegistry;
             _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
+            _getRelatedToManyMethod = GetType()
+                .GetMethod("GetRelatedToMany", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public virtual Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -51,6 +57,25 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
             return _singleResourcePayloadBuilder.BuildPayload(singleResource, apiBaseUrl, null);
+        }
+
+        public virtual async Task<IJsonApiPayload> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var apiBaseUrl = GetBaseUrlFromRequest(request);
+            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
+            var relationship = (ResourceTypeRelationship) registration.GetFieldByName(relationshipKey);
+
+            if (relationship.IsToMany)
+            {
+                var method = _getRelatedToManyMethod.MakeGenericMethod(relationship.RelatedType);
+                var result = (Task<IResourceCollectionPayload>)method.Invoke(this, new object[] { id, relationship, request, cancellationToken });
+                return await result;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public virtual async Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload,
@@ -102,6 +127,69 @@ namespace JSONAPI.EntityFramework.Http
         {
             var materializer = new EntityFrameworkResourceObjectMaterializer(_dbContext, _resourceTypeRegistry);
             return await materializer.MaterializeResourceObject(resourceObject, cancellationToken);
+        }
+
+        // ReSharper disable once UnusedMember.Local
+        private async Task<IResourceCollectionPayload> GetRelatedToMany<TRelated>(string id,
+            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var param = Expression.Parameter(typeof(T));
+            var accessorExpr = Expression.Property(param, relationship.Property);
+            var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
+
+            var primaryEntityQuery = FilterById<T>(id);
+            var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
+
+            return await _queryableResourceCollectionPayloadBuilder.BuildPayload(relatedResourceQuery, request, cancellationToken);
+        }
+
+        private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
+            params Expression<Func<TResource, object>>[] includes) where TResource : class
+        {
+            IQueryable<TResource> query = _dbContext.Set<TResource>();
+            if (includes != null && includes.Any())
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.AsQueryable();
+        }
+
+        private IQueryable<TResource> FilterById<TResource>(string id, params Expression<Func<TResource, object>>[] includes) where TResource : class
+        {
+            var keyProp = GetKeyProp(typeof(TResource));
+            var param = Expression.Parameter(typeof(TResource));
+            var pkPropExpr = Expression.Property(param, keyProp);
+            var idExpr = Expression.Constant(id);
+            var equalsExpr = Expression.Equal(pkPropExpr, idExpr);
+            var predicate = Expression.Lambda<Func<TResource, bool>>(equalsExpr, param);
+            return Filter(predicate, includes);
+        }
+
+        private PropertyInfo GetKeyProp(Type t)
+        {
+            IEnumerable<string> propertyNames = null;
+            while (t != null && t != typeof(Object))
+            {
+                var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric",
+                    BindingFlags.Public | BindingFlags.Static);
+                var method = openMethod.MakeGenericMethod(t);
+                try
+                {
+                    propertyNames = (IEnumerable<string>)method.Invoke(null, new object[] { _dbContext });
+                    break;
+                }
+                catch (TargetInvocationException)
+                {
+                    t = t.BaseType;
+                }
+            }
+
+            if (propertyNames == null)
+                throw new Exception(String.Format("Unable to detect key property for type {0}.", t.Name));
+
+            return typeof(T).GetProperty(propertyNames.First());
         }
     }
 }

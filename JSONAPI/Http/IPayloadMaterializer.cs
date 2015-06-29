@@ -14,21 +14,24 @@ namespace JSONAPI.Http
         /// Returns a payload containing records that are filtered, sorted,
         /// and paginated according to query parameters present in the provided request.
         /// </summary>
-        /// <returns></returns>
         Task<IResourceCollectionPayload> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns a payload with the resource identified by the given ID.
         /// </summary>
-        /// <returns></returns>
         Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request,
+            CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets the resource(s) related to the resource identified by the given ID
+        /// </summary>
+        Task<IJsonApiPayload> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
             CancellationToken cancellationToken);
 
         /// <summary>
         /// Creates a record corresponding to the data in the request payload, and returns a payload
         /// corresponding to the created record.
         /// </summary>
-        /// <returns></returns>
         Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload, HttpRequestMessage request,
             CancellationToken cancellationToken);
 
@@ -36,14 +39,12 @@ namespace JSONAPI.Http
         /// Updates the record corresponding to the data in the request payload, and returns a payload
         /// corresponding to the updated record.
         /// </summary>
-        /// <returns></returns>
         Task<ISingleResourcePayload> UpdateRecord(string id, ISingleResourcePayload requestPayload,
             HttpRequestMessage request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Deletes the record corresponding to the given id.
         /// </summary>
-        /// <returns></returns>
         Task<IJsonApiPayload> DeleteRecord(string id, CancellationToken cancellationToken);
     }
 }

@@ -1,0 +1,70 @@
+﻿{
+    "data": [
+        {
+            "type": "comments",
+            "id": "101",
+            "attributes": {
+                "created": "2015-01-31T14:30:00.0000000+00:00",
+                "text": "Comment 1"
+            },
+            "relationships": {
+                "author": {
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/author",
+                        "related": "https://www.example.com/comments/101/author"
+                    }
+                },
+                "post": {
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/post",
+                        "related": "https://www.example.com/comments/101/post"
+                    }
+                }
+            }
+        },
+        {
+            "type": "comments",
+            "id": "102",
+            "attributes": {
+                "created": "2015-01-31T14:35:00.0000000+00:00",
+                "text": "Comment 2"
+            },
+            "relationships": {
+                "author": {
+                    "links": {
+                        "self": "https://www.example.com/comments/102/relationships/author",
+                        "related": "https://www.example.com/comments/102/author"
+                    }
+                },
+                "post": {
+                    "links": {
+                        "self": "https://www.example.com/comments/102/relationships/post",
+                        "related": "https://www.example.com/comments/102/post"
+                    }
+                }
+            }
+        },
+        {
+            "type": "comments",
+            "id": "103",
+            "attributes": {
+                "created": "2015-01-31T14:41:00.0000000+00:00",
+                "text": "Comment 3"
+            },
+            "relationships": {
+                "author": {
+                    "links": {
+                        "self": "https://www.example.com/comments/103/relationships/author",
+                        "related": "https://www.example.com/comments/103/author"
+                    }
+                },
+                "post": {
+                    "links": {
+                        "self": "https://www.example.com/comments/103/relationships/post",
+                        "related": "https://www.example.com/comments/103/post"
+                    }
+                }
+            }
+        }
+    ]
+}
