@@ -9,7 +9,6 @@ using JSONAPI.Autofac;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.Http;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
-using JSONAPI.Http;
 using Microsoft.Owin;
 using Owin;
 
@@ -62,7 +61,6 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
             containerBuilder.RegisterGeneric(typeof (EntityFrameworkPayloadMaterializer<>))
-                .WithParameter("apiBaseUrl", "https://www.example.com")
                 .AsImplementedInterfaces();
             containerBuilder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
             containerBuilder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();

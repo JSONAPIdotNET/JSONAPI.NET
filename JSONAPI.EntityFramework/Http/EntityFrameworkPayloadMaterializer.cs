@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -15,7 +16,6 @@ namespace JSONAPI.EntityFramework.Http
     /// </summary>
     public class EntityFrameworkPayloadMaterializer<T> : IPayloadMaterializer<T> where T : class
     {
-        private readonly string _apiBaseUrl;
         private readonly DbContext _dbContext;
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
@@ -24,19 +24,16 @@ namespace JSONAPI.EntityFramework.Http
         /// <summary>
         /// Creates a new EntityFrameworkPayloadMaterializer
         /// </summary>
-        /// <param name="apiBaseUrl">The base url of the API, e.g. https://www.example.com</param>
         /// <param name="dbContext"></param>
         /// <param name="resourceTypeRegistry"></param>
         /// <param name="queryableResourceCollectionPayloadBuilder"></param>
         /// <param name="singleResourcePayloadBuilder"></param>
         public EntityFrameworkPayloadMaterializer(
-            string apiBaseUrl,
             DbContext dbContext,
             IResourceTypeRegistry resourceTypeRegistry,
             IQueryableResourceCollectionPayloadBuilder queryableResourceCollectionPayloadBuilder,
             ISingleResourcePayloadBuilder singleResourcePayloadBuilder)
         {
-            _apiBaseUrl = apiBaseUrl;
             _dbContext = dbContext;
             _resourceTypeRegistry = resourceTypeRegistry;
             _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
@@ -51,15 +48,17 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual async Task<ISingleResourcePayload> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var apiBaseUrl = GetBaseUrlFromRequest(request);
             var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
-            return _singleResourcePayloadBuilder.BuildPayload(singleResource, _apiBaseUrl, null);
+            return _singleResourcePayloadBuilder.BuildPayload(singleResource, apiBaseUrl, null);
         }
 
         public virtual async Task<ISingleResourcePayload> CreateRecord(ISingleResourcePayload requestPayload,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
-            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, _apiBaseUrl, null);
+            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, apiBaseUrl, null);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return returnPayload;
@@ -68,8 +67,9 @@ namespace JSONAPI.EntityFramework.Http
         public virtual async Task<ISingleResourcePayload> UpdateRecord(string id, ISingleResourcePayload requestPayload,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
-            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, _apiBaseUrl, null);
+            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, apiBaseUrl, null);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return returnPayload;
@@ -82,6 +82,16 @@ namespace JSONAPI.EntityFramework.Http
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets the base URL for link creation from the current request
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected static string GetBaseUrlFromRequest(HttpRequestMessage request)
+        {
+            return new Uri(request.RequestUri.AbsoluteUri.Replace(request.RequestUri.PathAndQuery, String.Empty)).ToString();
         }
 
         /// <summary>

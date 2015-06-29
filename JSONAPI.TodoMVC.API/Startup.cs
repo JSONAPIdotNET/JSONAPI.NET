@@ -31,7 +31,6 @@ namespace JSONAPI.TodoMVC.API
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
             containerBuilder.RegisterGeneric(typeof(EntityFrameworkPayloadMaterializer<>))
-                .WithParameter("apiBaseUrl", "https://www.example.com")
                 .AsImplementedInterfaces();
             var container = containerBuilder.Build();
             httpConfig.UseJsonApiWithAutofac(container);
