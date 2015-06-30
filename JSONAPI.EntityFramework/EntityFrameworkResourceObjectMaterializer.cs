@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace JSONAPI.EntityFramework
         private readonly DbContext _dbContext;
         private readonly IResourceTypeRegistry _registry;
         private readonly MethodInfo _openSetToManyRelationshipValueMethod;
+        private readonly MethodInfo _openGetExistingRecordGenericMethod;
 
         /// <summary>
         /// Creates a new EntityFrameworkEntityFrameworkResourceObjectMaterializer
@@ -32,13 +34,25 @@ namespace JSONAPI.EntityFramework
             _registry = registry;
             _openSetToManyRelationshipValueMethod = GetType()
                 .GetMethod("SetToManyRelationshipValue", BindingFlags.NonPublic | BindingFlags.Instance);
+            _openGetExistingRecordGenericMethod = GetType()
+                .GetMethod("GetExistingRecordGeneric", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public async Task<object> MaterializeResourceObject(IResourceObject resourceObject, CancellationToken cancellationToken)
         {
             var registration = _registry.GetRegistrationForResourceTypeName(resourceObject.Type);
+            
+            var relationshipsToInclude = new List<ResourceTypeRelationship>();
+            if (resourceObject.Relationships != null)
+            {
+                relationshipsToInclude.AddRange(
+                    resourceObject.Relationships
+                        .Select(relationshipObject => registration.GetFieldByName(relationshipObject.Key))
+                        .OfType<ResourceTypeRelationship>());
+            }
 
-            var material = await GetExistingRecord(registration, resourceObject.Id, cancellationToken);
+
+            var material = await GetExistingRecord(registration, resourceObject.Id, relationshipsToInclude.ToArray(), cancellationToken);
             if (material == null)
             {
                 material = Activator.CreateInstance(registration.Type);
@@ -64,13 +78,13 @@ namespace JSONAPI.EntityFramework
         /// <summary>
         /// Gets an existing record from the store by ID, if it exists
         /// </summary>
-        /// <param name="registration"></param>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual Task<object> GetExistingRecord(IResourceTypeRegistration registration, string id, CancellationToken cancellationToken)
+        protected virtual async Task<object> GetExistingRecord(IResourceTypeRegistration registration, string id,
+            ResourceTypeRelationship[] relationshipsToInclude, CancellationToken cancellationToken)
         {
-            return _dbContext.Set(registration.Type).FindAsync(cancellationToken, id);
+            var method = _openGetExistingRecordGenericMethod.MakeGenericMethod(registration.Type);
+            var result = (dynamic) method.Invoke(this, new object[] {registration, id, relationshipsToInclude, cancellationToken});
+            return await result;
         }
 
         /// <summary>
@@ -127,7 +141,7 @@ namespace JSONAPI.EntityFramework
                         var relatedId = resourceIdentifierObject["id"].Value<string>();
                         
                         var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(relatedType);
-                        var relatedObject = await GetExistingRecord(relatedObjectRegistration, relatedId, cancellationToken);
+                        var relatedObject = await GetExistingRecord(relatedObjectRegistration, relatedId, null, cancellationToken);
                         newCollection.Add(relatedObject);
                     }
 
@@ -142,9 +156,6 @@ namespace JSONAPI.EntityFramework
 
                     if (linkage.LinkageToken == null)
                     {
-                        // For some reason we have to get the value first, or else setting it to null does nothing.
-                        // TODO: This will cause a synchronous query. We can get rid of this line entirely by using Include when the object is first fetched.
-                        typeRelationship.Property.GetValue(material);
                         typeRelationship.Property.SetValue(material, null);
                     }
                     else
@@ -161,7 +172,7 @@ namespace JSONAPI.EntityFramework
 
                         var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(relatedType);
                         var relatedObject =
-                            await GetExistingRecord(relatedObjectRegistration, relatedId, cancellationToken);
+                            await GetExistingRecord(relatedObjectRegistration, relatedId, null, cancellationToken);
 
                         typeRelationship.Property.SetValue(material, relatedObject);
                     }
@@ -170,11 +181,31 @@ namespace JSONAPI.EntityFramework
         }
 
         /// <summary>
+        /// Gets a record by ID
+        /// </summary>
+        protected async Task<TRecord> GetExistingRecordGeneric<TRecord>(IResourceTypeRegistration registration,
+            string id, ResourceTypeRelationship[] relationshipsToInclude, CancellationToken cancellationToken) where TRecord : class
+        {
+            var param = Expression.Parameter(registration.Type);
+            var filterExpression = registration.GetFilterByIdExpression(param, id);
+            var lambda = Expression.Lambda<Func<TRecord, bool>>(filterExpression, param);
+            var query = _dbContext.Set<TRecord>().AsQueryable()
+                .Where(lambda);
+
+            if (relationshipsToInclude != null)
+            {
+                query = relationshipsToInclude.Aggregate(query,
+                    (current, resourceTypeRelationship) => current.Include(resourceTypeRelationship.Property.Name));
+            }
+
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
+
+        /// <summary>
         /// Sets the value of a to-many relationship
         /// </summary>
         protected void SetToManyRelationshipValue<TRelated>(object material, IEnumerable<object> relatedObjects, ResourceTypeRelationship relationship)
         {
-            // TODO: we need to fetch this property asynchronously first
             var currentValue = relationship.Property.GetValue(material);
             var typedArray = relatedObjects.Select(o => (TRelated) o).ToArray();
             if (relationship.Property.PropertyType.IsAssignableFrom(typeof (List<TRelated>)))
