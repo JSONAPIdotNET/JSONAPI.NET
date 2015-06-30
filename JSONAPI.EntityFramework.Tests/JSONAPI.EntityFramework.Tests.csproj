@@ -200,6 +200,10 @@
     <EmbeddedResource Include="Acceptance\Fixtures\ComputedId\Responses\Get_resource_with_computed_id_by_id_Response.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Requests\Post_with_empty_id_Request.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_attribute_Request.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_attribute_Response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_relationship_Response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_relationship_Request.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

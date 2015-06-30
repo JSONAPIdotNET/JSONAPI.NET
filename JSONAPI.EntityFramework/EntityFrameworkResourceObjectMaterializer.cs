@@ -87,7 +87,8 @@ namespace JSONAPI.EntityFramework
         {
             foreach (var attributeValue in resourceObject.Attributes)
             {
-                var attribute = (ResourceTypeAttribute) registration.GetFieldByName(attributeValue.Key);
+                var attribute = registration.GetFieldByName(attributeValue.Key) as ResourceTypeAttribute;
+                if (attribute == null) continue;
                 attribute.SetValue(material, attributeValue.Value);
             }
 
@@ -95,7 +96,9 @@ namespace JSONAPI.EntityFramework
             {
                 var linkage = relationshipValue.Value.Linkage;
 
-                var typeRelationship = (ResourceTypeRelationship) registration.GetFieldByName(relationshipValue.Key);
+                var typeRelationship = registration.GetFieldByName(relationshipValue.Key) as ResourceTypeRelationship;
+                if (typeRelationship == null) continue;
+
                 if (typeRelationship.IsToMany)
                 {
                     if (linkage == null)

@@ -47,6 +47,64 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
         [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Patch_with_unknown_attribute()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_attribute_Request.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_attribute_Response.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("New post title");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Patch_with_unknown_relationship()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202", @"Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_relationship_Request.json");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_relationship_Response.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("New post title");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
         public async Task PatchWithToManyUpdate()
         {
             using (var effortConnection = GetEffortConnection())
