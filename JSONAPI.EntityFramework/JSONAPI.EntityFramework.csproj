@@ -74,6 +74,7 @@
     <Compile Include="DbContextExtensions.cs" />
     <Compile Include="Http\EntityFrameworkPayloadMaterializer.cs" />
     <Compile Include="EntityFrameworkPluralizationService.cs" />
+    <Compile Include="IEntityFrameworkResourceObjectMaterializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EntityFrameworkResourceObjectMaterializer.cs" />
   </ItemGroup>

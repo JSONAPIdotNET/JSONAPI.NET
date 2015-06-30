@@ -1,0 +1,18 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "attributes": {
+            "title": "New post",
+            "content": "The server generated my ID",
+            "created": "2015-04-13T12:09:00+03:00"
+        },
+        "relationships": {
+            "author": {
+                "data": {
+                    "type": "users",
+                    "id": "401"
+                }
+            }
+        }
+    }
+}

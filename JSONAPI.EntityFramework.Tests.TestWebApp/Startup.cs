@@ -7,6 +7,7 @@ using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
 using JSONAPI.Autofac;
+using JSONAPI.Autofac.EntityFramework;
 using JSONAPI.Core;
 using JSONAPI.EntityFramework.Http;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
@@ -62,14 +63,16 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             configuration.RegisterResourceType(typeof(User));
             configuration.RegisterResourceType(typeof(UserGroup));
             var module = configuration.GetAutofacModule();
+            var efModule = configuration.GetEntityFrameworkAutofacModule();
 
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
-            containerBuilder.RegisterGeneric(typeof (EntityFrameworkPayloadMaterializer<>))
-                .AsImplementedInterfaces();
+            containerBuilder.RegisterModule(efModule);
             containerBuilder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
             containerBuilder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            containerBuilder.RegisterType<CustomEntityFrameworkResourceObjectMaterializer>()
+                .As<IEntityFrameworkResourceObjectMaterializer>();
             var container = containerBuilder.Build();
 
             var httpConfig = new HttpConfiguration

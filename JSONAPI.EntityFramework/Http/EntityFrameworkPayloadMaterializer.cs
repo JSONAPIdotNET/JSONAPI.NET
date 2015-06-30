@@ -23,6 +23,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly IQueryableResourceCollectionPayloadBuilder _queryableResourceCollectionPayloadBuilder;
         private readonly ISingleResourcePayloadBuilder _singleResourcePayloadBuilder;
+        private readonly IEntityFrameworkResourceObjectMaterializer _entityFrameworkResourceObjectMaterializer;
         private readonly IBaseUrlService _baseUrlService;
         private readonly MethodInfo _getRelatedToManyMethod;
         private readonly MethodInfo _getRelatedToOneMethod;
@@ -34,18 +35,21 @@ namespace JSONAPI.EntityFramework.Http
         /// <param name="resourceTypeRegistry"></param>
         /// <param name="queryableResourceCollectionPayloadBuilder"></param>
         /// <param name="singleResourcePayloadBuilder"></param>
+        /// <param name="entityFrameworkResourceObjectMaterializer"></param>
         /// <param name="baseUrlService"></param>
         public EntityFrameworkPayloadMaterializer(
             DbContext dbContext,
             IResourceTypeRegistry resourceTypeRegistry,
             IQueryableResourceCollectionPayloadBuilder queryableResourceCollectionPayloadBuilder,
             ISingleResourcePayloadBuilder singleResourcePayloadBuilder,
+            IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
             IBaseUrlService baseUrlService)
         {
             _dbContext = dbContext;
             _resourceTypeRegistry = resourceTypeRegistry;
             _queryableResourceCollectionPayloadBuilder = queryableResourceCollectionPayloadBuilder;
             _singleResourcePayloadBuilder = singleResourcePayloadBuilder;
+            _entityFrameworkResourceObjectMaterializer = entityFrameworkResourceObjectMaterializer;
             _baseUrlService = baseUrlService;
             _getRelatedToManyMethod = GetType()
                 .GetMethod("GetRelatedToMany", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -92,8 +96,8 @@ namespace JSONAPI.EntityFramework.Http
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await MaterializeAsync(requestPayload.PrimaryData, cancellationToken);
-            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, apiBaseUrl, null);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            var returnPayload = _singleResourcePayloadBuilder.BuildPayload(newRecord, apiBaseUrl, null);
 
             return returnPayload;
         }
@@ -132,8 +136,7 @@ namespace JSONAPI.EntityFramework.Http
         /// <returns></returns>
         protected virtual async Task<object> MaterializeAsync(IResourceObject resourceObject, CancellationToken cancellationToken)
         {
-            var materializer = new EntityFrameworkResourceObjectMaterializer(_dbContext, _resourceTypeRegistry);
-            return await materializer.MaterializeResourceObject(resourceObject, cancellationToken);
+            return await _entityFrameworkResourceObjectMaterializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
 
         /// <summary>

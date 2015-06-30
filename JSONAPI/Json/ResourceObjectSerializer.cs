@@ -152,8 +152,6 @@ namespace JSONAPI.Json
 
             if (string.IsNullOrEmpty(type))
                 throw new DeserializationException("Resource object missing type", "Expected a value for `type`", currentPath + "/type");
-            if (string.IsNullOrEmpty(id))
-                throw new DeserializationException("Resource object missing id", "Expected a value for `id`", currentPath + "/id");
 
             return new ResourceObject(type, id,
                 attributes ?? new Dictionary<string, JToken>(),

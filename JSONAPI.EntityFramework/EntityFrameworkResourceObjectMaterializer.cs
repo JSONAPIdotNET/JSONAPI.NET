@@ -13,10 +13,9 @@ using Newtonsoft.Json.Linq;
 namespace JSONAPI.EntityFramework
 {
     /// <summary>
-    /// This class manages converting IResourceObject instances from a request into records managed
-    /// by Entity Framework.
+    /// Default implementation of IEntityFrameworkResourceObjectMaterializer
     /// </summary>
-    public class EntityFrameworkResourceObjectMaterializer
+    public class EntityFrameworkResourceObjectMaterializer : IEntityFrameworkResourceObjectMaterializer
     {
         private readonly DbContext _dbContext;
         private readonly IResourceTypeRegistry _registry;
@@ -35,14 +34,6 @@ namespace JSONAPI.EntityFramework
                 .GetMethod("SetToManyRelationshipValue", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        /// <summary>
-        /// Gets a record managed by Entity Framework that has merged in the data from
-        /// the supplied resource object.
-        /// </summary>
-        /// <param name="resourceObject"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        /// <exception cref="DeserializationException"></exception>
         public async Task<object> MaterializeResourceObject(IResourceObject resourceObject, CancellationToken cancellationToken)
         {
             var registration = _registry.GetRegistrationForResourceTypeName(resourceObject.Type);
@@ -51,13 +42,23 @@ namespace JSONAPI.EntityFramework
             if (material == null)
             {
                 material = Activator.CreateInstance(registration.Type);
-                registration.IdProperty.SetValue(material, resourceObject.Id);
+                await SetIdForNewResource(resourceObject, material, registration);
                 _dbContext.Set(registration.Type).Add(material);
             }
 
             await MergeFieldsIntoProperties(resourceObject, material, registration, cancellationToken);
 
             return material;
+        }
+
+        /// <summary>
+        /// Allows implementers to control how a new resource's ID should be set.
+        /// </summary>
+        protected virtual Task SetIdForNewResource(IResourceObject resourceObject, object newObject, IResourceTypeRegistration typeRegistration)
+        {
+            typeRegistration.IdProperty.SetValue(newObject, resourceObject.Id);
+
+            return Task.FromResult(0);
         }
 
         /// <summary>
@@ -165,8 +166,10 @@ namespace JSONAPI.EntityFramework
             }
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private void SetToManyRelationshipValue<TRelated>(object material, IEnumerable<object> relatedObjects, ResourceTypeRelationship relationship)
+        /// <summary>
+        /// Sets the value of a to-many relationship
+        /// </summary>
+        protected void SetToManyRelationshipValue<TRelated>(object material, IEnumerable<object> relatedObjects, ResourceTypeRelationship relationship)
         {
             // TODO: we need to fetch this property asynchronously first
             var currentValue = relationship.Property.GetValue(material);

@@ -127,6 +127,10 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Autofac.EntityFramework\JSONAPI.Autofac.EntityFramework.csproj">
+      <Project>{64abe648-efcb-46ee-9e1a-e163f52bf372}</Project>
+      <Name>JSONAPI.Autofac.EntityFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI.Autofac\JSONAPI.Autofac.csproj">
       <Project>{af7861f3-550b-4f70-a33e-1e5f48d39333}</Project>
       <Name>JSONAPI.Autofac</Name>
