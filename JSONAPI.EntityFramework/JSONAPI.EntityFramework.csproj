@@ -72,7 +72,7 @@
   <ItemGroup>
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformer.cs" />
     <Compile Include="DbContextExtensions.cs" />
-    <Compile Include="Http\EntityFrameworkPayloadMaterializer.cs" />
+    <Compile Include="Http\EntityFrameworkDocumentMaterializer.cs" />
     <Compile Include="EntityFrameworkPluralizationService.cs" />
     <Compile Include="IEntityFrameworkResourceObjectMaterializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

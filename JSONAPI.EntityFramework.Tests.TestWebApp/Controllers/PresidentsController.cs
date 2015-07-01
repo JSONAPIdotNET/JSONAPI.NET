@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Http;
+using JSONAPI.Documents;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
-using JSONAPI.Payload;
-using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class PresidentsController : ApiController
     {
-        // This endpoint exists to demonstrate returning IResourceCollectionPayload
+        // This endpoint exists to demonstrate returning IResourceCollectionDocument
         [Route("presidents")]
         public IHttpActionResult GetPresidents()
         {
@@ -34,8 +29,8 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
             
             var userResources = users.Select(u => (IResourceObject)new ResourceObject("users", u.Id)).ToArray();
 
-            var payload = new ResourceCollectionPayload(userResources, null, null);
-            return Ok(payload);
+            var document = new ResourceCollectionDocument(userResources, null, null);
+            return Ok(document);
         }
     }
 }

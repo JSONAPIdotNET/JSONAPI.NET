@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using JSONAPI.Documents;
 using JSONAPI.Json;
-using JSONAPI.Payload;
 
 namespace JSONAPI.EntityFramework
 {

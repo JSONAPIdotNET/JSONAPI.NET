@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
 using JSONAPI.Core;
-using JSONAPI.Payload.Builders;
+using JSONAPI.Documents.Builders;
 
 namespace JSONAPI.ActionFilters
 {
     /// <summary>
-    /// This transform sorts an IQueryable payload according to query parameters.
+    /// This transform sorts an IQueryable according to query parameters.
     /// </summary>
     public class DefaultSortingTransformer : IQueryableSortingTransformer
     {
@@ -19,7 +19,7 @@ namespace JSONAPI.ActionFilters
         /// <summary>
         /// Creates a new SortingQueryableTransformer
         /// </summary>
-        /// <param name="resourceTypeRegistry">The model manager used to look up registered type information.</param>
+        /// <param name="resourceTypeRegistry">The registry used to look up registered type information.</param>
         public DefaultSortingTransformer(IResourceTypeRegistry resourceTypeRegistry)
         {
             _resourceTypeRegistry = resourceTypeRegistry;

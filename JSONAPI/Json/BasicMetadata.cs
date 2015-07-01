@@ -1,4 +1,4 @@
-using JSONAPI.Payload;
+using JSONAPI.Documents;
 using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Json

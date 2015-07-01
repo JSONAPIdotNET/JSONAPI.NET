@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using JSONAPI.Payload;
+using JSONAPI.Documents;
 
 namespace JSONAPI.Http
 {
@@ -11,41 +11,41 @@ namespace JSONAPI.Http
     /// </summary>
     public class JsonApiController<T> : ApiController where T : class
     {
-        private readonly IPayloadMaterializer<T> _payloadMaterializer;
+        private readonly IDocumentMaterializer<T> _documentMaterializer;
 
         /// <summary>
         /// Creates a new ApiController
         /// </summary>
-        /// <param name="payloadMaterializer"></param>
-        public JsonApiController(IPayloadMaterializer<T> payloadMaterializer)
+        /// <param name="documentMaterializer"></param>
+        public JsonApiController(IDocumentMaterializer<T> documentMaterializer)
         {
-            _payloadMaterializer = payloadMaterializer;
+            _documentMaterializer = documentMaterializer;
         }
 
         /// <summary>
-        /// Returns a payload corresponding to a set of records of this type.
+        /// Returns a document corresponding to a set of records of this type.
         /// </summary>
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Get(CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.GetRecords(Request, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.GetRecords(Request, cancellationToken);
+            return Ok(document);
         }
 
         /// <summary>
-        /// Returns a payload corresponding to the single record matching the ID.
+        /// Returns a document corresponding to the single record matching the ID.
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> Get(string id, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.GetRecordById(id, Request, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.GetRecordById(id, Request, cancellationToken);
+            return Ok(document);
         }
 
         /// <summary>
-        /// Returns a payload corresponding to the resource(s) related to the resource identified by the ID,
+        /// Returns a document corresponding to the resource(s) related to the resource identified by the ID,
         /// and the relationship name.
         /// </summary>
         /// <param name="id"></param>
@@ -54,34 +54,34 @@ namespace JSONAPI.Http
         /// <returns></returns>
         public virtual async Task<IHttpActionResult> GetRelatedResource(string id, string relationshipName, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.GetRelated(id, relationshipName, Request, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.GetRelated(id, relationshipName, Request, cancellationToken);
+            return Ok(document);
         }
 
 
         /// <summary>
-        /// Creates a new record corresponding to the data in the request payload.
+        /// Creates a new record corresponding to the data in the request document.
         /// </summary>
-        /// <param name="requestPayload"></param>
+        /// <param name="requestDocument"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Post([FromBody]ISingleResourcePayload requestPayload, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Post([FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.CreateRecord(requestPayload, Request, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.CreateRecord(requestDocument, Request, cancellationToken);
+            return Ok(document);
         }
 
         /// <summary>
         /// Updates the record with the given ID with data from the request payloaad.
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="requestPayload"></param>
+        /// <param name="requestDocument"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Patch(string id, [FromBody]ISingleResourcePayload requestPayload, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Patch(string id, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.UpdateRecord(id, requestPayload, Request, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.UpdateRecord(id, requestDocument, Request, cancellationToken);
+            return Ok(document);
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace JSONAPI.Http
         /// <param name="cancellationToken"></param>
         public virtual async Task<IHttpActionResult> Delete(string id, CancellationToken cancellationToken)
         {
-            var payload = await _payloadMaterializer.DeleteRecord(id, cancellationToken);
-            return Ok(payload);
+            var document = await _documentMaterializer.DeleteRecord(id, cancellationToken);
+            return Ok(document);
         }
     }
 }

@@ -2,8 +2,8 @@
 using System.Data.Entity;
 using System.Threading.Tasks;
 using JSONAPI.Core;
+using JSONAPI.Documents;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
-using JSONAPI.Payload;
 
 namespace JSONAPI.EntityFramework.Tests.TestWebApp
 {

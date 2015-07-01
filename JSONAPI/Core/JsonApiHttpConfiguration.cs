@@ -13,22 +13,22 @@ namespace JSONAPI.Core
     public class JsonApiHttpConfiguration
     {
         private readonly JsonApiFormatter _formatter;
-        private readonly FallbackPayloadBuilderAttribute _fallbackPayloadBuilderAttribute;
+        private readonly FallbackDocumentBuilderAttribute _fallbackDocumentBuilderAttribute;
         private readonly JsonApiExceptionFilterAttribute _jsonApiExceptionFilterAttribute;
 
         /// <summary>
         /// Creates a new configuration
         /// </summary>
         public JsonApiHttpConfiguration(JsonApiFormatter formatter,
-            FallbackPayloadBuilderAttribute fallbackPayloadBuilderAttribute,
+            FallbackDocumentBuilderAttribute fallbackDocumentBuilderAttribute,
             JsonApiExceptionFilterAttribute jsonApiExceptionFilterAttribute)
         {
             if (formatter == null) throw new ArgumentNullException("formatter");
-            if (fallbackPayloadBuilderAttribute == null) throw new ArgumentNullException("fallbackPayloadBuilderAttribute");
+            if (fallbackDocumentBuilderAttribute == null) throw new ArgumentNullException("fallbackDocumentBuilderAttribute");
             if (jsonApiExceptionFilterAttribute == null) throw new ArgumentNullException("jsonApiExceptionFilterAttribute");
 
             _formatter = formatter;
-            _fallbackPayloadBuilderAttribute = fallbackPayloadBuilderAttribute;
+            _fallbackDocumentBuilderAttribute = fallbackDocumentBuilderAttribute;
             _jsonApiExceptionFilterAttribute = jsonApiExceptionFilterAttribute;
         }
 
@@ -41,7 +41,7 @@ namespace JSONAPI.Core
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(_formatter);
 
-            httpConfig.Filters.Add(_fallbackPayloadBuilderAttribute);
+            httpConfig.Filters.Add(_fallbackDocumentBuilderAttribute);
             httpConfig.Filters.Add(_jsonApiExceptionFilterAttribute);
 
             httpConfig.Services.Replace(typeof(IHttpControllerSelector),

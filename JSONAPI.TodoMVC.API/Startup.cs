@@ -33,7 +33,7 @@ namespace JSONAPI.TodoMVC.API
             var containerBuilder = new ContainerBuilder();
             containerBuilder.RegisterModule(module);
             containerBuilder.RegisterModule(efModule);
-            containerBuilder.RegisterGeneric(typeof(EntityFrameworkPayloadMaterializer<>))
+            containerBuilder.RegisterGeneric(typeof(EntityFrameworkDocumentMaterializer<>))
                 .AsImplementedInterfaces();
             var container = containerBuilder.Build();
             httpConfig.UseJsonApiWithAutofac(container);

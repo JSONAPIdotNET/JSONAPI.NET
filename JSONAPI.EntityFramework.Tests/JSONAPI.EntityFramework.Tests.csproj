@@ -114,7 +114,7 @@
     <Compile Include="Acceptance\DeletingResourcesTests.cs" />
     <Compile Include="Acceptance\ErrorsTests.cs" />
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
-    <Compile Include="Acceptance\PayloadTests.cs" />
+    <Compile Include="Acceptance\DocumentTests.cs" />
     <Compile Include="Acceptance\CreatingResourcesTests.cs" />
     <Compile Include="Acceptance\RelatedResourcesTests.cs" />
     <Compile Include="Acceptance\ComputedIdTests.cs" />
@@ -180,7 +180,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithArrayForToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithArrayForToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithStringForToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Payload\Responses\Get_returns_IResourceCollectionPayload.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\Document\Responses\Get_returns_IResourceCollectionDocument.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>

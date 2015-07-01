@@ -102,7 +102,7 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Represents a type's registration with a model manager
+        /// Represents a type's registration with a registry
         /// </summary>
         protected sealed class ResourceTypeRegistration : IResourceTypeRegistration
         {
@@ -211,7 +211,7 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Registeres a type with this ModelManager, using a default resource type name.
+        /// Registeres a type with this ResourceTypeRegistry, using a default resource type name.
         /// </summary>
         /// <param name="type">The type to register.</param>
         /// <param name="resourceTypeName">The resource type name to use</param>

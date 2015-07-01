@@ -7,8 +7,8 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
-using JSONAPI.Payload;
-using JSONAPI.Payload.Builders;
+using JSONAPI.Documents;
+using JSONAPI.Documents.Builders;
 using Newtonsoft.Json;
 
 namespace JSONAPI.Json
@@ -18,23 +18,23 @@ namespace JSONAPI.Json
     /// </summary>
     public class JsonApiFormatter : JsonMediaTypeFormatter
     {
-        private readonly ISingleResourcePayloadSerializer _singleResourcePayloadSerializer;
-        private readonly IResourceCollectionPayloadSerializer _resourceCollectionPayloadSerializer;
-        private readonly IErrorPayloadSerializer _errorPayloadSerializer;
-        private readonly IErrorPayloadBuilder _errorPayloadBuilder;
+        private readonly ISingleResourceDocumentFormatter _singleResourceDocumentFormatter;
+        private readonly IResourceCollectionDocumentFormatter _resourceCollectionDocumentFormatter;
+        private readonly IErrorDocumentFormatter _errorDocumentFormatter;
+        private readonly IErrorDocumentBuilder _errorDocumentBuilder;
 
         /// <summary>
         /// Creates a new JsonApiFormatter
         /// </summary>
-        public JsonApiFormatter(ISingleResourcePayloadSerializer singleResourcePayloadSerializer,
-            IResourceCollectionPayloadSerializer resourceCollectionPayloadSerializer,
-            IErrorPayloadSerializer errorPayloadSerializer,
-            IErrorPayloadBuilder errorPayloadBuilder)
+        public JsonApiFormatter(ISingleResourceDocumentFormatter singleResourceDocumentFormatter,
+            IResourceCollectionDocumentFormatter resourceCollectionDocumentFormatter,
+            IErrorDocumentFormatter errorDocumentFormatter,
+            IErrorDocumentBuilder errorDocumentBuilder)
         {
-            _singleResourcePayloadSerializer = singleResourcePayloadSerializer;
-            _resourceCollectionPayloadSerializer = resourceCollectionPayloadSerializer;
-            _errorPayloadSerializer = errorPayloadSerializer;
-            _errorPayloadBuilder = errorPayloadBuilder;
+            _singleResourceDocumentFormatter = singleResourceDocumentFormatter;
+            _resourceCollectionDocumentFormatter = resourceCollectionDocumentFormatter;
+            _errorDocumentFormatter = errorDocumentFormatter;
+            _errorDocumentBuilder = errorDocumentBuilder;
 
             SupportedMediaTypes.Clear();
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/vnd.api+json"));
@@ -52,35 +52,35 @@ namespace JSONAPI.Json
 
         public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
         {
-            if (type == typeof(IJsonApiPayload) && value == null)
+            if (type == typeof(IJsonApiDocument) && value == null)
                 return Task.FromResult(0);
 
             var contentHeaders = content == null ? null : content.Headers;
             var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
             var writer = CreateJsonWriter(typeof(object), writeStream, effectiveEncoding);
 
-            var singleResourcePayload = value as ISingleResourcePayload;
-            var resourceCollectionPayload = value as IResourceCollectionPayload;
-            var errorPayload = value as IErrorPayload;
-            if (singleResourcePayload != null)
+            var singleResourceDocument = value as ISingleResourceDocument;
+            var resourceCollectionDocument = value as IResourceCollectionDocument;
+            var errorDocument = value as IErrorDocument;
+            if (singleResourceDocument != null)
             {
-                _singleResourcePayloadSerializer.Serialize(singleResourcePayload, writer);
+                _singleResourceDocumentFormatter.Serialize(singleResourceDocument, writer);
             }
-            else if (resourceCollectionPayload != null)
+            else if (resourceCollectionDocument != null)
             {
-                _resourceCollectionPayloadSerializer.Serialize(resourceCollectionPayload, writer);
+                _resourceCollectionDocumentFormatter.Serialize(resourceCollectionDocument, writer);
             }
-            else if (errorPayload != null)
+            else if (errorDocument != null)
             {
-                _errorPayloadSerializer.Serialize(errorPayload, writer);
+                _errorDocumentFormatter.Serialize(errorDocument, writer);
             }
             else
             {
                 var error = value as HttpError;
                 if (error != null)
                 {
-                    var httpErrorPayload = _errorPayloadBuilder.BuildFromHttpError(error, HttpStatusCode.InternalServerError);
-                    _errorPayloadSerializer.Serialize(httpErrorPayload, writer);
+                    var httpErrorDocument = _errorDocumentBuilder.BuildFromHttpError(error, HttpStatusCode.InternalServerError);
+                    _errorDocumentFormatter.Serialize(httpErrorDocument, writer);
                 }
                 else
                 {
@@ -103,10 +103,10 @@ namespace JSONAPI.Json
 
             reader.Read();
 
-            if (typeof(ISingleResourcePayload).IsAssignableFrom(type))
-                return await _singleResourcePayloadSerializer.Deserialize(reader, "");
-            if (typeof(IResourceCollectionPayload).IsAssignableFrom(type))
-                return await _resourceCollectionPayloadSerializer.Deserialize(reader, "");
+            if (typeof(ISingleResourceDocument).IsAssignableFrom(type))
+                return await _singleResourceDocumentFormatter.Deserialize(reader, "");
+            if (typeof(IResourceCollectionDocument).IsAssignableFrom(type))
+                return await _resourceCollectionDocumentFormatter.Deserialize(reader, "");
 
             throw new Exception(string.Format("The type {0} is not supported for deserialization.", type.Name));
         }

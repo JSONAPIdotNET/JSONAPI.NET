@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Autofac.Core;
 using JSONAPI.Core;
-using JSONAPI.Payload;
+using JSONAPI.Documents;
 
 namespace JSONAPI.Autofac
 {

@@ -11,7 +11,7 @@ namespace JSONAPI.Autofac.EntityFramework
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<AsynchronousEnumerationTransformer>().As<IQueryableEnumerationTransformer>();
-            builder.RegisterGeneric(typeof(EntityFrameworkPayloadMaterializer<>))
+            builder.RegisterGeneric(typeof(EntityFrameworkDocumentMaterializer<>))
                 .AsImplementedInterfaces();
             builder.RegisterType<EntityFrameworkResourceObjectMaterializer>()
                 .As<IEntityFrameworkResourceObjectMaterializer>();

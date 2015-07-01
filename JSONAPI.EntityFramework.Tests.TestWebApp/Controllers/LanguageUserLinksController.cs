@@ -5,8 +5,8 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class LanguageUserLinksController : JsonApiController<LanguageUserLink>
     {
-        public LanguageUserLinksController(IPayloadMaterializer<LanguageUserLink> payloadMaterializer)
-            : base(payloadMaterializer)
+        public LanguageUserLinksController(IDocumentMaterializer<LanguageUserLink> documentMaterializer)
+            : base(documentMaterializer)
         {
         }
     }

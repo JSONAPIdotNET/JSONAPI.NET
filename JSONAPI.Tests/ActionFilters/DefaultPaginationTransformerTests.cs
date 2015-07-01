@@ -7,7 +7,7 @@ using System.Web.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
-using JSONAPI.Payload.Builders;
+using JSONAPI.Documents.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters

@@ -10,7 +10,7 @@ using JSONAPI.Core;
 namespace JSONAPI.ActionFilters
 {
     /// <summary>
-    /// This transformer filters an IQueryable payload based on query-string values.
+    /// This transformer filters an IQueryable based on query-string values.
     /// </summary>
     public class DefaultFilteringTransformer : IQueryableFilteringTransformer
     {
@@ -19,7 +19,7 @@ namespace JSONAPI.ActionFilters
         /// <summary>
         /// Creates a new FilteringQueryableTransformer
         /// </summary>
-        /// <param name="resourceTypeRegistry">The model manager used to look up registered type information.</param>
+        /// <param name="resourceTypeRegistry">The registry used to look up registered type information.</param>
         public DefaultFilteringTransformer(IResourceTypeRegistry resourceTypeRegistry)
         {
             _resourceTypeRegistry = resourceTypeRegistry;

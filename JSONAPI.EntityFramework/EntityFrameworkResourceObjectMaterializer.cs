@@ -7,8 +7,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
+using JSONAPI.Documents;
 using JSONAPI.Json;
-using JSONAPI.Payload;
 using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.EntityFramework
@@ -95,7 +95,7 @@ namespace JSONAPI.EntityFramework
         /// <param name="registration"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        /// <exception cref="DeserializationException">Thrown when a semantically incorrect part of the payload is encountered</exception>
+        /// <exception cref="DeserializationException">Thrown when a semantically incorrect part of the document is encountered</exception>
         protected virtual async Task MergeFieldsIntoProperties(IResourceObject resourceObject, object material,
             IResourceTypeRegistration registration, CancellationToken cancellationToken)
         {

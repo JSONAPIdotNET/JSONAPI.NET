@@ -5,7 +5,7 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
 {
     public class UsersController : JsonApiController<User>
     {
-        public UsersController(IPayloadMaterializer<User> payloadMaterializer) : base(payloadMaterializer)
+        public UsersController(IDocumentMaterializer<User> documentMaterializer) : base(documentMaterializer)
         {
         }
     }

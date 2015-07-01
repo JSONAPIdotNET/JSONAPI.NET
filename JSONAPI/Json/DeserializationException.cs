@@ -3,8 +3,8 @@
 namespace JSONAPI.Json
 {
     /// <summary>
-    /// An exception that may be thrown by payload serializers during deserialization
-    /// in response to a JSON API-noncompliant payload being submitted by the client.
+    /// An exception that may be thrown by document formatters during deserialization
+    /// in response to a JSON API-noncompliant document being submitted by the client.
     /// </summary>
     public class DeserializationException : Exception
     {

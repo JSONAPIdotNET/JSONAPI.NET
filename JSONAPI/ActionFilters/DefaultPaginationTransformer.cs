@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-using JSONAPI.Payload.Builders;
+using JSONAPI.Documents.Builders;
 
 namespace JSONAPI.ActionFilters
 {

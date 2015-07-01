@@ -1,9 +1,9 @@
 ﻿using System.Web.Http;
 using JSONAPI.ActionFilters;
+using JSONAPI.Documents;
+using JSONAPI.Documents.Builders;
 using JSONAPI.Http;
 using JSONAPI.Json;
-using JSONAPI.Payload;
-using JSONAPI.Payload.Builders;
 
 namespace JSONAPI.Core
 {
@@ -34,7 +34,7 @@ namespace JSONAPI.Core
         }
 
         /// <summary>
-        /// Allows overriding the queryable payload builder to use. This is useful for 
+        /// Allows overriding the queryable document builder to use. This is useful for 
         /// </summary>
         /// <param name="queryableEnumerationTransformer"></param>
         public void UseQueryableEnumeration(IQueryableEnumerationTransformer queryableEnumerationTransformer)
@@ -51,15 +51,15 @@ namespace JSONAPI.Core
             var linkConventions = _linkConventions ?? new DefaultLinkConventions();
 
             // Serialization
-            var metadataSerializer = new MetadataSerializer();
-            var linkSerializer = new LinkSerializer(metadataSerializer);
-            var resourceLinkageSerializer = new ResourceLinkageSerializer();
-            var relationshipObjectSerializer = new RelationshipObjectSerializer(linkSerializer, resourceLinkageSerializer, metadataSerializer);
-            var resourceObjectSerializer = new ResourceObjectSerializer(relationshipObjectSerializer, linkSerializer, metadataSerializer);
-            var errorSerializer = new ErrorSerializer(linkSerializer, metadataSerializer);
-            var singleResourcePayloadSerializer = new SingleResourcePayloadSerializer(resourceObjectSerializer, metadataSerializer);
-            var resourceCollectionPayloadSerializer = new ResourceCollectionPayloadSerializer(resourceObjectSerializer, metadataSerializer);
-            var errorPayloadSerializer = new ErrorPayloadSerializer(errorSerializer, metadataSerializer);
+            var metadataFormatter = new MetadataFormatter();
+            var linkFormatter = new LinkFormatter(metadataFormatter);
+            var resourceLinkageFormatter = new ResourceLinkageFormatter();
+            var relationshipObjectFormatter = new RelationshipObjectFormatter(linkFormatter, resourceLinkageFormatter, metadataFormatter);
+            var resourceObjectFormatter = new ResourceObjectFormatter(relationshipObjectFormatter, linkFormatter, metadataFormatter);
+            var errorFormatter = new ErrorFormatter(linkFormatter, metadataFormatter);
+            var singleResourceDocumentFormatter = new SingleResourceDocumentFormatter(resourceObjectFormatter, metadataFormatter);
+            var resourceCollectionDocumentFormatter = new ResourceCollectionDocumentFormatter(resourceObjectFormatter, metadataFormatter);
+            var errorDocumentFormatter = new ErrorDocumentFormatter(errorFormatter, metadataFormatter);
 
             // Queryable transforms
             var queryableEnumerationTransformer = _queryableEnumerationTransformer ?? new SynchronousEnumerationTransformer();
@@ -69,20 +69,20 @@ namespace JSONAPI.Core
 
             // Builders
             var baseUrlService = new BaseUrlService();
-            var singleResourcePayloadBuilder = new RegistryDrivenSingleResourcePayloadBuilder(_resourceTypeRegistry, linkConventions);
-            var resourceCollectionPayloadBuilder = new RegistryDrivenResourceCollectionPayloadBuilder(_resourceTypeRegistry, linkConventions);
-            var queryableResourcePayloadBuilder = new DefaultQueryableResourceCollectionPayloadBuilder(resourceCollectionPayloadBuilder,
+            var singleResourceDocumentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(_resourceTypeRegistry, linkConventions);
+            var resourceCollectionDocumentBuilder = new RegistryDrivenResourceCollectionDocumentBuilder(_resourceTypeRegistry, linkConventions);
+            var queryableResourceCollectionDocumentBuilder = new DefaultQueryableResourceCollectionDocumentBuilder(resourceCollectionDocumentBuilder,
                 queryableEnumerationTransformer, filteringTransformer, sortingTransformer, paginationTransformer, baseUrlService);
-            var errorPayloadBuilder = new ErrorPayloadBuilder();
-            var fallbackPayloadBuilder = new FallbackPayloadBuilder(singleResourcePayloadBuilder,
-                queryableResourcePayloadBuilder, resourceCollectionPayloadBuilder, baseUrlService);
+            var errorDocumentBuilder = new ErrorDocumentBuilder();
+            var fallbackDocumentBuilder = new FallbackDocumentBuilder(singleResourceDocumentBuilder,
+                queryableResourceCollectionDocumentBuilder, resourceCollectionDocumentBuilder, baseUrlService);
 
             // Dependencies for JsonApiHttpConfiguration
-            var formatter = new JsonApiFormatter(singleResourcePayloadSerializer, resourceCollectionPayloadSerializer, errorPayloadSerializer, errorPayloadBuilder);
-            var fallbackPayloadBuilderAttribute = new FallbackPayloadBuilderAttribute(fallbackPayloadBuilder, errorPayloadBuilder);
-            var exceptionFilterAttribute = new JsonApiExceptionFilterAttribute(errorPayloadBuilder, formatter);
+            var formatter = new JsonApiFormatter(singleResourceDocumentFormatter, resourceCollectionDocumentFormatter, errorDocumentFormatter, errorDocumentBuilder);
+            var fallbackDocumentBuilderAttribute = new FallbackDocumentBuilderAttribute(fallbackDocumentBuilder, errorDocumentBuilder);
+            var exceptionFilterAttribute = new JsonApiExceptionFilterAttribute(errorDocumentBuilder, formatter);
 
-            var jsonApiHttpConfiguration = new JsonApiHttpConfiguration(formatter, fallbackPayloadBuilderAttribute, exceptionFilterAttribute);
+            var jsonApiHttpConfiguration = new JsonApiHttpConfiguration(formatter, fallbackDocumentBuilderAttribute, exceptionFilterAttribute);
             jsonApiHttpConfiguration.Apply(httpConfig);
         }
     }
