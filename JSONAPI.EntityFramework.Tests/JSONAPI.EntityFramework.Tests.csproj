@@ -113,12 +113,11 @@
     <Compile Include="Acceptance\AttributeSerializationTests.cs" />
     <Compile Include="Acceptance\DeletingResourcesTests.cs" />
     <Compile Include="Acceptance\ErrorsTests.cs" />
+    <Compile Include="Acceptance\FetchingResourcesTests.cs" />
     <Compile Include="Acceptance\HeterogeneousTests.cs" />
     <Compile Include="Acceptance\DocumentTests.cs" />
     <Compile Include="Acceptance\CreatingResourcesTests.cs" />
-    <Compile Include="Acceptance\RelatedResourcesTests.cs" />
     <Compile Include="Acceptance\ComputedIdTests.cs" />
-    <Compile Include="Acceptance\FetchingResourcesTests.cs" />
     <Compile Include="Acceptance\UpdatingResourcesTests.cs" />
     <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
     <Compile Include="Acceptance\SortingTests.cs" />
@@ -188,8 +187,8 @@
     <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_action_throws_exception.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithMissingToOneLinkageRequest.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithMissingToOneLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_many_response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\RelatedResources\Responses\Get_related_to_one_response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_response.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_response.json" />
     <None Include="Acceptance\Data\LanguageUserLink.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -204,6 +203,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_attribute_Response.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_relationship_Response.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_relationship_Request.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_resource_by_id_that_doesnt_exist.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

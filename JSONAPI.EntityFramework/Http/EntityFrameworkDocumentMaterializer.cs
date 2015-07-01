@@ -68,6 +68,9 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
             var singleResource = await FilterById<T>(id, registration).FirstOrDefaultAsync(cancellationToken);
+            if (singleResource == null)
+                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`",
+                    registration.ResourceTypeName, id));
             return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null);
         }
 

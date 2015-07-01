@@ -56,6 +56,22 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         }
 
         [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Get_resource_by_id_that_doesnt_exist()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/3000");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\FetchingResources\Get_resource_by_id_that_doesnt_exist.json", HttpStatusCode.NotFound, true);
+            }
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Acceptance\Data\UserGroup.csv", @"Acceptance\Data")]
         public async Task Get_dasherized_resource()
         {
@@ -64,6 +80,38 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                 var response = await SubmitGet(effortConnection, "user-groups");
 
                 await AssertResponseContent(response, @"Acceptance\Fixtures\FetchingResources\Get_dasherized_resource.json", HttpStatusCode.OK);
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Get_related_to_many()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/201/comments");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\FetchingResources\Get_related_to_many_response.json", HttpStatusCode.OK);
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Get_related_to_one()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/201/author");
+
+                await AssertResponseContent(response, @"Acceptance\Fixtures\FetchingResources\Get_related_to_one_response.json", HttpStatusCode.OK);
             }
         }
     }
