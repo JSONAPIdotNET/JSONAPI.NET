@@ -1,5 +1,8 @@
-﻿using System.Web.Http;
+﻿using System.Data.Entity;
+using System.Reflection;
+using System.Web.Http;
 using Autofac;
+using Autofac.Integration.WebApi;
 using JSONAPI.Autofac;
 using JSONAPI.Autofac.EntityFramework;
 using JSONAPI.Core;
@@ -35,6 +38,9 @@ namespace JSONAPI.TodoMVC.API
             containerBuilder.RegisterModule(efModule);
             containerBuilder.RegisterGeneric(typeof(EntityFrameworkDocumentMaterializer<>))
                 .AsImplementedInterfaces();
+            containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            containerBuilder.RegisterType<TodoMvcContext>().As<DbContext>();
+
             var container = containerBuilder.Build();
             httpConfig.UseJsonApiWithAutofac(container);
 
