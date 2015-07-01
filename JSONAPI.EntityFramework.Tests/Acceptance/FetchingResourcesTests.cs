@@ -132,5 +132,23 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                     HttpStatusCode.NotFound, true);
             }
         }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        public async Task Get_related_to_many_for_resource_that_doesnt_exist()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/3000/tags");
+
+                await AssertResponseContent(response,
+                    @"Acceptance\Fixtures\FetchingResources\Get_related_to_many_for_resource_that_doesnt_exist.json",
+                    HttpStatusCode.NotFound, true);
+            }
+        }
     }
 }

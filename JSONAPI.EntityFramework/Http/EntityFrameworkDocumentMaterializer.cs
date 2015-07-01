@@ -154,6 +154,13 @@ namespace JSONAPI.EntityFramework.Http
             var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
 
             var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
+
+            // We have to see if the resource even exists, so we can throw a 404 if it doesn't
+            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
+            if (relatedResource == null)
+                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
+                    primaryEntityRegistration.ResourceTypeName, id));
+
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
 
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, cancellationToken);
