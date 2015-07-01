@@ -69,7 +69,7 @@ namespace JSONAPI.EntityFramework.Http
             var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
             var singleResource = await FilterById<T>(id, registration).FirstOrDefaultAsync(cancellationToken);
             if (singleResource == null)
-                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`",
+                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     registration.ResourceTypeName, id));
             return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null);
         }
@@ -172,6 +172,9 @@ namespace JSONAPI.EntityFramework.Http
 
             var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
             var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
+            if (relatedResource == null)
+                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
+                    primaryEntityRegistration.ResourceTypeName, id));
             return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null);
         }
 
