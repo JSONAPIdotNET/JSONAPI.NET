@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.ActionFilters;
 using JSONAPI.Http;
+using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Documents.Builders
 {

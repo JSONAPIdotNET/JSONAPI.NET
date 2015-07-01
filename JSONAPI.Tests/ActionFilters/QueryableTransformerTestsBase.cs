@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net.Http;
 using JSONAPI.ActionFilters;
+using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Tests.ActionFilters
 {

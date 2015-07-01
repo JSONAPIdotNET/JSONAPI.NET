@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Net.Http;
 
-namespace JSONAPI.ActionFilters
+namespace JSONAPI.QueryableTransformers
 {
     /// <summary>
     /// Service for filtering an IQueryable according to an HTTP request.

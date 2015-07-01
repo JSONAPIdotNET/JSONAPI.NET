@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using JSONAPI.ActionFilters;
 using JSONAPI.Documents.Builders;
 
-namespace JSONAPI.ActionFilters
+namespace JSONAPI.QueryableTransformers
 {
     /// <summary>
     /// Performs pagination

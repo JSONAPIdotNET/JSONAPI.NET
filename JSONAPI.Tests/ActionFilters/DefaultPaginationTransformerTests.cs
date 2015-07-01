@@ -8,6 +8,7 @@ using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
+using JSONAPI.QueryableTransformers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.Tests.ActionFilters

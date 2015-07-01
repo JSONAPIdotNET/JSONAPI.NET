@@ -66,17 +66,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionFilters\DefaultFilteringTransformer.cs" />
-    <Compile Include="ActionFilters\DefaultPaginationTransformer.cs" />
-    <Compile Include="ActionFilters\DefaultPaginationTransformResult.cs" />
+    <Compile Include="QueryableTransformers\DefaultFilteringTransformer.cs" />
+    <Compile Include="QueryableTransformers\DefaultPaginationTransformer.cs" />
+    <Compile Include="QueryableTransformers\DefaultPaginationTransformResult.cs" />
     <Compile Include="ActionFilters\FallbackDocumentBuilderAttribute.cs" />
-    <Compile Include="ActionFilters\IQueryableEnumerationTransformer.cs" />
-    <Compile Include="ActionFilters\IQueryableFilteringTransformer.cs" />
-    <Compile Include="ActionFilters\IQueryablePaginationTransformer.cs" />
-    <Compile Include="ActionFilters\IQueryableSortingTransformer.cs" />
-    <Compile Include="ActionFilters\DefaultSortingTransformer.cs" />
+    <Compile Include="QueryableTransformers\IQueryableEnumerationTransformer.cs" />
+    <Compile Include="QueryableTransformers\IQueryableFilteringTransformer.cs" />
+    <Compile Include="QueryableTransformers\IQueryablePaginationTransformer.cs" />
+    <Compile Include="QueryableTransformers\IQueryableSortingTransformer.cs" />
+    <Compile Include="QueryableTransformers\DefaultSortingTransformer.cs" />
     <Compile Include="ActionFilters\JsonApiExceptionFilterAttribute.cs" />
-    <Compile Include="ActionFilters\SynchronousEnumerationTransformer.cs" />
+    <Compile Include="QueryableTransformers\SynchronousEnumerationTransformer.cs" />
     <Compile Include="Attributes\RelatedResourceLinkTemplate.cs" />
     <Compile Include="Attributes\RelationshipLinkTemplate.cs" />
     <Compile Include="Attributes\SerializeAsComplexAttribute.cs" />

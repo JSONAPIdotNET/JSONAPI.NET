@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using JSONAPI.ActionFilters;
 
-namespace JSONAPI.ActionFilters
+namespace JSONAPI.QueryableTransformers
 {
     /// <summary>
     /// Default implementation of IPaginationTransformResult`1

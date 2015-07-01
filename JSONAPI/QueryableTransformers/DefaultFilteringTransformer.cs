@@ -5,9 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Web.Http;
+using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 
-namespace JSONAPI.ActionFilters
+namespace JSONAPI.QueryableTransformers
 {
     /// <summary>
     /// This transformer filters an IQueryable based on query-string values.

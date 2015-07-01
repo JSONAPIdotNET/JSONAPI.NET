@@ -4,6 +4,7 @@ using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
 using JSONAPI.Http;
 using JSONAPI.Json;
+using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Core
 {

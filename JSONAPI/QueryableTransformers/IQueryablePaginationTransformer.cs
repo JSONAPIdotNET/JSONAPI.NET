@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Net.Http;
 
-namespace JSONAPI.ActionFilters
+namespace JSONAPI.QueryableTransformers
 {
     /// <summary>
     /// Provides a service to provide a page of data based on information from the request.

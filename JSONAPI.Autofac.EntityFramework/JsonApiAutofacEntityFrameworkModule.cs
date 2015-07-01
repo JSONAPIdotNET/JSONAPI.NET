@@ -3,6 +3,7 @@ using JSONAPI.ActionFilters;
 using JSONAPI.EntityFramework;
 using JSONAPI.EntityFramework.ActionFilters;
 using JSONAPI.EntityFramework.Http;
+using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Autofac.EntityFramework
 {
