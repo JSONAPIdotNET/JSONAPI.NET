@@ -79,6 +79,9 @@ namespace JSONAPI.EntityFramework.Http
         {
             var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
             var relationship = (ResourceTypeRelationship) registration.GetFieldByName(relationshipKey);
+            if (relationship == null)
+                throw JsonApiException.CreateForNotFound(string.Format("No relationship `{0}` exists for the resource with type `{1}` and id `{2}`.",
+                    relationshipKey, registration.ResourceTypeName, id));
 
             if (relationship.IsToMany)
             {

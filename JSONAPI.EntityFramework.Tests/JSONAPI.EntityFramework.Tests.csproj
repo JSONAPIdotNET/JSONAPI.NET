@@ -206,6 +206,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_resource_by_id_that_doesnt_exist.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_for_resource_that_doesnt_exist.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_for_resource_that_doesnt_exist.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_resource_for_relationship_that_doesnt_exist.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>
