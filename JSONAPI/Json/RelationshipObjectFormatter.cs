@@ -39,7 +39,19 @@ namespace JSONAPI.Json
                         LinksKeyName, LinkageKeyName, MetaKeyName));
 
             writer.WriteStartObject();
+            SerializeLinks(relationshipObject, writer);
+            SerializeLinkage(relationshipObject, writer);
+            SerializeMetadata(relationshipObject, writer);
+            writer.WriteEndObject();
 
+            return Task.FromResult(0);
+        }
+
+        /// <summary>
+        /// Serializes the relationship object's links.
+        /// </summary>
+        protected virtual void SerializeLinks(IRelationshipObject relationshipObject, JsonWriter writer)
+        {
             if (relationshipObject.SelfLink != null || relationshipObject.RelatedResourceLink != null)
             {
                 writer.WritePropertyName(LinksKeyName);
@@ -58,22 +70,30 @@ namespace JSONAPI.Json
 
                 writer.WriteEndObject();
             }
+        }
 
+        /// <summary>
+        /// Serializes the relationship object's linkage.
+        /// </summary>
+        protected virtual void SerializeLinkage(IRelationshipObject relationshipObject, JsonWriter writer)
+        {
             if (relationshipObject.Linkage != null)
             {
                 writer.WritePropertyName(LinkageKeyName);
                 _resourceLinkageFormatter.Serialize(relationshipObject.Linkage, writer);
             }
+        }
 
+        /// <summary>
+        /// Serializes the relationship object's metadata.
+        /// </summary>
+        protected virtual void SerializeMetadata(IRelationshipObject relationshipObject, JsonWriter writer)
+        {
             if (relationshipObject.Metadata != null)
             {
                 writer.WritePropertyName(MetaKeyName);
                 _metadataFormatter.Serialize(relationshipObject.Metadata, writer);
             }
-
-            writer.WriteEndObject();
-
-            return Task.FromResult(0);
         }
 
         public async Task<IRelationshipObject> Deserialize(JsonReader reader, string currentPath)
