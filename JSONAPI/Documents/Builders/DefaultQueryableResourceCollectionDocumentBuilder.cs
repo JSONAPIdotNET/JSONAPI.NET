@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.ActionFilters;
 using JSONAPI.Http;
+using JSONAPI.Json;
 using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Documents.Builders
@@ -39,24 +41,29 @@ namespace JSONAPI.Documents.Builders
             _baseUrlService = baseUrlService;
         }
 
-        public async Task<IResourceCollectionDocument> BuildDocument<T>(IQueryable<T> query, HttpRequestMessage request, CancellationToken cancellationToken)
+        public async Task<IResourceCollectionDocument> BuildDocument<T>(IQueryable<T> query, HttpRequestMessage request, CancellationToken cancellationToken,
+            string[] includes = null)
         {
-            if (_filteringTransformer != null)
-                query = _filteringTransformer.Filter(query, request);
+            var filteredQuery = _filteringTransformer.Filter(query, request);
+            var sortedQuery = _sortingTransformer.Sort(filteredQuery, request);
 
-            if (_sortingTransformer != null)
-                query = _sortingTransformer.Sort(query, request);
-
-            if (_paginationTransformer != null)
-            {
-                var paginationResults = _paginationTransformer.ApplyPagination(query, request);
-                query = paginationResults.PagedQuery;
-            }
+            var paginationResults = _paginationTransformer.ApplyPagination(sortedQuery, request);
+            query = paginationResults.PagedQuery;
 
             var linkBaseUrl = _baseUrlService.GetBaseUrl(request);
 
             var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
-            return _resourceCollectionDocumentBuilder.BuildDocument(results, linkBaseUrl, null, null);
+            var metadata = await GetDocumentMetadata(query, filteredQuery, sortedQuery, paginationResults, cancellationToken);
+            return _resourceCollectionDocumentBuilder.BuildDocument(results, linkBaseUrl, includes, metadata);
+        }
+
+        /// <summary>
+        /// Returns the metadata that should be sent with this document.
+        /// </summary>
+        protected virtual Task<IMetadata> GetDocumentMetadata<T>(IQueryable<T> originalQuery, IQueryable<T> filteredQuery, IOrderedQueryable<T> sortedQuery,
+            IPaginationTransformResult<T> paginationResult, CancellationToken cancellationToken)
+        {
+            return Task.FromResult((IMetadata)null);
         }
     }
 }

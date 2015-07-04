@@ -61,7 +61,7 @@ namespace JSONAPI.Documents.Builders
                     _openBuildDocumentFromQueryableMethod.Value.MakeGenericMethod(queryableElementType);
 
                 dynamic materializedQueryTask = buildDocumentMethod.Invoke(_queryableResourceCollectionDocumentBuilder,
-                    new[] {obj, requestMessage, cancellationToken});
+                    new[] { obj, requestMessage, cancellationToken, null });
 
                 return await materializedQueryTask;
             }

@@ -75,8 +75,8 @@ namespace JSONAPI.Tests.Documents.Builders
 
             var mockQueryableDocumentBuilder = new Mock<IQueryableResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             mockQueryableDocumentBuilder
-                .Setup(b => b.BuildDocument(items, request, cancellationTokenSource.Token))
-                .Returns(() => Task.FromResult(mockDocument.Object));
+                .Setup(b => b.BuildDocument(items, request, cancellationTokenSource.Token, null))
+                .Returns(Task.FromResult(mockDocument.Object));
 
             var mockResourceCollectionDocumentBuilder = new Mock<IResourceCollectionDocumentBuilder>(MockBehavior.Strict);
 
