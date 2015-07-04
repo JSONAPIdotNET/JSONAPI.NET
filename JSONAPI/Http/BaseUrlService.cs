@@ -8,7 +8,7 @@ namespace JSONAPI.Http
     /// </summary>
     public class BaseUrlService : IBaseUrlService
     {
-        public string GetBaseUrl(HttpRequestMessage requestMessage)
+        public virtual string GetBaseUrl(HttpRequestMessage requestMessage)
         {
             return
                 new Uri(requestMessage.RequestUri.AbsoluteUri.Replace(requestMessage.RequestUri.PathAndQuery,
