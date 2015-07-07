@@ -76,29 +76,31 @@ namespace JSONAPI.Documents.Builders
                     {
                         var propertyValue =
                             (IEnumerable<object>)modelRelationship.Property.GetValue(modelObject);
-
-                        var identifiers = new List<IResourceIdentifier>();
-                        foreach (var relatedResource in propertyValue)
+                        if (propertyValue != null)
                         {
-                            var identifier = GetResourceIdentifierForResource(relatedResource);
-                            identifiers.Add(identifier);
-
-                            IDictionary<string, ResourceObject> idDictionary;
-                            if (!idDictionariesByType.TryGetValue(identifier.Type, out idDictionary))
+                            var identifiers = new List<IResourceIdentifier>();
+                            foreach (var relatedResource in propertyValue)
                             {
-                                idDictionary = new Dictionary<string, ResourceObject>();
-                                idDictionariesByType[identifier.Type] = idDictionary;
-                            }
+                                var identifier = GetResourceIdentifierForResource(relatedResource);
+                                identifiers.Add(identifier);
 
-                            ResourceObject relatedResourceObject;
-                            if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
-                            {
-                                relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
-                                    childPath, includePathExpressions, linkBaseUrl);
-                                idDictionary[identifier.Id] = relatedResourceObject;
+                                IDictionary<string, ResourceObject> idDictionary;
+                                if (!idDictionariesByType.TryGetValue(identifier.Type, out idDictionary))
+                                {
+                                    idDictionary = new Dictionary<string, ResourceObject>();
+                                    idDictionariesByType[identifier.Type] = idDictionary;
+                                }
+
+                                ResourceObject relatedResourceObject;
+                                if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
+                                {
+                                    relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
+                                        childPath, includePathExpressions, linkBaseUrl);
+                                    idDictionary[identifier.Id] = relatedResourceObject;
+                                }
                             }
+                            linkage = new ToManyResourceLinkage(identifiers.ToArray());
                         }
-                        linkage = new ToManyResourceLinkage(identifiers.ToArray());
                     }
                     else
                     {
