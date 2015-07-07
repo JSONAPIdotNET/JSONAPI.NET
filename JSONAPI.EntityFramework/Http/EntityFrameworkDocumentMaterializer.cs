@@ -159,7 +159,7 @@ namespace JSONAPI.EntityFramework.Http
             var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
 
             // We have to see if the resource even exists, so we can throw a 404 if it doesn't
-            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
+            var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
             if (relatedResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     primaryEntityRegistration.ResourceTypeName, id));
