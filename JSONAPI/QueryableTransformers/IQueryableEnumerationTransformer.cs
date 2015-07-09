@@ -18,5 +18,14 @@ namespace JSONAPI.QueryableTransformers
         /// <typeparam name="T">The queryable element type</typeparam>
         /// <returns>A task yielding the enumerated results of the query</returns>
         Task<T[]> Enumerate<T>(IQueryable<T> query, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets the first result for the specified query.
+        /// </summary>
+        /// <param name="query">The query to enumerate</param>
+        /// <param name="cancellationToken">The request's cancellation token. If this token is cancelled during enumeration, enumeration must halt.</param>
+        /// <typeparam name="T">The queryable element type</typeparam>
+        /// <returns>A task yielding the enumerated results of the query</returns>
+        Task<T> FirstOrDefault<T>(IQueryable<T> query, CancellationToken cancellationToken);
     }
 }

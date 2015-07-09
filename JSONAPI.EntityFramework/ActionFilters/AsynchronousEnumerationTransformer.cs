@@ -15,5 +15,10 @@ namespace JSONAPI.EntityFramework.ActionFilters
         {
             return await query.ToArrayAsync(cancellationToken);
         }
+
+        public async Task<T> FirstOrDefault<T>(IQueryable<T> query, CancellationToken cancellationToken)
+        {
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
     }
 }

@@ -13,5 +13,10 @@ namespace JSONAPI.QueryableTransformers
         {
             return Task.FromResult(query.ToArray());
         }
+
+        public Task<T> FirstOrDefault<T>(IQueryable<T> query, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(query.FirstOrDefault());
+        }
     }
 }
