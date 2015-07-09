@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Linq.Expressions;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -15,6 +17,11 @@ namespace JSONAPI.Http
         /// and paginated according to query parameters present in the provided request.
         /// </summary>
         Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns a document containing records matching the provided lambda expression.
+        /// </summary>
+        Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns a document with the resource identified by the given ID.

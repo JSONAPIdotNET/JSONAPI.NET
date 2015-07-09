@@ -63,6 +63,12 @@ namespace JSONAPI.EntityFramework.Http
             return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken);
         }
 
+        public Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Set<T>().AsQueryable().Where(filter);
+            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken);
+        }
+
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);

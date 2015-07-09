@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\MappedDocumentMaterializer.cs" />
     <Compile Include="QueryableTransformers\DefaultFilteringTransformer.cs" />
     <Compile Include="QueryableTransformers\DefaultPaginationTransformer.cs" />
     <Compile Include="QueryableTransformers\DefaultPaginationTransformResult.cs" />
