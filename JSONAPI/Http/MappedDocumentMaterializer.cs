@@ -91,7 +91,7 @@ namespace JSONAPI.Http
             if (primaryResource == null) throw JsonApiException.CreateForNotFound(string.Format("No record exists with ID {0} for the requested type.", id));
 
             var baseUrl = _baseUrlService.GetBaseUrl(request);
-            return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths);
+            return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
         }
 
         public async Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request, CancellationToken cancellationToken)

@@ -4,6 +4,7 @@ using FluentAssertions;
 using JSONAPI.Core;
 using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
+using JSONAPI.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json.Linq;
@@ -169,9 +170,13 @@ namespace JSONAPI.Tests.Documents.Builders
 
             var linkConventions = new DefaultLinkConventions();
 
+            var metadataObject = new JObject();
+            metadataObject["baz"] = "qux";
+            var metadata = new BasicMetadata(metadataObject);
+
             // Act
             var documentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(mockRegistry.Object, linkConventions);
-            var document = documentBuilder.BuildDocument(country, "http://www.example.com", new[] { "provinces.capital", "continent" });
+            var document = documentBuilder.BuildDocument(country, "http://www.example.com", new[] { "provinces.capital", "continent" }, metadata);
 
             // Assert
             document.PrimaryData.Id.Should().Be("4");
@@ -242,6 +247,8 @@ namespace JSONAPI.Tests.Documents.Builders
             continentCountriesRelationship.Value.SelfLink.Href.Should().Be("http://www.example.com/continents/1/relationships/countries");
             continentCountriesRelationship.Value.RelatedResourceLink.Href.Should().Be("http://www.example.com/continents/1/countries");
             continentCountriesRelationship.Value.Linkage.Should().BeNull();
+
+            ((string) document.Metadata.MetaObject["baz"]).Should().Be("qux");
         }
 
         [TestMethod]
@@ -253,7 +260,7 @@ namespace JSONAPI.Tests.Documents.Builders
 
             // Act
             var documentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(mockRegistry.Object, linkConventions);
-            var document = documentBuilder.BuildDocument(null, "http://www.example.com", null);
+            var document = documentBuilder.BuildDocument(null, "http://www.example.com", null, null);
 
             // Assert
             document.PrimaryData.Should().BeNull();

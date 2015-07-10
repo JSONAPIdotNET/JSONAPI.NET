@@ -84,7 +84,7 @@ namespace JSONAPI.Documents.Builders
             }
 
             // Single resource object
-            return _singleResourceDocumentBuilder.BuildDocument(obj, linkBaseUrl, null);
+            return _singleResourceDocumentBuilder.BuildDocument(obj, linkBaseUrl, null, null);
         }
 
         private static Type GetEnumerableElementType(Type collectionType)

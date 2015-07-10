@@ -77,7 +77,7 @@ namespace JSONAPI.EntityFramework.Http
             if (singleResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     registration.ResourceTypeName, id));
-            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null);
+            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null, null);
         }
 
         public virtual async Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
@@ -109,7 +109,7 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
 
             return returnDocument;
         }
@@ -119,7 +119,7 @@ namespace JSONAPI.EntityFramework.Http
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return returnDocument;
@@ -192,7 +192,7 @@ namespace JSONAPI.EntityFramework.Http
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     primaryEntityRegistration.ResourceTypeName, id));
             var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
-            return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null);
+            return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null, null);
         }
 
         private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,

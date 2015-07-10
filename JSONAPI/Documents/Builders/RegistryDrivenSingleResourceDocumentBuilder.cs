@@ -19,13 +19,13 @@ namespace JSONAPI.Documents.Builders
         {
         }
 
-        public ISingleResourceDocument BuildDocument(object primaryData, string linkBaseUrl, string[] includePathExpressions)
+        public ISingleResourceDocument BuildDocument(object primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata topLevelMetadata)
         {
             var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
             var primaryDataResource = CreateResourceObject(primaryData, idDictionariesByType, null, includePathExpressions, linkBaseUrl);
 
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
-            var document = new SingleResourceDocument(primaryDataResource, relatedData, null);
+            var document = new SingleResourceDocument(primaryDataResource, relatedData, topLevelMetadata);
             return document;
         }
     }
