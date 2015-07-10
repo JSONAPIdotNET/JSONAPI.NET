@@ -168,5 +168,20 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
                     HttpStatusCode.NotFound, true);
             }
         }
+
+        [TestMethod]
+        [DeploymentItem(@"Acceptance\Data\Building.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Acceptance\Data\Company.csv", @"Acceptance\Data")]
+        public async Task Get_related_to_one_where_it_is_null()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "buildings/1001/owner");
+
+                await AssertResponseContent(response,
+                    @"Acceptance\Fixtures\FetchingResources\Get_related_to_one_where_it_is_null.json",
+                    HttpStatusCode.OK);
+            }
+        }
     }
 }

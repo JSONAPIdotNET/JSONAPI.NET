@@ -144,6 +144,7 @@
     <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Serialize_null_metadata.json" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_null_document.json" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_document_with_resource.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_null_resource.json" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_only.json" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_and_metadata.json" />

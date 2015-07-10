@@ -38,6 +38,12 @@ namespace JSONAPI.Json
 
         public Task Serialize(IResourceObject resourceObject, JsonWriter writer)
         {
+            if (resourceObject == null)
+            {
+                writer.WriteNull();
+                return Task.FromResult(0);
+            }
+
             writer.WriteStartObject();
 
             writer.WritePropertyName(TypeKeyName);

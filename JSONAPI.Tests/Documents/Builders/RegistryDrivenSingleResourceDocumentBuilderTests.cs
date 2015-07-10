@@ -244,6 +244,21 @@ namespace JSONAPI.Tests.Documents.Builders
             continentCountriesRelationship.Value.Linkage.Should().BeNull();
         }
 
+        [TestMethod]
+        public void Returns_correct_document_for_null_resource()
+        {
+            // Arrange
+            var mockRegistry = new Mock<IResourceTypeRegistry>(MockBehavior.Strict);
+            var linkConventions = new DefaultLinkConventions();
+
+            // Act
+            var documentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(mockRegistry.Object, linkConventions);
+            var document = documentBuilder.BuildDocument(null, "http://www.example.com", null);
+
+            // Assert
+            document.PrimaryData.Should().BeNull();
+        }
+
         private void AssertToOneRelationship(KeyValuePair<string, IRelationshipObject> relationshipPair, string keyName, string selfLink, string relatedResourceLink,
             string linkageType, string linkageId)
         {

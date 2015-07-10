@@ -50,8 +50,10 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp
             var namingConventions = new DefaultNamingConventions(pluralizationService);
 
             var configuration = new JsonApiAutofacConfiguration(namingConventions);
+            configuration.RegisterResourceType(typeof(Building));
             configuration.RegisterResourceType(typeof(City));
             configuration.RegisterResourceType(typeof(Comment));
+            configuration.RegisterResourceType(typeof(Company));
             configuration.RegisterResourceType(typeof(Language));
             configuration.RegisterResourceType(typeof(LanguageUserLink),
                 sortByIdFactory: LanguageUserLinkSortByIdFactory,

@@ -187,10 +187,11 @@ namespace JSONAPI.EntityFramework.Http
             var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
 
             var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
-            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
-            if (relatedResource == null)
+            var primaryEntityExists = await primaryEntityQuery.AnyAsync(cancellationToken);
+            if (!primaryEntityExists)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     primaryEntityRegistration.ResourceTypeName, id));
+            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
             return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null);
         }
 

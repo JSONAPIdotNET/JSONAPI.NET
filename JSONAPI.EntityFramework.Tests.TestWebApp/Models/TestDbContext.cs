@@ -35,6 +35,8 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
                 .Map(c => c.MapLeftKey("PostId").MapRightKey("TagId").ToTable("PostTagLink"));
         }
 
+        public DbSet<Building> Buildings { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Post> Posts { get; set; }

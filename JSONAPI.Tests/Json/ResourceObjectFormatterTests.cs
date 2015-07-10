@@ -16,6 +16,13 @@ namespace JSONAPI.Tests.Json
     public class ResourceObjectFormatterTests : JsonApiFormatterTestsBase
     {
         [TestMethod]
+        public async Task Serialize_ResourceObject_for_null_resource()
+        {
+            var formatter = new ResourceObjectFormatter(null, null, null);
+            await AssertSerializeOutput(formatter, (IResourceObject)null, "Json/Fixtures/ResourceObjectFormatter/Serialize_ResourceObject_for_null_resource.json");
+        }
+
+        [TestMethod]
         public async Task Serialize_ResourceObject_for_resource_without_attributes()
         {
             IResourceObject resourceObject = new ResourceObject("countries", "1100");

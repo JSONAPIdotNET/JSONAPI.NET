@@ -189,6 +189,12 @@
     <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithMissingToOneLinkageResponse.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_response.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_response.json" />
+    <None Include="Acceptance\Data\Company.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Acceptance\Data\Building.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Acceptance\Data\LanguageUserLink.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -207,6 +213,7 @@
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_for_resource_that_doesnt_exist.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_for_resource_that_doesnt_exist.json" />
     <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_resource_for_relationship_that_doesnt_exist.json" />
+    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_where_it_is_null.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
     </None>

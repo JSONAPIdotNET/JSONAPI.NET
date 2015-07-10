@@ -50,6 +50,8 @@ namespace JSONAPI.Documents.Builders
         protected ResourceObject CreateResourceObject(object modelObject, IDictionary<string, IDictionary<string, ResourceObject>> idDictionariesByType,
             string currentPath, string[] includePathExpressions, string linkBaseUrl)
         {
+            if (modelObject == null) return null;
+
             var modelObjectRuntimeType = modelObject.GetType();
             var resourceTypeRegistration = _resourceTypeRegistry.GetRegistrationForType(modelObjectRuntimeType);
 
