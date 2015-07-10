@@ -44,11 +44,22 @@ namespace JSONAPI.Http
         /// <summary>
         /// Gets a query returning all entities for this endpoint
         /// </summary>
-        /// <returns></returns>
         protected abstract IQueryable<TEntity> GetQuery();
+
+
+        /// <summary>
+        /// Gets a query for only the entity matching the given ID
+        /// </summary>
         protected abstract IQueryable<TEntity> GetByIdQuery(string id);
+
+        /// <summary>
+        /// Gets a query for the DTOs based on the given entity query.
+        /// </summary>
         protected abstract IQueryable<TDto> GetMappedQuery(IQueryable<TEntity> entityQuery, Expression<Func<TDto, object>>[] propertiesToInclude);
 
+        /// <summary>
+        /// Creates a new MappedDocumentMaterializer
+        /// </summary>
         protected MappedDocumentMaterializer(
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             IBaseUrlService baseUrlService,
