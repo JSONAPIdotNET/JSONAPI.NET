@@ -21,7 +21,14 @@ namespace JSONAPI.Http
         /// <summary>
         /// Returns a document containing records matching the provided lambda expression.
         /// </summary>
-        Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken);
+        Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter,
+            HttpRequestMessage request, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Returns a document containing the first record matching the provided lambda expression.
+        /// </summary>
+        Task<ISingleResourceDocument> GetSingleRecordMatchingExpression(Expression<Func<T, bool>> filter,
+            HttpRequestMessage request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns a document with the resource identified by the given ID.

@@ -46,7 +46,6 @@ namespace JSONAPI.Http
         /// </summary>
         protected abstract IQueryable<TEntity> GetQuery();
 
-
         /// <summary>
         /// Gets a query for only the entity matching the given ID
         /// </summary>
@@ -90,6 +89,19 @@ namespace JSONAPI.Http
             var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
             var mappedQuery = GetMappedQuery(entityQuery, includePaths);
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, cancellationToken, jsonApiPaths);
+        }
+
+        public async Task<ISingleResourceDocument> GetSingleRecordMatchingExpression(Expression<Func<TDto, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var entityQuery = GetQuery();
+            var includePaths = GetIncludePathsForQuery() ?? new Expression<Func<TDto, object>>[] { };
+            var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
+            var mappedQuery = GetMappedQuery(entityQuery, includePaths);
+            var filteredQuery = mappedQuery.Where(filter);
+            var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(filteredQuery, cancellationToken);
+            
+            var baseUrl = _baseUrlService.GetBaseUrl(request);
+            return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
         }
 
         public async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
