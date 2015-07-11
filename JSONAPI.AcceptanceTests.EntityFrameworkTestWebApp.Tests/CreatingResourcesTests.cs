@@ -6,24 +6,24 @@ using FluentAssertions;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JSONAPI.EntityFramework.Tests.Acceptance
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     [TestClass]
-    public class PostsTests : AcceptanceTestsBase
+    public class CreatingResourcesTests : AcceptanceTestsBase
     {
         [TestMethod]
-        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
         public async Task Post_with_client_provided_id()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPost(effortConnection, "posts", @"Acceptance\Fixtures\CreatingResources\Requests\Post_with_client_provided_id_Request.json");
+                var response = await SubmitPost(effortConnection, "posts", @"Fixtures\CreatingResources\Requests\Post_with_client_provided_id_Request.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\CreatingResources\Responses\Post_with_client_provided_id_Response.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Fixtures\CreatingResources\Responses\Post_with_client_provided_id_Response.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {
@@ -40,18 +40,18 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
         }
 
         [TestMethod]
-        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
         public async Task Post_with_empty_id()
         {
             using (var effortConnection = GetEffortConnection())
             {
-                var response = await SubmitPost(effortConnection, "posts", @"Acceptance\Fixtures\CreatingResources\Requests\Post_with_empty_id_Request.json");
+                var response = await SubmitPost(effortConnection, "posts", @"Fixtures\CreatingResources\Requests\Post_with_empty_id_Request.json");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json", HttpStatusCode.OK);
 
                 using (var dbContext = new TestDbContext(effortConnection, false))
                 {

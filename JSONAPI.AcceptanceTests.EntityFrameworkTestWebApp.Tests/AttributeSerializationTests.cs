@@ -1,9 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JSONAPI.EntityFramework.Tests.Acceptance
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     [TestClass]
     public class AttributeSerializationTests : AcceptanceTestsBase
@@ -15,7 +14,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "samples");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json", HttpStatusCode.OK);
+                await AssertResponseContent(response, @"Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json", HttpStatusCode.OK);
             }
         }
     }

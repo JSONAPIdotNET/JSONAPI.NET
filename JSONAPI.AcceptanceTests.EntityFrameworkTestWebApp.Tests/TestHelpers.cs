@@ -5,13 +5,20 @@ using System.Reflection;
 using Effort;
 using Effort.DataLoaders;
 
-namespace JSONAPI.EntityFramework.Tests
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     internal static class TestHelpers
     {
+        // http://stackoverflow.com/questions/21175713/no-entity-framework-provider-found-for-the-ado-net-provider-with-invariant-name
+        private static volatile Type _dependency;
+        static TestHelpers()
+        {
+            _dependency = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
+        }
+
         public static string ReadEmbeddedFile(string path)
         {
-            var resourcePath = "JSONAPI.EntityFramework.Tests." + path.Replace("\\", ".").Replace("/", ".");
+            var resourcePath = "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests." + path.Replace("\\", ".").Replace("/", ".");
             using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
             {
                 if (stream == null) throw new Exception("Could not find a file at the path: " + path);

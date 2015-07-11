@@ -44,11 +44,11 @@
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=3.2.2.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -110,17 +110,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Acceptance\AttributeSerializationTests.cs" />
-    <Compile Include="Acceptance\DeletingResourcesTests.cs" />
-    <Compile Include="Acceptance\ErrorsTests.cs" />
-    <Compile Include="Acceptance\FetchingResourcesTests.cs" />
-    <Compile Include="Acceptance\HeterogeneousTests.cs" />
-    <Compile Include="Acceptance\DocumentTests.cs" />
-    <Compile Include="Acceptance\CreatingResourcesTests.cs" />
-    <Compile Include="Acceptance\ComputedIdTests.cs" />
-    <Compile Include="Acceptance\UpdatingResourcesTests.cs" />
-    <Compile Include="Acceptance\AcceptanceTestsBase.cs" />
-    <Compile Include="Acceptance\SortingTests.cs" />
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformerTests.cs" />
     <Compile Include="DbContextExtensionsTests.cs" />
     <Compile Include="Helpers\TestDbAsyncEnumerable.cs" />
@@ -132,114 +121,10 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_dasherized_resource.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedAscendingResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedDescendingResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleAscendingResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByMultipleDescendingResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByMixedDirectionResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedByUnknownColumnResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Sorting\Responses\GetSortedBySameColumnTwiceResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithMissingToManyLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToManyLinkageObjectMissingTypeRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToOneLinkageObjectMissingIdRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToOneLinkageObjectMissingTypeRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToManyUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToOneUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToManyUpdateResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToOneUpdateResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToOneLinkageObjectMissingTypeResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToManyLinkageObjectMissingTypeResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithMissingToManyLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToOneLinkageObjectMissingIdResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithStringRelationshipValueRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithStringRelationshipValueResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithArrayRelationshipValueResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithArrayRelationshipValueRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithNullToOneUpdateResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithNullToOneUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToManyHomogeneousDataUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToManyHomogeneousDataUpdateResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToManyEmptyLinkageUpdateResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToManyEmptyLinkageUpdateRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Heterogeneous\Responses\GetSearchResultsResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithToManyLinkageObjectMissingIdRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithToManyLinkageObjectMissingIdResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithNullForToManyLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithStringForToManyLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithObjectForToManyLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithObjectForToManyLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithNullForToManyLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithStringForToManyLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithStringForToOneLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithArrayForToOneLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithArrayForToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithStringForToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Document\Responses\Get_returns_IResourceCollectionDocument.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\AttributeSerialization\Attributes_of_various_types_serialize_correctly.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_does_not_exist.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\Errors\Controller_action_throws_exception.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\PatchWithMissingToOneLinkageRequest.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithMissingToOneLinkageResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_response.json" />
-    <None Include="Acceptance\Data\Company.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\Building.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\LanguageUserLink.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\Language.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <EmbeddedResource Include="Acceptance\Fixtures\ComputedId\Responses\Get_all_of_resource_with_computed_id_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\ComputedId\Responses\Get_resource_with_computed_id_by_id_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Requests\Post_with_empty_id_Request.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_attribute_Request.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_attribute_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\Patch_with_unknown_relationship_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Requests\Patch_with_unknown_relationship_Request.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_resource_by_id_that_doesnt_exist.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_for_resource_that_doesnt_exist.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_many_for_resource_that_doesnt_exist.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_resource_for_relationship_that_doesnt_exist.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\Get_related_to_one_where_it_is_null.json" />
     <None Include="App.Config">
       <SubType>Designer</SubType>
-    </None>
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\GetByIdResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\GetAllResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\FetchingResources\GetWithFilterResponse.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Requests\Post_with_client_provided_id_Request.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\CreatingResources\Responses\Post_with_client_provided_id_Response.json" />
-    <EmbeddedResource Include="Acceptance\Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponse.json" />
-    <None Include="Acceptance\Data\PostTagLink.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\Tag.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\Comment.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\User.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\Post.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Acceptance\Data\UserGroup.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Data\Comment.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -250,9 +135,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JSONAPI.EntityFramework.Tests.TestWebApp\JSONAPI.EntityFramework.Tests.TestWebApp.csproj">
+    <ProjectReference Include="..\JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp\JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.csproj">
       <Project>{76dee472-723b-4be6-8b97-428ac326e30f}</Project>
-      <Name>JSONAPI.EntityFramework.Tests.TestWebApp</Name>
+      <Name>JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp</Name>
     </ProjectReference>
     <ProjectReference Include="..\JSONAPI.EntityFramework\JSONAPI.EntityFramework.csproj">
       <Project>{E906356C-93F6-41F6-9A0D-73B8A99AA53C}</Project>

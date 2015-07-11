@@ -12,7 +12,7 @@ using JSONAPI.Json;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JSONAPI.EntityFramework.Tests.Acceptance
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     [TestClass]
     public abstract class AcceptanceTestsBase
@@ -25,7 +25,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
 
         protected static DbConnection GetEffortConnection()
         {
-            return TestHelpers.GetEffortConnection(@"Acceptance\Data");
+            return TestHelpers.GetEffortConnection(@"Data");
         }
 
         protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode, bool redactErrorData = false)

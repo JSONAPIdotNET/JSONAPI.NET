@@ -5,17 +5,17 @@ using FluentAssertions;
 using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JSONAPI.EntityFramework.Tests.Acceptance
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     [TestClass]
     public class DeletingResourcesTests : AcceptanceTestsBase
     {
         [TestMethod]
-        [DeploymentItem(@"Acceptance\Data\Comment.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Post.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\PostTagLink.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\Tag.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Acceptance\Data\User.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Comment.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\User.csv", @"Acceptance\Data")]
         public async Task Delete()
         {
             using (var effortConnection = GetEffortConnection())

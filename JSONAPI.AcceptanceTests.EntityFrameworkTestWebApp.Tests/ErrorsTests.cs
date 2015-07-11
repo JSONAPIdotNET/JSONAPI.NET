@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace JSONAPI.EntityFramework.Tests.Acceptance
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
     [TestClass]
     public class ErrorsTests : AcceptanceTestsBase
@@ -14,7 +14,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "trees");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Errors\Controller_action_throws_exception.json", HttpStatusCode.InternalServerError, true);
+                await AssertResponseContent(response, @"Fixtures\Errors\Controller_action_throws_exception.json", HttpStatusCode.InternalServerError, true);
             }
         }
 
@@ -27,7 +27,7 @@ namespace JSONAPI.EntityFramework.Tests.Acceptance
             {
                 var response = await SubmitGet(effortConnection, "foo");
 
-                await AssertResponseContent(response, @"Acceptance\Fixtures\Errors\Controller_does_not_exist.json", HttpStatusCode.NotFound, true);
+                await AssertResponseContent(response, @"Fixtures\Errors\Controller_does_not_exist.json", HttpStatusCode.NotFound, true);
             }
         }
     }
