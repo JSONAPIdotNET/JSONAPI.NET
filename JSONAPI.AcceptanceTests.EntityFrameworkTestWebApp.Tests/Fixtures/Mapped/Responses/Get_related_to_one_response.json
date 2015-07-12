@@ -1,0 +1,19 @@
+﻿{
+    "data": {
+        "type": "starship-officers",
+        "id": "NCC-1701-D_12013",
+        "attributes": {
+            "name": "Deanna Troi",
+            "position": "Ship's Counselor",
+            "rank": "Lt. Commander"
+        },
+        "relationships": {
+            "current-ship": {
+                "links": { 
+                    "self": "https://www.example.com/starship-officers/NCC-1701-D_12013/relationships/current-ship",
+                    "related": "https://www.example.com/starship-officers/NCC-1701-D_12013/current-ship"
+                }
+            }
+        }
+    }
+}

@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
@@ -17,44 +16,32 @@ namespace JSONAPI.EntityFramework.Http
     /// <summary>
     /// Implementation of IDocumentMaterializer for use with Entity Framework.
     /// </summary>
-    public class EntityFrameworkDocumentMaterializer<T> : IDocumentMaterializer<T> where T : class
+    public class EntityFrameworkDocumentMaterializer<T> : IDocumentMaterializer where T : class
     {
         private readonly DbContext _dbContext;
-        private readonly IResourceTypeRegistry _resourceTypeRegistry;
+        private readonly IResourceTypeRegistration _resourceTypeRegistration;
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IEntityFrameworkResourceObjectMaterializer _entityFrameworkResourceObjectMaterializer;
         private readonly IBaseUrlService _baseUrlService;
-        private readonly MethodInfo _getRelatedToManyMethod;
-        private readonly MethodInfo _getRelatedToOneMethod;
 
         /// <summary>
         /// Creates a new EntityFrameworkDocumentMaterializer
         /// </summary>
-        /// <param name="dbContext"></param>
-        /// <param name="resourceTypeRegistry"></param>
-        /// <param name="queryableResourceCollectionDocumentBuilder"></param>
-        /// <param name="singleResourceDocumentBuilder"></param>
-        /// <param name="entityFrameworkResourceObjectMaterializer"></param>
-        /// <param name="baseUrlService"></param>
         public EntityFrameworkDocumentMaterializer(
             DbContext dbContext,
-            IResourceTypeRegistry resourceTypeRegistry,
+            IResourceTypeRegistration resourceTypeRegistration,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
             IBaseUrlService baseUrlService)
         {
             _dbContext = dbContext;
-            _resourceTypeRegistry = resourceTypeRegistry;
+            _resourceTypeRegistration = resourceTypeRegistration;
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _entityFrameworkResourceObjectMaterializer = entityFrameworkResourceObjectMaterializer;
             _baseUrlService = baseUrlService;
-            _getRelatedToManyMethod = GetType()
-                .GetMethod("GetRelatedToMany", BindingFlags.NonPublic | BindingFlags.Instance);
-            _getRelatedToOneMethod = GetType()
-                .GetMethod("GetRelatedToOne", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -63,52 +50,14 @@ namespace JSONAPI.EntityFramework.Http
             return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken);
         }
 
-        public Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var query = _dbContext.Set<T>().AsQueryable().Where(filter);
-            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken);
-        }
-
-        public async Task<ISingleResourceDocument> GetSingleRecordMatchingExpression(Expression<Func<T, bool>> filter, HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var singleResource = await Filter(filter).FirstOrDefaultAsync(cancellationToken);
-            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null, null);
-        }
-
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
-            var singleResource = await FilterById<T>(id, registration).FirstOrDefaultAsync(cancellationToken);
+            var singleResource = await FilterById<T>(id, _resourceTypeRegistration).FirstOrDefaultAsync(cancellationToken);
             if (singleResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    registration.ResourceTypeName, id));
+                    _resourceTypeRegistration.ResourceTypeName, id));
             return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null, null);
-        }
-
-        public virtual async Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
-            var relationship = (ResourceTypeRelationship) registration.GetFieldByName(relationshipKey);
-            if (relationship == null)
-                throw JsonApiException.CreateForNotFound(string.Format("No relationship `{0}` exists for the resource with type `{1}` and id `{2}`.",
-                    relationshipKey, registration.ResourceTypeName, id));
-
-            if (relationship.IsToMany)
-            {
-                var method = _getRelatedToManyMethod.MakeGenericMethod(relationship.RelatedType);
-                var result = (Task<IResourceCollectionDocument>)method.Invoke(this, new object[] { id, relationship, request, cancellationToken });
-                return await result;
-            }
-            else
-            {
-                var method = _getRelatedToOneMethod.MakeGenericMethod(relationship.RelatedType);
-                var result = (Task<ISingleResourceDocument>)method.Invoke(this, new object[] { id, relationship, request, cancellationToken });
-                return await result;
-            }
         }
 
         public virtual async Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument,
@@ -165,18 +114,17 @@ namespace JSONAPI.EntityFramework.Http
         protected async Task<IResourceCollectionDocument> GetRelatedToMany<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var primaryEntityRegistration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
             var param = Expression.Parameter(typeof(T));
             var accessorExpr = Expression.Property(param, relationship.Property);
             var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
 
-            var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
+            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
 
             // We have to see if the resource even exists, so we can throw a 404 if it doesn't
             var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
             if (relatedResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    primaryEntityRegistration.ResourceTypeName, id));
+                    _resourceTypeRegistration.ResourceTypeName, id));
 
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
 
@@ -189,16 +137,15 @@ namespace JSONAPI.EntityFramework.Http
         protected async Task<ISingleResourceDocument> GetRelatedToOne<TRelated>(string id,
             ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var primaryEntityRegistration = _resourceTypeRegistry.GetRegistrationForType(typeof(T));
             var param = Expression.Parameter(typeof(T));
             var accessorExpr = Expression.Property(param, relationship.Property);
             var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
 
-            var primaryEntityQuery = FilterById<T>(id, primaryEntityRegistration);
+            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
             var primaryEntityExists = await primaryEntityQuery.AnyAsync(cancellationToken);
             if (!primaryEntityExists)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    primaryEntityRegistration.ResourceTypeName, id));
+                    _resourceTypeRegistration.ResourceTypeName, id));
             var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
             return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null, null);
         }

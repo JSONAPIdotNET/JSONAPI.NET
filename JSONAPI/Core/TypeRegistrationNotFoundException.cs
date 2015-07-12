@@ -12,7 +12,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="type"></param>
         public TypeRegistrationNotFoundException(Type type)
-            : base("No model registration was found for the type \"" + type.Name + "\".")
+            : base("No type registration was found for the type \"" + type.Name + "\".")
         {
         }
 
@@ -21,7 +21,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="resourceTypeName"></param>
         public TypeRegistrationNotFoundException(string resourceTypeName)
-            : base("No model registration was found for the type name \"" + resourceTypeName + "\".")
+            : base("No type registration was found for the type name \"" + resourceTypeName + "\".")
         {
         }
     }

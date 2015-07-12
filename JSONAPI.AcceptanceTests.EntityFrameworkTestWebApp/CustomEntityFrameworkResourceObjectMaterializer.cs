@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Threading.Tasks;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Core;
 using JSONAPI.Documents;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.EntityFramework;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 {
     public class CustomEntityFrameworkResourceObjectMaterializer : EntityFrameworkResourceObjectMaterializer
     {

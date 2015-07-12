@@ -5,8 +5,8 @@ using Autofac;
 using Autofac.Integration.WebApi;
 using JSONAPI.Autofac;
 using JSONAPI.Autofac.EntityFramework;
+using JSONAPI.Configuration;
 using JSONAPI.Core;
-using JSONAPI.EntityFramework.Http;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 
@@ -24,28 +24,14 @@ namespace JSONAPI.TodoMVC.API
         {
             var httpConfig = new HttpConfiguration();
 
-            var pluralizationService = new PluralizationService();
-            pluralizationService.AddMapping("todo", "todos");
-            var namingConventions = new DefaultNamingConventions(pluralizationService);
-
-            var configuration = new JsonApiAutofacConfiguration(namingConventions);
-            configuration.RegisterResourceType(typeof(Todo));
-            var module = configuration.GetAutofacModule();
-            var efModule = configuration.GetEntityFrameworkAutofacModule();
-
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(module);
-            containerBuilder.RegisterModule(efModule);
-            containerBuilder.RegisterGeneric(typeof(EntityFrameworkDocumentMaterializer<>))
-                .AsImplementedInterfaces();
             containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-            containerBuilder.RegisterType<TodoMvcContext>().As<DbContext>();
-
+            containerBuilder.RegisterType<TodoMvcContext>().As<DbContext>().InstancePerRequest();
             var container = containerBuilder.Build();
-            httpConfig.UseJsonApiWithAutofac(container);
 
-            // Web API routes
-            httpConfig.Routes.MapHttpRoute("DefaultApi", "{controller}/{id}", new { id = RouteParameter.Optional });
+            var configuration = new JsonApiConfiguration();
+            configuration.RegisterEntityFrameworkResourceType<Todo>(c => c.OverrideDefaultResourceTypeName("todos"));
+            configuration.SetupHttpConfigurationUsingAutofac(httpConfig, container);
 
             return httpConfig;
         }

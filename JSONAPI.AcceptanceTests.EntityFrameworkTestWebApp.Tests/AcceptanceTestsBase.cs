@@ -6,8 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
-using JSONAPI.EntityFramework.Tests.TestWebApp;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Json;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -58,7 +57,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         {
             using (var server = TestServer.Create(app =>
             {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
+                var startup = new Startup(() => new TestDbContext(effortConnection, false));
                 startup.Configuration(app);
             }))
             {
@@ -75,7 +74,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         {
             using (var server = TestServer.Create(app =>
             {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
+                var startup = new Startup(() => new TestDbContext(effortConnection, false));
                 startup.Configuration(app);
             }))
             {
@@ -100,7 +99,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         {
             using (var server = TestServer.Create(app =>
             {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
+                var startup = new Startup(() => new TestDbContext(effortConnection, false));
                 startup.Configuration(app);
             }))
             {
@@ -124,7 +123,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         {
             using (var server = TestServer.Create(app =>
             {
-                var startup = new Startup(context => new TestDbContext(effortConnection, false));
+                var startup = new Startup(() => new TestDbContext(effortConnection, false));
                 startup.Configuration(app);
             }))
             {

@@ -29,5 +29,11 @@ namespace JSONAPI.Core
         /// <returns>The registration for the given type name.</returns>
         /// <exception cref="TypeRegistrationNotFoundException">Thrown when the type name was not registered</exception>
         IResourceTypeRegistration GetRegistrationForResourceTypeName(string resourceTypeName);
+
+        /// <summary>
+        /// Adds a registration to the registry.
+        /// </summary>
+        /// <param name="registration">The registration to add</param>
+        void AddRegistration(IResourceTypeRegistration registration);
     }
 }

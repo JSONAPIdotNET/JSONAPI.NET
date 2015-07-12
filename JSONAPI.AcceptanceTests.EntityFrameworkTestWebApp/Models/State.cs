@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
     public class State
     {

@@ -10,6 +10,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
     internal static class TestHelpers
     {
         // http://stackoverflow.com/questions/21175713/no-entity-framework-provider-found-for-the-ado-net-provider-with-invariant-name
+        // ReSharper disable once NotAccessedField.Local
         private static volatile Type _dependency;
         static TestHelpers()
         {

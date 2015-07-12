@@ -74,6 +74,9 @@
     <Compile Include="DbContextExtensions.cs" />
     <Compile Include="Http\EntityFrameworkDocumentMaterializer.cs" />
     <Compile Include="EntityFrameworkPluralizationService.cs" />
+    <Compile Include="Http\EntityFrameworkToOneRelatedResourceDocumentMaterializer.cs" />
+    <Compile Include="Http\EntityFrameworkToManyRelatedResourceDocumentMaterializer.cs" />
+    <Compile Include="Configuration\JsonApiAutofacConfigurationExtensions.cs" />
     <Compile Include="IEntityFrameworkResourceObjectMaterializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EntityFrameworkResourceObjectMaterializer.cs" />

@@ -6,41 +6,38 @@ using JSONAPI.Documents;
 namespace JSONAPI.Http
 {
     /// <summary>
-    /// This generic ApiController provides JSON API-compatible endpoints corresponding to a
-    /// registered type.
+    /// This ApiController is capable of serving all requests using JSON API.
     /// </summary>
-    public class JsonApiController<T> : ApiController where T : class
+    public class JsonApiController : ApiController
     {
-        private readonly IDocumentMaterializer<T> _documentMaterializer;
+        private readonly IDocumentMaterializerLocator _documentMaterializerLocator;
 
         /// <summary>
-        /// Creates a new ApiController
+        /// Creates a new JsonApiController
         /// </summary>
-        /// <param name="documentMaterializer"></param>
-        public JsonApiController(IDocumentMaterializer<T> documentMaterializer)
+        /// <param name="documentMaterializerLocator">The service locator to get document materializers for a given resource type.</param>
+        public JsonApiController(IDocumentMaterializerLocator documentMaterializerLocator)
         {
-            _documentMaterializer = documentMaterializer;
+            _documentMaterializerLocator = documentMaterializerLocator;
         }
 
         /// <summary>
         /// Returns a document corresponding to a set of records of this type.
         /// </summary>
-        /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Get(CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> GetResourceCollection(string resourceType, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.GetRecords(Request, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            var document = await materializer.GetRecords(Request, cancellationToken);
             return Ok(document);
         }
 
         /// <summary>
         /// Returns a document corresponding to the single record matching the ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Get(string id, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Get(string resourceType, string id, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.GetRecordById(id, Request, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            var document = await materializer.GetRecordById(id, Request, cancellationToken);
             return Ok(document);
         }
 
@@ -48,50 +45,40 @@ namespace JSONAPI.Http
         /// Returns a document corresponding to the resource(s) related to the resource identified by the ID,
         /// and the relationship name.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="relationshipName"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<IHttpActionResult> GetRelatedResource(string id, string relationshipName, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> GetRelatedResource(string resourceType, string id, string relationshipName, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.GetRelated(id, relationshipName, Request, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetRelatedResourceMaterializer(resourceType, relationshipName);
+            var document = await materializer.GetRelatedResourceDocument(id, Request, cancellationToken);
             return Ok(document);
         }
-
 
         /// <summary>
         /// Creates a new record corresponding to the data in the request document.
         /// </summary>
-        /// <param name="requestDocument"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Post([FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Post(string resourceType, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.CreateRecord(requestDocument, Request, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            var document = await materializer.CreateRecord(requestDocument, Request, cancellationToken);
             return Ok(document);
         }
 
         /// <summary>
         /// Updates the record with the given ID with data from the request payloaad.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="requestDocument"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public virtual async Task<IHttpActionResult> Patch(string id, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Patch(string resourceType, string id, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.UpdateRecord(id, requestDocument, Request, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            var document = await materializer.UpdateRecord(id, requestDocument, Request, cancellationToken);
             return Ok(document);
         }
 
         /// <summary>
         /// Deletes the record corresponding to the ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        public virtual async Task<IHttpActionResult> Delete(string id, CancellationToken cancellationToken)
+        public virtual async Task<IHttpActionResult> Delete(string resourceType, string id, CancellationToken cancellationToken)
         {
-            var document = await _documentMaterializer.DeleteRecord(id, cancellationToken);
+            var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            var document = await materializer.DeleteRecord(id, cancellationToken);
             return Ok(document);
         }
     }

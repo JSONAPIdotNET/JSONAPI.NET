@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Web.Http;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
 {
     public class SamplesController : ApiController
     {

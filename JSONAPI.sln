@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac.EntityFrame
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests", "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests\JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests.csproj", "{58AEF8B8-8D51-4175-AC96-BC622703E8BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac.Tests", "JSONAPI.Autofac.Tests\JSONAPI.Autofac.Tests.csproj", "{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

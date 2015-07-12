@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,7 +18,7 @@ namespace JSONAPI.Http
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <typeparam name="TDto"></typeparam>
-    public abstract class MappedDocumentMaterializer<TEntity, TDto> : IDocumentMaterializer<TDto> where TDto : class
+    public abstract class MappedDocumentMaterializer<TEntity, TDto> : IDocumentMaterializer where TDto : class
     {
         /// <summary>
         /// Materializes a document for the resources found on the other side of the to-many relationship belonging to the resource.
@@ -38,8 +37,6 @@ namespace JSONAPI.Http
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IQueryableEnumerationTransformer _queryableEnumerationTransformer;
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
-        private readonly IDictionary<ResourceTypeRelationship, MaterializeDocumentForToManyRelationship> _toManyRelatedResourceMaterializers;
-        private readonly IDictionary<ResourceTypeRelationship, MaterializeDocumentForToOneRelationship> _toOneRelatedResourceMaterializers;
 
         /// <summary>
         /// Gets a query returning all entities for this endpoint
@@ -71,37 +68,20 @@ namespace JSONAPI.Http
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _queryableEnumerationTransformer = queryableEnumerationTransformer;
             _resourceTypeRegistry = resourceTypeRegistry;
-            _toManyRelatedResourceMaterializers =
-                new ConcurrentDictionary<ResourceTypeRelationship, MaterializeDocumentForToManyRelationship>();
-            _toOneRelatedResourceMaterializers =
-                new ConcurrentDictionary<ResourceTypeRelationship, MaterializeDocumentForToOneRelationship>();
+        }
+
+        private string ResourceTypeName
+        {
+            get { return _resourceTypeRegistry.GetRegistrationForType(typeof (TDto)).ResourceTypeName; }
         }
 
         public async Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            return await GetRecordsMatchingExpression(m => true, request, cancellationToken);
-        }
-
-        public async Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<TDto, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var entityQuery = GetQuery();
             var includePaths = GetIncludePathsForQuery() ?? new Expression<Func<TDto, object>>[] { };
             var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
             var mappedQuery = GetMappedQuery(entityQuery, includePaths);
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, cancellationToken, jsonApiPaths);
-        }
-
-        public async Task<ISingleResourceDocument> GetSingleRecordMatchingExpression(Expression<Func<TDto, bool>> filter, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var entityQuery = GetQuery();
-            var includePaths = GetIncludePathsForQuery() ?? new Expression<Func<TDto, object>>[] { };
-            var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
-            var mappedQuery = GetMappedQuery(entityQuery, includePaths);
-            var filteredQuery = mappedQuery.Where(filter);
-            var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(filteredQuery, cancellationToken);
-            
-            var baseUrl = _baseUrlService.GetBaseUrl(request);
-            return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
         }
 
         public async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
@@ -111,7 +91,9 @@ namespace JSONAPI.Http
             var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
             var mappedQuery = GetMappedQuery(entityQuery, includePaths);
             var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(mappedQuery, cancellationToken);
-            if (primaryResource == null) throw JsonApiException.CreateForNotFound(string.Format("No record exists with ID {0} for the requested type.", id));
+            if (primaryResource == null)
+                throw JsonApiException.CreateForNotFound(
+                    string.Format("No record exists with type `{0}` and ID `{1}`.", ResourceTypeName, id));
 
             var baseUrl = _baseUrlService.GetBaseUrl(request);
             return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
@@ -119,44 +101,30 @@ namespace JSONAPI.Http
 
         public async Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(TDto));
+            //var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(TDto));
 
-            var primaryEntityQuery = GetByIdQuery(id);
-            var mappedQuery = GetMappedQuery(primaryEntityQuery, null);
-            var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(mappedQuery, cancellationToken);
-            if (primaryResource == null)
-            {
-                var dtoRegistration = _resourceTypeRegistry.GetRegistrationForType(typeof(TDto));
-                throw JsonApiException.CreateForNotFound(string.Format(
-                    "No resource of type `{0}` exists with id `{1}`.",
-                    dtoRegistration.ResourceTypeName, id));
-            }
+            //var entityQuery = GetByIdQuery(id);
+            //var includePaths = GetIncludePathsForSingleResource() ?? new Expression<Func<TDto, object>>[] { };
+            //var mappedQuery = GetMappedQuery(entityQuery, includePaths);
+            //var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(mappedQuery, cancellationToken);
+            //if (primaryResource == null)
+            //    throw JsonApiException.CreateForNotFound(
+            //        string.Format("No record exists with type `{0}` and ID `{1}`.", ResourceTypeName, id));
 
-            var relationship = (ResourceTypeRelationship)registration.GetFieldByName(relationshipKey);
-            if (relationship == null)
-                throw JsonApiException.CreateForNotFound(string.Format("No relationship `{0}` exists for the resource with type `{1}` and id `{2}`.",
-                    relationshipKey, registration.ResourceTypeName, id));
+            //var relationship = (ResourceTypeRelationship)registration.GetFieldByName(relationshipKey);
+            //if (relationship == null)
+            //    throw JsonApiException.CreateForNotFound(string.Format("No relationship `{0}` exists for the resource with type `{1}` and id `{2}`.",
+            //        relationshipKey, registration.ResourceTypeName, id));
 
-            if (relationship.IsToMany)
-            {
-                MaterializeDocumentForToManyRelationship documentFactory;
-                if (!_toManyRelatedResourceMaterializers.TryGetValue(relationship, out documentFactory))
-                {
-                    documentFactory = GetMaterializerForToManyRelatedResource(relationship);
-                    _toManyRelatedResourceMaterializers.Add(relationship, documentFactory);
-                }
-                return await documentFactory(primaryResource, request, cancellationToken);
-            }
-            else
-            {
-                MaterializeDocumentForToOneRelationship relatedResourceMaterializer;
-                if (!_toOneRelatedResourceMaterializers.TryGetValue(relationship, out relatedResourceMaterializer))
-                {
-                    relatedResourceMaterializer = GetMaterializerForToOneRelatedResource(relationship);
-                    _toOneRelatedResourceMaterializers.Add(relationship, relatedResourceMaterializer);
-                }
-                return await relatedResourceMaterializer(primaryResource, request, cancellationToken);
-            }
+            //var toManyRelationship = relationship as ToManyResourceTypeRelationship;
+            //if (toManyRelationship != null)
+            //    return await toManyRelationship.GetRelatedResourceCollection(id, request, cancellationToken);
+
+            //var toOneRelationship = relationship as ToOneResourceTypeRelationship;
+            //if (toOneRelationship != null)
+            //    return await toOneRelationship.GetRelatedResource(id, request, cancellationToken);
+
+            throw new NotSupportedException();
         }
 
         public Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument, HttpRequestMessage request,
@@ -191,16 +159,6 @@ namespace JSONAPI.Http
         {
             return null;
         }
-
-        /// <summary>
-        /// Returns a materialization delegate to handle related resource requests for a to-many relationship
-        /// </summary>
-        protected abstract MaterializeDocumentForToManyRelationship GetMaterializerForToManyRelatedResource(ResourceTypeRelationship relationship);
-
-        /// <summary>
-        /// Returns a materialization delegate to handle related resource requests for a to-one relationship
-        /// </summary>
-        protected abstract MaterializeDocumentForToOneRelationship GetMaterializerForToOneRelatedResource(ResourceTypeRelationship relationship);
 
         private string ConvertToJsonKeyPath(Expression<Func<TDto, object>> expression)
         {

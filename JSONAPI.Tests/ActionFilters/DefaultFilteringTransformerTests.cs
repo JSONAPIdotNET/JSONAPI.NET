@@ -542,9 +542,10 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 {"Dummy", "Dummies"}
             });
-            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(pluralizationService));
-            registry.RegisterResourceType(typeof(Dummy));
-            registry.RegisterResourceType(typeof(RelatedItemWithId));
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(pluralizationService));
+            var registry = new ResourceTypeRegistry();
+            registry.AddRegistration(registrar.BuildRegistration(typeof(Dummy)));
+            registry.AddRegistration(registrar.BuildRegistration(typeof(RelatedItemWithId)));
             return new DefaultFilteringTransformer(registry);
         }
 

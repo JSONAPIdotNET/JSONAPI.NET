@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using JSONAPI.Attributes;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
     public class City
     {

@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using JSONAPI.Documents;
+using JSONAPI.Http;
 
 namespace JSONAPI.Core
 {

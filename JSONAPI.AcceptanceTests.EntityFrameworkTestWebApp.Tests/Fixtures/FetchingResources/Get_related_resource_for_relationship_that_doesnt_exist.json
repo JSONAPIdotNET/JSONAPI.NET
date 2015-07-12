@@ -4,7 +4,7 @@
             "id": "{{SOME_GUID}}",
             "status": "404",
             "title": "Resource not found",
-            "detail": "No relationship `bananas` exists for the resource with type `posts` and id `201`."
+            "detail": "No relationship `bananas` exists for the resource type `posts`."
         }
     ]
 }

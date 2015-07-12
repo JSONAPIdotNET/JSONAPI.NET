@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.Http;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
 {
     public class TreesController : ApiController
     {

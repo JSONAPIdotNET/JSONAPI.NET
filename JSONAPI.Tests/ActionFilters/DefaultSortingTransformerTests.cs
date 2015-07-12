@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using FluentAssertions;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 using JSONAPI.QueryableTransformers;
@@ -52,8 +51,10 @@ namespace JSONAPI.Tests.ActionFilters
             {
                 {"Dummy", "Dummies"}
             });
-            var registry = new ResourceTypeRegistry(new DefaultNamingConventions(pluralizationService));
-            registry.RegisterResourceType(typeof(Dummy));
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(pluralizationService));
+            var registration = registrar.BuildRegistration(typeof(Dummy));
+            var registry = new ResourceTypeRegistry();
+            registry.AddRegistration(registration);
             return new DefaultSortingTransformer(registry);
         }
 

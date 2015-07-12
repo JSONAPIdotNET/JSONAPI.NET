@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JSONAPI.EntityFramework.Tests.TestWebApp</RootNamespace>
-    <AssemblyName>JSONAPI.EntityFramework.Tests.TestWebApp</AssemblyName>
+    <RootNamespace>JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp</RootNamespace>
+    <AssemblyName>JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
@@ -40,16 +40,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac">
+    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac.Integration.Owin">
+    <Reference Include="Autofac.Integration.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Autofac.Owin.3.1.0\lib\net45\Autofac.Integration.Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac.Integration.WebApi">
+    <Reference Include="Autofac.Integration.WebApi, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Autofac.WebApi2.3.4.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
     </Reference>
-    <Reference Include="Autofac.Integration.WebApi.Owin">
+    <Reference Include="Autofac.Integration.WebApi.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Autofac.WebApi2.Owin.3.2.0\lib\net45\Autofac.Integration.WebApi.Owin.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -67,8 +71,9 @@
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -112,30 +117,32 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\BuildingsController.cs" />
-    <Compile Include="Controllers\CitiesController.cs" />
-    <Compile Include="Controllers\CompaniesController.cs" />
-    <Compile Include="Controllers\PresidentsController.cs" />
+    <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\SamplesController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
-    <Compile Include="Controllers\CommentsController.cs" />
-    <Compile Include="Controllers\LanguageUserLinksController.cs" />
     <Compile Include="Controllers\TreesController.cs" />
-    <Compile Include="Controllers\UserGroupsController.cs" />
-    <Compile Include="Controllers\UsersController.cs" />
-    <Compile Include="Controllers\TagsController.cs" />
-    <Compile Include="Controllers\PostsController.cs" />
     <Compile Include="CustomEntityFrameworkResourceObjectMaterializer.cs" />
+    <Compile Include="DocumentMaterializers\StarshipDocumentMaterializer.cs" />
+    <Compile Include="DocumentMaterializers\StarshipOfficersRelatedResourceMaterializer - Copy.cs" />
+    <Compile Include="DocumentMaterializers\StarshipOfficersRelatedResourceMaterializer.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\LanguageUserLink.cs" />
+    <Compile Include="Models\Officer.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Sample.cs" />
+    <Compile Include="Models\Starship.cs" />
+    <Compile Include="Models\StarshipDto.cs" />
+    <Compile Include="Models\StarshipClass.cs" />
+    <Compile Include="Models\StarshipOfficerDto.cs" />
+    <Compile Include="Models\StarshipOfficerLink.cs" />
     <Compile Include="Models\State.cs" />
     <Compile Include="Models\Tag.cs" />
     <Compile Include="Models\City.cs" />

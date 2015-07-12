@@ -8,11 +8,11 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
     public class HeterogeneousTests : AcceptanceTestsBase
     {
         [TestMethod]
-        [DeploymentItem(@"Data\Comment.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Data\Post.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Data\PostTagLink.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Data\Tag.csv", @"Acceptance\Data")]
-        [DeploymentItem(@"Data\User.csv", @"Acceptance\Data")]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
         public async Task Get()
         {
             using (var effortConnection = GetEffortConnection())

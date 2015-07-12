@@ -51,6 +51,7 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=5.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.2\lib\net45\System.Web.Http.dll</HintPath>
@@ -66,6 +67,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Configuration\IResourceTypeConfiguration.cs" />
+    <Compile Include="Configuration\JsonApiConfiguration.cs" />
+    <Compile Include="Configuration\ResourceTypeConfiguration.cs" />
+    <Compile Include="Configuration\ResourceTypeRelationshipConfiguration.cs" />
+    <Compile Include="Core\DefaultNamingConventions.cs" />
+    <Compile Include="Core\INamingConventions.cs" />
+    <Compile Include="Core\IResourceTypeRegistrar.cs" />
+    <Compile Include="Core\ResourceTypeAttribute.cs" />
+    <Compile Include="Core\ResourceTypeRegistrar.cs" />
+    <Compile Include="Core\ResourceTypeRegistration.cs" />
+    <Compile Include="Core\ResourceTypeRelationship.cs" />
+    <Compile Include="Core\ToManyResourceTypeRelationship.cs" />
+    <Compile Include="Core\ToOneResourceTypeRelationship.cs" />
+    <Compile Include="Http\DocumentMaterializerLocator.cs" />
+    <Compile Include="Http\IDocumentMaterializerLocator.cs" />
+    <Compile Include="Http\IRelatedResourceDocumentMaterializer.cs" />
     <Compile Include="Http\MappedDocumentMaterializer.cs" />
     <Compile Include="QueryableTransformers\DefaultFilteringTransformer.cs" />
     <Compile Include="QueryableTransformers\DefaultPaginationTransformer.cs" />
@@ -92,8 +109,7 @@
     <Compile Include="Core\IResourceTypeRegistry.cs" />
     <Compile Include="Core\IResourceTypeRegistration.cs" />
     <Compile Include="Core\IPluralizationService.cs" />
-    <Compile Include="Core\JsonApiHttpConfiguration.cs" />
-    <Compile Include="Core\JsonApiConfiguration.cs" />
+    <Compile Include="Configuration\JsonApiHttpConfiguration.cs" />
     <Compile Include="Core\PrimitiveTypeAttributeValueConverter.cs" />
     <Compile Include="Core\ResourceTypeRegistry.cs" />
     <Compile Include="Core\ResourceTypeField.cs" />
@@ -106,7 +122,6 @@
     <Compile Include="Http\IBaseUrlService.cs" />
     <Compile Include="Http\IDocumentMaterializer.cs" />
     <Compile Include="Http\JsonApiController.cs" />
-    <Compile Include="Http\PascalizedControllerSelector.cs" />
     <Compile Include="Json\BasicMetadata.cs" />
     <Compile Include="Json\DeserializationException.cs" />
     <Compile Include="Documents\Builders\FallbackDocumentBuilder.cs" />

@@ -96,6 +96,7 @@
     <Compile Include="ErrorsTests.cs" />
     <Compile Include="FetchingResourcesTests.cs" />
     <Compile Include="HeterogeneousTests.cs" />
+    <Compile Include="MappedTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SortingTests.cs" />
     <Compile Include="TestHelpers.cs" />
@@ -122,6 +123,18 @@
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_client_provided_id_Response.json" />
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json" />
     <None Include="App.config" />
+    <None Include="Data\Officer.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\StarshipOfficerLink.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\StarshipClass.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Starship.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\Building.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -215,6 +228,11 @@
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithToOneLinkageObjectMissingIdResponse.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithToOneLinkageObjectMissingTypeResponse.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithToOneUpdateResponse.json" />
+    <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_all.json" />
+    <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_by_id.json" />
+    <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_resource_by_id_that_doesnt_exist.json" />
+    <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_one_response.json" />
+    <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_many_response.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

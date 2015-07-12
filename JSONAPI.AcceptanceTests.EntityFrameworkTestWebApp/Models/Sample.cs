@@ -1,7 +1,7 @@
 ﻿using System;
 using JSONAPI.Attributes;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
     public enum SampleEnum
     {

@@ -1,0 +1,24 @@
+﻿{
+    "data": {
+        "type": "starships",
+        "id": "NCC-1701",
+        "attributes": {
+            "name": "USS Enterprise",
+            "starship-class": "Constitution"
+        },
+        "relationships": {
+            "officers": {
+                "links": {
+                    "self": "https://www.example.com/starships/NCC-1701/relationships/officers",
+                    "related": "https://www.example.com/starships/NCC-1701/officers"
+                }
+            },
+            "ship-counselor": {
+                "links": {
+                    "self": "https://www.example.com/starships/NCC-1701/relationships/ship-counselor",
+                    "related": "https://www.example.com/starships/NCC-1701/ship-counselor"
+                }
+            }
+        }
+    }
+}

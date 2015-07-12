@@ -1,0 +1,70 @@
+﻿{
+    "data": [
+        {
+            "type": "starships",
+            "id": "NCC-1701",
+            "attributes": {
+                "name": "USS Enterprise",
+                "starship-class": "Constitution"
+            },
+            "relationships": {
+                "officers": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-1701/relationships/officers",
+                        "related": "https://www.example.com/starships/NCC-1701/officers"
+                    }
+                },
+                "ship-counselor": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-1701/relationships/ship-counselor",
+                        "related": "https://www.example.com/starships/NCC-1701/ship-counselor"
+                    }
+                }
+            }
+        },
+        {
+            "type": "starships",
+            "id": "NCC-1701-D",
+            "attributes": {
+                "name": "USS Enterprise",
+                "starship-class": "Galaxy"
+            },
+            "relationships": {
+                "officers": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-1701-D/relationships/officers",
+                        "related": "https://www.example.com/starships/NCC-1701-D/officers"
+                    }
+                },
+                "ship-counselor": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-1701-D/relationships/ship-counselor",
+                        "related": "https://www.example.com/starships/NCC-1701-D/ship-counselor"
+                    }
+                }
+            }
+        },
+        {
+            "type": "starships",
+            "id": "NCC-74656",
+            "attributes": {
+                "name": "USS Voyager",
+                "starship-class": "Intrepid"
+            },
+            "relationships": {
+                "officers": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-74656/relationships/officers",
+                        "related": "https://www.example.com/starships/NCC-74656/officers"
+                    }
+                },
+                "ship-counselor": {
+                    "links": {
+                        "self": "https://www.example.com/starships/NCC-74656/relationships/ship-counselor",
+                        "related": "https://www.example.com/starships/NCC-74656/ship-counselor"
+                    }
+                }
+            }
+        }
+    ]
+}

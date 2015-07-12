@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autofac;
+using Autofac.Core;
 using JSONAPI.ActionFilters;
+using JSONAPI.Configuration;
 using JSONAPI.Core;
 using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
@@ -13,33 +14,98 @@ namespace JSONAPI.Autofac
 {
     public class JsonApiAutofacModule : Module
     {
-        private readonly INamingConventions _namingConventions;
-        private readonly ILinkConventions _linkConventions;
-        private readonly IEnumerable<Action<ResourceTypeRegistry>> _registrationActions;
+        private readonly IJsonApiConfiguration _jsonApiConfiguration;
 
-        public JsonApiAutofacModule(INamingConventions namingConventions, ILinkConventions linkConventions,
-            IEnumerable<Action<ResourceTypeRegistry>> registrationActions)
+        internal JsonApiAutofacModule(IJsonApiConfiguration jsonApiConfiguration)
         {
-            _namingConventions = namingConventions;
-            _linkConventions = linkConventions;
-            _registrationActions = registrationActions;
+            _jsonApiConfiguration = jsonApiConfiguration;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
-            // Registry
-            builder.Register(c => _namingConventions).As<INamingConventions>().SingleInstance();
-            builder.RegisterType<ResourceTypeRegistry>().AsSelf().SingleInstance();
+            // Register resource types
+            var registry = new ResourceTypeRegistry();
+            foreach (var resourceTypeConfiguration in _jsonApiConfiguration.ResourceTypeConfigurations)
+            {
+                var resourceTypeRegistration = resourceTypeConfiguration.BuildResourceTypeRegistration();
+                registry.AddRegistration(resourceTypeRegistration);
+
+                var configuration = resourceTypeConfiguration;
+                builder.Register(c => configuration)
+                    .Keyed<IResourceTypeConfiguration>(resourceTypeRegistration.Type)
+                    .Keyed<IResourceTypeConfiguration>(resourceTypeRegistration.ResourceTypeName)
+                    .SingleInstance();
+
+                if (resourceTypeConfiguration.DocumentMaterializerType != null)
+                    builder.RegisterType(resourceTypeConfiguration.DocumentMaterializerType);
+
+                foreach (var relationshipConfiguration in resourceTypeConfiguration.RelationshipConfigurations)
+                {
+                    var prop = relationshipConfiguration.Key;
+                    var relationship = relationshipConfiguration.Value;
+                    builder.RegisterType(relationship.MaterializerType);
+                }
+            }
+
+            builder.Register(c => registry).As<IResourceTypeRegistry>().SingleInstance();
             builder.Register(c =>
             {
-                var registry = c.Resolve<ResourceTypeRegistry>();
-                foreach (var registrationAction in _registrationActions)
-                    registrationAction(registry);
-                return registry;
-            }).As<IResourceTypeRegistry>().SingleInstance();
+                var context = c.Resolve<IComponentContext>();
+                Func<string, IDocumentMaterializer> factory = resourceTypeName =>
+                {
+                    var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(resourceTypeName);
+                    var registration = registry.GetRegistrationForResourceTypeName(resourceTypeName);
+                    var parameters = new Parameter[] { new TypedParameter(typeof (IResourceTypeRegistration), registration) };
+                    if (configuration.DocumentMaterializerType != null)
+                        return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
+                    return context.Resolve<IDocumentMaterializer>(parameters);
+                };
+                return factory;
+            });
+            builder.Register(c =>
+            {
+                var context = c.Resolve<IComponentContext>();
+                Func<Type, IDocumentMaterializer> factory = clrType =>
+                {
+                    var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(clrType);
+                    var registration = registry.GetRegistrationForType(clrType);
+                    var parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration) };
+                    if (configuration.DocumentMaterializerType != null)
+                        return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
+                    return context.Resolve<IDocumentMaterializer>(parameters);
+                };
+                return factory;
+            });
+            builder.Register(c =>
+            {
+                var context = c.Resolve<IComponentContext>();
+                Func<string, string, IRelatedResourceDocumentMaterializer> factory = (resourceTypeName, relationshipName) =>
+                {
+                    var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(resourceTypeName);
+                    var registration = registry.GetRegistrationForResourceTypeName(resourceTypeName);
+                    var relationship = registration.GetFieldByName(relationshipName) as ResourceTypeRelationship;
+                    if (relationship == null)
+                        throw JsonApiException.CreateForNotFound(
+                            string.Format("No relationship `{0}` exists for the resource type `{1}`.", relationshipName, resourceTypeName));
+                    
+                    var parameters = new Parameter[]
+                    {
+                        new TypedParameter(typeof(IResourceTypeRegistration), registration),
+                        new TypedParameter(typeof(ResourceTypeRelationship), relationship)
+                    };
 
-            builder.RegisterType<JsonApiHttpConfiguration>();
-            builder.RegisterType<BaseUrlService>().As<IBaseUrlService>();
+                    IResourceTypeRelationshipConfiguration relationshipConfiguration;
+                    if (configuration.RelationshipConfigurations.TryGetValue(relationship.Property,
+                        out relationshipConfiguration) && relationshipConfiguration.MaterializerType != null)
+                        return (IRelatedResourceDocumentMaterializer)context.Resolve(relationshipConfiguration.MaterializerType, parameters);
+                    return context.Resolve<IRelatedResourceDocumentMaterializer>(parameters);
+                };
+                return factory;
+            });
+
+            builder.RegisterType<JsonApiHttpConfiguration>().SingleInstance();
+            builder.RegisterType<BaseUrlService>().As<IBaseUrlService>().SingleInstance();
+            builder.RegisterType<DocumentMaterializerLocator>().As<IDocumentMaterializerLocator>().InstancePerRequest();
 
             // Serialization
             builder.RegisterType<MetadataFormatter>().As<IMetadataFormatter>().SingleInstance();
@@ -58,9 +124,8 @@ namespace JSONAPI.Autofac
             builder.RegisterType<DefaultSortingTransformer>().As<IQueryableSortingTransformer>().SingleInstance();
             builder.RegisterType<DefaultPaginationTransformer>().As<IQueryablePaginationTransformer>().SingleInstance();
 
-            // document building
-            var linkConventions = _linkConventions ?? new DefaultLinkConventions();
-            builder.Register(c => linkConventions).As<ILinkConventions>().SingleInstance();
+            // Document building
+            builder.Register(c => _jsonApiConfiguration.LinkConventions).As<ILinkConventions>().SingleInstance();
             builder.RegisterType<JsonApiFormatter>().SingleInstance();
             builder.RegisterType<RegistryDrivenResourceCollectionDocumentBuilder>().As<IResourceCollectionDocumentBuilder>().SingleInstance();
             builder.RegisterType<RegistryDrivenSingleResourceDocumentBuilder>().As<ISingleResourceDocumentBuilder>().SingleInstance();

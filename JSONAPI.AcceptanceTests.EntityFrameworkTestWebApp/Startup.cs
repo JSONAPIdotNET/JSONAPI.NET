@@ -2,94 +2,91 @@
 using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Web;
 using System.Web.Http;
 using Autofac;
 using Autofac.Integration.WebApi;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializers;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Autofac;
 using JSONAPI.Autofac.EntityFramework;
-using JSONAPI.Core;
-using JSONAPI.EntityFramework.Http;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
-using Microsoft.Owin;
+using JSONAPI.Configuration;
+using JSONAPI.EntityFramework;
 using Owin;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 {
     public class Startup
     {
-        private const string DbContextKey = "TestWebApp.DbContext";
-
-        private readonly Func<IOwinContext, TestDbContext> _dbContextFactory;
+        private readonly Func<TestDbContext> _dbContextFactory;
 
         public Startup()
-            : this(context => new TestDbContext())
+            : this(() => new TestDbContext())
         {
 
         }
 
-        public Startup(Func<IOwinContext, TestDbContext> dbContextFactory)
+        public Startup(Func<TestDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }
 
         public void Configuration(IAppBuilder app)
         {
-            // Setup db context for use in DI
-            app.Use(async (context, next) =>
-            {
-                TestDbContext dbContext = _dbContextFactory(context);
-                context.Set(DbContextKey, dbContext);
-
-                await next();
-
-                dbContext.Dispose();
-            });
-
-            var pluralizationService = new EntityFrameworkPluralizationService();
-            var namingConventions = new DefaultNamingConventions(pluralizationService);
-
-            var configuration = new JsonApiAutofacConfiguration(namingConventions);
-            configuration.RegisterResourceType(typeof(Building));
-            configuration.RegisterResourceType(typeof(City));
-            configuration.RegisterResourceType(typeof(Comment));
-            configuration.RegisterResourceType(typeof(Company));
-            configuration.RegisterResourceType(typeof(Language));
-            configuration.RegisterResourceType(typeof(LanguageUserLink),
-                sortByIdFactory: LanguageUserLinkSortByIdFactory,
-                filterByIdFactory: LanguageUserLinkFilterByIdFactory);
-            configuration.RegisterResourceType(typeof(Post));
-            configuration.RegisterResourceType(typeof(Sample));
-            configuration.RegisterResourceType(typeof(State));
-            configuration.RegisterResourceType(typeof(Tag));
-            configuration.RegisterResourceType(typeof(User));
-            configuration.RegisterResourceType(typeof(UserGroup));
-            var module = configuration.GetAutofacModule();
-            var efModule = configuration.GetEntityFrameworkAutofacModule();
-
             var containerBuilder = new ContainerBuilder();
-            containerBuilder.RegisterModule(module);
-            containerBuilder.RegisterModule(efModule);
-            containerBuilder.Register(c => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
-            containerBuilder.Register(c => c.Resolve<IOwinContext>().Get<TestDbContext>(DbContextKey)).AsSelf().As<DbContext>();
-            containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            containerBuilder.Register(c => _dbContextFactory())
+                .AsSelf()
+                .As<DbContext>()
+                .InstancePerRequest();
+            containerBuilder.RegisterModule<JsonApiAutofacEntityFrameworkModule>();
             containerBuilder.RegisterType<CustomEntityFrameworkResourceObjectMaterializer>()
                 .As<IEntityFrameworkResourceObjectMaterializer>();
+            containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
             var container = containerBuilder.Build();
+
+            var configuration = new JsonApiConfiguration();
+            configuration.RegisterEntityFrameworkResourceType<Building>();
+            configuration.RegisterEntityFrameworkResourceType<City>();
+            configuration.RegisterEntityFrameworkResourceType<Comment>();
+            configuration.RegisterEntityFrameworkResourceType<Company>();
+            configuration.RegisterEntityFrameworkResourceType<Language>();
+            configuration.RegisterEntityFrameworkResourceType<LanguageUserLink>(c =>
+            {
+                c.OverrideDefaultFilterById(LanguageUserLinkFilterByIdFactory);
+                c.OverrideDefaultSortById(LanguageUserLinkSortByIdFactory);
+            });
+            configuration.RegisterResourceType<Post>();
+            configuration.RegisterEntityFrameworkResourceType<State>();
+            configuration.RegisterEntityFrameworkResourceType<Tag>();
+            configuration.RegisterEntityFrameworkResourceType<User>();
+            configuration.RegisterEntityFrameworkResourceType<UserGroup>();
+            configuration.RegisterResourceType<Sample>(); // Example of a resource type not controlled by EF
+            configuration.RegisterMappedType<Starship, StarshipDto, StarshipDocumentMaterializer>(c =>
+            {
+                c.ConfigureRelationship(s => s.Officers,
+                    rc => rc.UseMaterializer<StarshipOfficersRelatedResourceMaterializer>());
+                c.ConfigureRelationship(s => s.ShipCounselor,
+                    rc => rc.UseMaterializer<StarshipShipCounselorRelatedResourceMaterializer>());
+            }); // Example of a resource that is mapped from a DB entity
+            configuration.RegisterResourceType<StarshipOfficerDto>();
+
+            var configurator = new JsonApiHttpAutofacConfigurator(container);
+            configurator.OnApplicationLifetimeScopeBegun(applicationLifetimeScope =>
+            {
+                // TODO: is this a candidate for spinning into a JSONAPI.Autofac.WebApi.Owin package? Yuck
+                app.UseAutofacMiddleware(applicationLifetimeScope);
+            });
 
             var httpConfig = new HttpConfiguration
             {
                 IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always
             };
-            httpConfig.UseJsonApiWithAutofac(container);
 
-            // Web API routes
-            httpConfig.Routes.MapHttpRoute("ResourceCollection", "{controller}");
-            httpConfig.Routes.MapHttpRoute("Resource", "{controller}/{id}");
-            httpConfig.Routes.MapHttpRoute("RelatedResource", "{controller}/{id}/{relationshipName}");
+            // Additional Web API routes
+            httpConfig.Routes.MapHttpRoute("Samples", "samples", new { Controller = "Samples" });
+            httpConfig.Routes.MapHttpRoute("Search", "search", new { Controller = "Search" });
+            httpConfig.Routes.MapHttpRoute("Trees", "trees", new { Controller = "Trees" });
 
-            app.UseAutofacMiddleware(container);
-
+            configurator.Apply(httpConfig, configuration);
             app.UseWebApi(httpConfig);
             app.UseAutofacWebApi(httpConfig);
         }

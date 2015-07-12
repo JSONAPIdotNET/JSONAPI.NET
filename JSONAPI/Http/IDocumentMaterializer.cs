@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -10,7 +8,7 @@ namespace JSONAPI.Http
     /// <summary>
     /// This service provides the glue between JSONAPI.NET and your persistence layer.
     /// </summary>
-    public interface IDocumentMaterializer<T> where T : class
+    public interface IDocumentMaterializer
     {
         /// <summary>
         /// Returns a document containing records that are filtered, sorted,
@@ -19,27 +17,9 @@ namespace JSONAPI.Http
         Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Returns a document containing records matching the provided lambda expression.
-        /// </summary>
-        Task<IResourceCollectionDocument> GetRecordsMatchingExpression(Expression<Func<T, bool>> filter,
-            HttpRequestMessage request, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Returns a document containing the first record matching the provided lambda expression.
-        /// </summary>
-        Task<ISingleResourceDocument> GetSingleRecordMatchingExpression(Expression<Func<T, bool>> filter,
-            HttpRequestMessage request, CancellationToken cancellationToken);
-
-        /// <summary>
         /// Returns a document with the resource identified by the given ID.
         /// </summary>
         Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request,
-            CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Gets the resource(s) related to the resource identified by the given ID
-        /// </summary>
-        Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request,
             CancellationToken cancellationToken);
 
         /// <summary>

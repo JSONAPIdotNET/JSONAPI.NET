@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests

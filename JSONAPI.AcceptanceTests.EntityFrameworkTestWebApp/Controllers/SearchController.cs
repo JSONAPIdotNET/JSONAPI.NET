@@ -3,9 +3,9 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
-using JSONAPI.EntityFramework.Tests.TestWebApp.Models;
+using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Controllers
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
 {
     public class SearchController : ApiController
     {

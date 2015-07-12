@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
     public class Comment
     {

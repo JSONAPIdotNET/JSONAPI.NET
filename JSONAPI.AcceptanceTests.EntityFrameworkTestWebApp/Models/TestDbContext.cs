@@ -2,7 +2,7 @@
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 
-namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
+namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
     public class TestDbContext : DbContext
     {
@@ -43,5 +43,9 @@ namespace JSONAPI.EntityFramework.Tests.TestWebApp.Models
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LanguageUserLink> LanguageUserLinks { get; set; }
+        public DbSet<Starship> Starships { get; set; }
+        public DbSet<StarshipClass> StarshipClasses { get; set; }
+        public DbSet<Officer> Officers { get; set; }
+        public DbSet<StarshipOfficerLink> StarshipOfficerLinks { get; set; }
     }
 }

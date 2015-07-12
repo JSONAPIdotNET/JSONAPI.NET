@@ -85,9 +85,9 @@
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\DefaultNamingConventionsTests.cs" />
+    <Compile Include="Core\ResourceTypeRegistrarTests.cs" />
     <Compile Include="Core\ResourceTypeRegistryTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
-    <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
     <Compile Include="Json\JsonApiFormatterTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
@@ -116,6 +116,10 @@
     <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Tests.SingleControllerWebApp\JSONAPI.Tests.SingleControllerWebApp.csproj">
+      <Project>{0fe799ec-b6c5-499b-b56c-b97613342f6c}</Project>
+      <Name>JSONAPI.Tests.SingleControllerWebApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI\JSONAPI.csproj">
       <Project>{52b19fd6-efaa-45b5-9c3e-a652e27608d1}</Project>
       <Name>JSONAPI</Name>
