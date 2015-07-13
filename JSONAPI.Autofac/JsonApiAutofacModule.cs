@@ -39,10 +39,24 @@ namespace JSONAPI.Autofac
                 if (resourceTypeConfiguration.DocumentMaterializerType != null)
                     builder.RegisterType(resourceTypeConfiguration.DocumentMaterializerType);
 
-                foreach (var relationshipConfiguration in resourceTypeConfiguration.RelationshipConfigurations)
+                foreach (var relationship in resourceTypeRegistration.Relationships)
                 {
-                    var relationship = relationshipConfiguration.Value;
-                    builder.RegisterType(relationship.MaterializerType);
+                    IResourceTypeRelationshipConfiguration relationshipConfiguration;
+                    if (resourceTypeConfiguration.RelationshipConfigurations
+                        .TryGetValue(relationship.Property, out relationshipConfiguration))
+                    {
+                        if (relationshipConfiguration.MaterializerType != null)
+                        {
+                            builder.RegisterType(relationshipConfiguration.MaterializerType);
+                            continue;
+                        }
+                    }
+
+                    // They didn't set an explicit materializer. See if they specified a factory for this resource type.
+                    if (configuration.RelatedResourceMaterializerTypeFactory == null) continue;
+
+                    var materializerType = configuration.RelatedResourceMaterializerTypeFactory(relationship);
+                    builder.RegisterType(materializerType);
                 }
             }
 

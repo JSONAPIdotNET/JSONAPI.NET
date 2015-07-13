@@ -128,7 +128,7 @@
     <Compile Include="Controllers\TreesController.cs" />
     <Compile Include="CustomEntityFrameworkResourceObjectMaterializer.cs" />
     <Compile Include="DocumentMaterializers\StarshipDocumentMaterializer.cs" />
-    <Compile Include="DocumentMaterializers\StarshipOfficersRelatedResourceMaterializer - Copy.cs" />
+    <Compile Include="DocumentMaterializers\StarshipShipCounselorRelatedResourceMaterializer.cs" />
     <Compile Include="DocumentMaterializers\StarshipOfficersRelatedResourceMaterializer.cs" />
     <Compile Include="Models\Building.cs" />
     <Compile Include="Models\Comment.cs" />

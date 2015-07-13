@@ -23,7 +23,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
             _dbContext = dbContext;
         }
 
-        protected override async Task<StarshipOfficerDto> GeRelatedRecord(string primaryResourceId, CancellationToken cancellationToken)
+        protected override async Task<StarshipOfficerDto> GetRelatedRecord(string primaryResourceId, CancellationToken cancellationToken)
         {
             var query = _dbContext.Set<Starship>().Where(s => s.StarshipId == primaryResourceId)
                 .SelectMany(s => s.OfficerLinks)

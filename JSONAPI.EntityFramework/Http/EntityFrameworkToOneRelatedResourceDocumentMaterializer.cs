@@ -34,7 +34,7 @@ namespace JSONAPI.EntityFramework.Http
             _dbContext = dbContext;
         }
 
-        protected override async Task<TRelated> GeRelatedRecord(string primaryResourceId, CancellationToken cancellationToken)
+        protected override async Task<TRelated> GetRelatedRecord(string primaryResourceId, CancellationToken cancellationToken)
         {
             var param = Expression.Parameter(typeof(TPrimaryResource));
             var accessorExpr = Expression.Property(param, _relationship.Property);

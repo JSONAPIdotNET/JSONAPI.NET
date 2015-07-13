@@ -28,7 +28,7 @@ namespace JSONAPI.Http
         public async Task<IJsonApiDocument> GetRelatedResourceDocument(string primaryResourceId, HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            var record = await GeRelatedRecord(primaryResourceId, cancellationToken);
+            var record = await GetRelatedRecord(primaryResourceId, cancellationToken);
             var baseUrl = _baseUrlService.GetBaseUrl(request);
             return _singleResourceDocumentBuilder.BuildDocument(record, baseUrl, null, null); // TODO: allow implementors to specify includes and metadata
         }
@@ -36,6 +36,6 @@ namespace JSONAPI.Http
         /// <summary>
         /// Gets the query for the related resources
         /// </summary>
-        protected abstract Task<TRelated> GeRelatedRecord(string primaryResourceId, CancellationToken cancellationToken);
+        protected abstract Task<TRelated> GetRelatedRecord(string primaryResourceId, CancellationToken cancellationToken);
     }
 }
