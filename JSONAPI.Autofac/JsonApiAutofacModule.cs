@@ -93,10 +93,19 @@ namespace JSONAPI.Autofac
                         new TypedParameter(typeof(ResourceTypeRelationship), relationship)
                     };
 
+                    // First, see if they have set an explicit materializer for this relationship
                     IResourceTypeRelationshipConfiguration relationshipConfiguration;
                     if (configuration.RelationshipConfigurations.TryGetValue(relationship.Property,
                         out relationshipConfiguration) && relationshipConfiguration.MaterializerType != null)
                         return (IRelatedResourceDocumentMaterializer)context.Resolve(relationshipConfiguration.MaterializerType, parameters);
+
+                    // They didn't set an explicit materializer. See if they specified a factory for this resource type.
+                    if (configuration.RelatedResourceMaterializerTypeFactory != null)
+                    {
+                        var materializerType = configuration.RelatedResourceMaterializerTypeFactory(relationship);
+                        return (IRelatedResourceDocumentMaterializer)context.Resolve(materializerType, parameters);
+                    }
+
                     return context.Resolve<IRelatedResourceDocumentMaterializer>(parameters);
                 };
                 return factory;

@@ -12,7 +12,7 @@ namespace JSONAPI.Configuration
     /// Configuration mechanism for resource types.
     /// </summary>
     /// <typeparam name="TResourceType"></typeparam>
-    public sealed class ResourceTypeConfiguration<TResourceType> : IResourceTypeConfiguration, IResourceTypeConfigurator<TResourceType>
+    public sealed class ResourceTypeConfiguration<TResourceType> : IResourceTypeConfigurator<TResourceType>, IResourceTypeConfiguration
     {
         private readonly IResourceTypeRegistrar _resourceTypeRegistrar;
 
@@ -26,6 +26,7 @@ namespace JSONAPI.Configuration
         public string ResourceTypeName { get; private set; }
         public Type ClrType { get; private set; }
         public Type DocumentMaterializerType { get; private set; }
+        public Func<ResourceTypeRelationship, Type> RelatedResourceMaterializerTypeFactory { get; private set; }
         public IDictionary<PropertyInfo, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; private set; }
         public Func<ParameterExpression, string, BinaryExpression> FilterByIdExpressionFactory { get; private set; }
         public Func<ParameterExpression, Expression> SortByIdExpressionFactory { get; private set; }
@@ -49,6 +50,11 @@ namespace JSONAPI.Configuration
             where TMaterializer : IDocumentMaterializer
         {
             DocumentMaterializerType = typeof (TMaterializer);
+        }
+
+        public void UseDefaultRelatedResourceMaterializer(Func<ResourceTypeRelationship, Type> materializerTypeFactory)
+        {
+            RelatedResourceMaterializerTypeFactory = materializerTypeFactory;
         }
 
         /// <summary>

@@ -27,6 +27,11 @@ namespace JSONAPI.Configuration
         Type DocumentMaterializerType { get; }
 
         /// <summary>
+        /// A factory to determine the related resource materializer for a given relationship
+        /// </summary>
+        Func<ResourceTypeRelationship, Type> RelatedResourceMaterializerTypeFactory { get; }
+
+        /// <summary>
         /// Configurations for this type's resources
         /// </summary>
         IDictionary<PropertyInfo, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; }

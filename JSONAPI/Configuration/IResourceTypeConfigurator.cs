@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using JSONAPI.Core;
 using JSONAPI.Http;
 
 namespace JSONAPI.Configuration
@@ -20,5 +21,11 @@ namespace JSONAPI.Configuration
         /// </summary>
         /// <typeparam name="TMaterializer"></typeparam>
         void UseDocumentMaterializer<TMaterializer>() where TMaterializer : IDocumentMaterializer;
+
+        /// <summary>
+        /// Allows specifying a default materializer for related resources.
+        /// </summary>
+        /// <param name="materializerTypeFactory"></param>
+        void UseDefaultRelatedResourceMaterializer(Func<ResourceTypeRelationship, Type> materializerTypeFactory);
     }
 }
