@@ -41,7 +41,6 @@ namespace JSONAPI.Autofac
 
                 foreach (var relationshipConfiguration in resourceTypeConfiguration.RelationshipConfigurations)
                 {
-                    var prop = relationshipConfiguration.Key;
                     var relationship = relationshipConfiguration.Value;
                     builder.RegisterType(relationship.MaterializerType);
                 }

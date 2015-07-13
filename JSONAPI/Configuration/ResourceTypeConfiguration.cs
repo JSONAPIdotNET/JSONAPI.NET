@@ -12,7 +12,7 @@ namespace JSONAPI.Configuration
     /// Configuration mechanism for resource types.
     /// </summary>
     /// <typeparam name="TResourceType"></typeparam>
-    public sealed class ResourceTypeConfiguration<TResourceType> : IResourceTypeConfiguration
+    public sealed class ResourceTypeConfiguration<TResourceType> : IResourceTypeConfiguration, IResourceTypeConfigurator<TResourceType>
     {
         private readonly IResourceTypeRegistrar _resourceTypeRegistrar;
 
@@ -30,28 +30,21 @@ namespace JSONAPI.Configuration
         public Func<ParameterExpression, string, BinaryExpression> FilterByIdExpressionFactory { get; private set; }
         public Func<ParameterExpression, Expression> SortByIdExpressionFactory { get; private set; }
 
-        /// <summary>
-        /// Configures the relationship corresponding to the specified property
-        /// </summary>
         public void ConfigureRelationship(Expression<Func<TResourceType, object>> property,
-            Action<ResourceTypeRelationshipConfiguration> relationshipConfiguration)
+            Action<IResourceTypeRelationshipConfigurator> configurationAction)
         {
             if (property == null) throw new ArgumentNullException("property");
-            if (relationshipConfiguration == null) throw new ArgumentNullException("relationshipConfiguration");
+            if (configurationAction == null) throw new ArgumentNullException("configurationAction");
 
             var member = (MemberExpression) property.Body;
             var propertyInfo = (PropertyInfo) member.Member;
 
             var config = new ResourceTypeRelationshipConfiguration();
-            relationshipConfiguration(config);
+            configurationAction(config);
 
             RelationshipConfigurations[propertyInfo] = config;
         }
 
-        /// <summary>
-        /// Specifies the materializer to use for this resource type
-        /// </summary>
-        /// <typeparam name="TMaterializer"></typeparam>
         public void UseDocumentMaterializer<TMaterializer>()
             where TMaterializer : IDocumentMaterializer
         {

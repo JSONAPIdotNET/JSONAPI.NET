@@ -7,7 +7,7 @@ using JSONAPI.Core;
 namespace JSONAPI.Configuration
 {
     /// <summary>
-    /// Configuration mechanism for resource types
+    /// Results of configuring a resource type
     /// </summary>
     public interface IResourceTypeConfiguration
     {

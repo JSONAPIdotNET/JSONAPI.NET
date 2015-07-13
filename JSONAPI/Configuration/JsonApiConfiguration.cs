@@ -67,7 +67,7 @@ namespace JSONAPI.Configuration
         /// <summary>
         /// Registers an entity type/resource type pair for use with MappedDocumentMaterializer />
         /// </summary>
-        public void RegisterMappedType<TEntity, TResourceType, TMaterializer>(Action<ResourceTypeConfiguration<TResourceType>> configurationAction = null)
+        public void RegisterMappedType<TEntity, TResourceType, TMaterializer>(Action<IResourceTypeConfigurator<TResourceType>> configurationAction = null)
             where TMaterializer : MappedDocumentMaterializer<TEntity, TResourceType>
             where TResourceType : class
         {

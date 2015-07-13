@@ -68,6 +68,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\IResourceTypeConfiguration.cs" />
+    <Compile Include="Configuration\IResourceTypeConfigurator.cs" />
+    <Compile Include="Configuration\IResourceTypeRelationshipConfiguration.cs" />
+    <Compile Include="Configuration\IResourceTypeRelationshipConfigurator.cs" />
     <Compile Include="Configuration\JsonApiConfiguration.cs" />
     <Compile Include="Configuration\ResourceTypeConfiguration.cs" />
     <Compile Include="Configuration\ResourceTypeRelationshipConfiguration.cs" />
