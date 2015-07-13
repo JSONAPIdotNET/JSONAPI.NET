@@ -20,18 +20,6 @@ namespace JSONAPI.Http
     /// <typeparam name="TDto"></typeparam>
     public abstract class MappedDocumentMaterializer<TEntity, TDto> : IDocumentMaterializer where TDto : class
     {
-        /// <summary>
-        /// Materializes a document for the resources found on the other side of the to-many relationship belonging to the resource.
-        /// </summary>
-        protected delegate Task<IResourceCollectionDocument> MaterializeDocumentForToManyRelationship(
-            TDto resource, HttpRequestMessage request, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Materializes a document for the resources found on the other side of the to-one relationship belonging to the resource.
-        /// </summary>
-        protected delegate Task<ISingleResourceDocument> MaterializeDocumentForToOneRelationship(
-            TDto resource, HttpRequestMessage request, CancellationToken cancellationToken);
-
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly IBaseUrlService _baseUrlService;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
@@ -97,34 +85,6 @@ namespace JSONAPI.Http
 
             var baseUrl = _baseUrlService.GetBaseUrl(request);
             return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
-        }
-
-        public async Task<IJsonApiDocument> GetRelated(string id, string relationshipKey, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            //var registration = _resourceTypeRegistry.GetRegistrationForType(typeof(TDto));
-
-            //var entityQuery = GetByIdQuery(id);
-            //var includePaths = GetIncludePathsForSingleResource() ?? new Expression<Func<TDto, object>>[] { };
-            //var mappedQuery = GetMappedQuery(entityQuery, includePaths);
-            //var primaryResource = await _queryableEnumerationTransformer.FirstOrDefault(mappedQuery, cancellationToken);
-            //if (primaryResource == null)
-            //    throw JsonApiException.CreateForNotFound(
-            //        string.Format("No record exists with type `{0}` and ID `{1}`.", ResourceTypeName, id));
-
-            //var relationship = (ResourceTypeRelationship)registration.GetFieldByName(relationshipKey);
-            //if (relationship == null)
-            //    throw JsonApiException.CreateForNotFound(string.Format("No relationship `{0}` exists for the resource with type `{1}` and id `{2}`.",
-            //        relationshipKey, registration.ResourceTypeName, id));
-
-            //var toManyRelationship = relationship as ToManyResourceTypeRelationship;
-            //if (toManyRelationship != null)
-            //    return await toManyRelationship.GetRelatedResourceCollection(id, request, cancellationToken);
-
-            //var toOneRelationship = relationship as ToOneResourceTypeRelationship;
-            //if (toOneRelationship != null)
-            //    return await toOneRelationship.GetRelatedResource(id, request, cancellationToken);
-
-            throw new NotSupportedException();
         }
 
         public Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument, HttpRequestMessage request,
