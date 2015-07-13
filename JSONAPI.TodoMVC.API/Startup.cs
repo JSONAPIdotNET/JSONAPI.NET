@@ -7,6 +7,7 @@ using JSONAPI.Autofac;
 using JSONAPI.Autofac.EntityFramework;
 using JSONAPI.Configuration;
 using JSONAPI.Core;
+using JSONAPI.EntityFramework.Configuration;
 using JSONAPI.TodoMVC.API.Models;
 using Owin;
 

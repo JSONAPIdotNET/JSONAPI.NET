@@ -57,26 +57,16 @@ namespace JSONAPI.Configuration
             RelatedResourceMaterializerTypeFactory = materializerTypeFactory;
         }
 
-        /// <summary>
-        /// Overrides the resource type name from naming conventions
-        /// </summary>
-        /// <param name="resourceTypeName"></param>
         public void OverrideDefaultResourceTypeName(string resourceTypeName)
         {
             ResourceTypeName = resourceTypeName;
         }
 
-        /// <summary>
-        /// Specifies a function to use build expressions that allow filtering resources of this type by ID
-        /// </summary>
         public void OverrideDefaultFilterById(Func<ParameterExpression, string, BinaryExpression> filterByIdExpressionFactory)
         {
             FilterByIdExpressionFactory = filterByIdExpressionFactory;
         }
 
-        /// <summary>
-        /// Specifies a function to use build expressions that allow sorting resources of this type by ID
-        /// </summary>
         public void OverrideDefaultSortById(Func<ParameterExpression, Expression> sortByIdExpressionFactory)
         {
             SortByIdExpressionFactory = sortByIdExpressionFactory;

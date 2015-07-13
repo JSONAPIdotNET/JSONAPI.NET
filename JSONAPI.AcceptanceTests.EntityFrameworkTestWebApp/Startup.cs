@@ -11,6 +11,7 @@ using JSONAPI.Autofac;
 using JSONAPI.Autofac.EntityFramework;
 using JSONAPI.Configuration;
 using JSONAPI.EntityFramework;
+using JSONAPI.EntityFramework.Configuration;
 using Owin;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp

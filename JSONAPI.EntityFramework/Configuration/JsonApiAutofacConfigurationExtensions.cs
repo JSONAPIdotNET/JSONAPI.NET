@@ -2,12 +2,12 @@
 using JSONAPI.Configuration;
 using JSONAPI.EntityFramework.Http;
 
-namespace JSONAPI.Autofac.EntityFramework
+namespace JSONAPI.EntityFramework.Configuration
 {
-    public static class JsonApiAutofacConfigurationExtensions
+    public static class JsonApiConfigurationExtensions
     {
         public static void RegisterEntityFrameworkResourceType<TResourceType>(this JsonApiConfiguration jsonApiConfiguration,
-            Action<ResourceTypeConfiguration<TResourceType>> configurationAction = null) where TResourceType : class
+            Action<IResourceTypeConfigurator<TResourceType>> configurationAction = null) where TResourceType : class
         {
             jsonApiConfiguration.RegisterResourceType<TResourceType>(c =>
             {

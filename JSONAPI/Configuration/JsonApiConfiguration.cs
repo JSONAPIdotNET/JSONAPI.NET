@@ -56,7 +56,7 @@ namespace JSONAPI.Configuration
         /// <summary>
         /// Registers a resource type with the configuration
         /// </summary>
-        public void RegisterResourceType<TResourceType>(Action<ResourceTypeConfiguration<TResourceType>> configurationAction = null)
+        public void RegisterResourceType<TResourceType>(Action<IResourceTypeConfigurator<TResourceType>> configurationAction = null)
         {
             var configuration = new ResourceTypeConfiguration<TResourceType>(_resourceTypeRegistrar);
             if (configurationAction != null)
