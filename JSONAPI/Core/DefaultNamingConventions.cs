@@ -29,7 +29,7 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        public string GetFieldNameForProperty(PropertyInfo property)
+        public virtual string GetFieldNameForProperty(PropertyInfo property)
         {
             var jsonPropertyAttribute = (JsonPropertyAttribute)property.GetCustomAttributes(typeof(JsonPropertyAttribute)).FirstOrDefault();
             return jsonPropertyAttribute != null ? jsonPropertyAttribute.PropertyName : property.Name.Dasherize();
@@ -43,19 +43,30 @@ namespace JSONAPI.Core
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public string GetResourceTypeNameForType(Type type)
+        public virtual string GetResourceTypeNameForType(Type type)
         {
-            var attrs = type.CustomAttributes.Where(x => x.AttributeType == typeof(JsonObjectAttribute)).ToList();
+            var jsonObjectAttribute = type.GetCustomAttributes().OfType<JsonObjectAttribute>().FirstOrDefault();
 
-            string title = type.Name;
-            if (attrs.Any())
+            string title = null;
+            if (jsonObjectAttribute != null)
             {
-                var titles = attrs.First().NamedArguments.Where(arg => arg.MemberName == "Title")
-                    .Select(arg => arg.TypedValue.Value.ToString()).ToList();
-                if (titles.Any()) title = titles.First();
+                title = jsonObjectAttribute.Title;
+            }
+
+            if (string.IsNullOrEmpty(title))
+            {
+                title = GetNameForType(type);
             }
 
             return _pluralizationService.Pluralize(title).Dasherize();
+        }
+
+        /// <summary>
+        /// Gets the name for a CLR type.
+        /// </summary>
+        protected virtual string GetNameForType(Type type)
+        {
+            return type.Name;
         }
     }
 }
