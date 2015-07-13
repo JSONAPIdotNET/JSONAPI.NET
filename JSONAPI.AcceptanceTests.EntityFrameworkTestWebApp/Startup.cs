@@ -33,17 +33,6 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 
         public void Configuration(IAppBuilder app)
         {
-            var containerBuilder = new ContainerBuilder();
-            containerBuilder.Register(c => _dbContextFactory())
-                .AsSelf()
-                .As<DbContext>()
-                .InstancePerRequest();
-            containerBuilder.RegisterModule<JsonApiAutofacEntityFrameworkModule>();
-            containerBuilder.RegisterType<CustomEntityFrameworkResourceObjectMaterializer>()
-                .As<IEntityFrameworkResourceObjectMaterializer>();
-            containerBuilder.RegisterApiControllers(Assembly.GetExecutingAssembly());
-            var container = containerBuilder.Build();
-
             var configuration = new JsonApiConfiguration();
             configuration.RegisterEntityFrameworkResourceType<Building>();
             configuration.RegisterEntityFrameworkResourceType<City>();
@@ -70,7 +59,18 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
             }); // Example of a resource that is mapped from a DB entity
             configuration.RegisterResourceType<StarshipOfficerDto>();
 
-            var configurator = new JsonApiHttpAutofacConfigurator(container);
+            var configurator = new JsonApiHttpAutofacConfigurator();
+            configurator.OnApplicationLifetimeScopeCreating(builder =>
+            {
+                builder.Register(c => _dbContextFactory())
+                    .AsSelf()
+                    .As<DbContext>()
+                    .InstancePerRequest();
+                builder.RegisterModule<JsonApiAutofacEntityFrameworkModule>();
+                builder.RegisterType<CustomEntityFrameworkResourceObjectMaterializer>()
+                    .As<IEntityFrameworkResourceObjectMaterializer>();
+                builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+            });
             configurator.OnApplicationLifetimeScopeBegun(applicationLifetimeScope =>
             {
                 // TODO: is this a candidate for spinning into a JSONAPI.Autofac.WebApi.Owin package? Yuck
