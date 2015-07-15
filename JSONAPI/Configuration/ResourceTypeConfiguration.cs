@@ -19,7 +19,7 @@ namespace JSONAPI.Configuration
         internal ResourceTypeConfiguration(IResourceTypeRegistrar resourceTypeRegistrar)
         {
             _resourceTypeRegistrar = resourceTypeRegistrar;
-            RelationshipConfigurations = new ConcurrentDictionary<PropertyInfo, IResourceTypeRelationshipConfiguration>();
+            RelationshipConfigurations = new ConcurrentDictionary<string, IResourceTypeRelationshipConfiguration>();
             ClrType = typeof (TResourceType);
         }
 
@@ -27,7 +27,7 @@ namespace JSONAPI.Configuration
         public Type ClrType { get; private set; }
         public Type DocumentMaterializerType { get; private set; }
         public Func<ResourceTypeRelationship, Type> RelatedResourceMaterializerTypeFactory { get; private set; }
-        public IDictionary<PropertyInfo, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; private set; }
+        public IDictionary<string, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; private set; }
         public Func<ParameterExpression, string, BinaryExpression> FilterByIdExpressionFactory { get; private set; }
         public Func<ParameterExpression, Expression> SortByIdExpressionFactory { get; private set; }
 
@@ -43,7 +43,7 @@ namespace JSONAPI.Configuration
             var config = new ResourceTypeRelationshipConfiguration();
             configurationAction(config);
 
-            RelationshipConfigurations[propertyInfo] = config;
+            RelationshipConfigurations[propertyInfo.Name] = config;
         }
 
         public void UseDocumentMaterializer<TMaterializer>()

@@ -43,7 +43,7 @@ namespace JSONAPI.Autofac
                 {
                     IResourceTypeRelationshipConfiguration relationshipConfiguration;
                     if (resourceTypeConfiguration.RelationshipConfigurations
-                        .TryGetValue(relationship.Property, out relationshipConfiguration))
+                        .TryGetValue(relationship.Property.Name, out relationshipConfiguration))
                     {
                         if (relationshipConfiguration.MaterializerType != null)
                         {
@@ -109,7 +109,7 @@ namespace JSONAPI.Autofac
 
                     // First, see if they have set an explicit materializer for this relationship
                     IResourceTypeRelationshipConfiguration relationshipConfiguration;
-                    if (configuration.RelationshipConfigurations.TryGetValue(relationship.Property,
+                    if (configuration.RelationshipConfigurations.TryGetValue(relationship.Property.Name,
                         out relationshipConfiguration) && relationshipConfiguration.MaterializerType != null)
                         return (IRelatedResourceDocumentMaterializer)context.Resolve(relationshipConfiguration.MaterializerType, parameters);
 

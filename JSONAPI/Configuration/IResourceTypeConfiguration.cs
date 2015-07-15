@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 using JSONAPI.Core;
 
 namespace JSONAPI.Configuration
@@ -34,7 +33,7 @@ namespace JSONAPI.Configuration
         /// <summary>
         /// Configurations for this type's resources
         /// </summary>
-        IDictionary<PropertyInfo, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; }
+        IDictionary<string, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; }
 
         /// <summary>
         /// A factory to use to build expressions to filter a collection of resources of this type by ID.
