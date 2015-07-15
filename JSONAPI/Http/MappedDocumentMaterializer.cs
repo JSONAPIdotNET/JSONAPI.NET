@@ -87,22 +87,15 @@ namespace JSONAPI.Http
             return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
         }
 
-        public Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument, HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument,
+            HttpRequestMessage request,
+            CancellationToken cancellationToken);
 
-        public Task<ISingleResourceDocument> UpdateRecord(string id, ISingleResourceDocument requestDocument, HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<ISingleResourceDocument> UpdateRecord(string id, ISingleResourceDocument requestDocument,
+            HttpRequestMessage request,
+            CancellationToken cancellationToken);
 
-        public Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken);
 
         /// <summary>
         /// Returns a list of property paths to be included when constructing a query for this resource type

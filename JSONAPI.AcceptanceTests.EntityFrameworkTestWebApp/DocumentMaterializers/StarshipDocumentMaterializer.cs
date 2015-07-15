@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Core;
 using JSONAPI.Documents;
@@ -45,6 +47,23 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
                 Name = s.Name,
                 StarshipClass = s.StarshipClass.Name
             });
+        }
+
+        public override Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument, HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<ISingleResourceDocument> UpdateRecord(string id, ISingleResourceDocument requestDocument, HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }
