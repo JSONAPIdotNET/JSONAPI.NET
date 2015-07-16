@@ -82,7 +82,7 @@ namespace JSONAPI.EntityFramework.Tests
         {
             // Act
             Action action = () => _context.GetKeyNames(typeof (NotAnEntity));
-            action.ShouldThrow<ArgumentException>().Which.Message.Should().Be("The Type NotAnEntity was not found in the DbContext with Type TestDbContext");
+            action.ShouldThrow<Exception>().Which.Message.Should().Be("Failed to identify the key names for NotAnEntity or any of its parent classes.");
         }
     }
 }
