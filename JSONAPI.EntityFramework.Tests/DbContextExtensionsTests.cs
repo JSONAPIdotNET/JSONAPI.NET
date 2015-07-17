@@ -30,6 +30,11 @@ namespace JSONAPI.EntityFramework.Tests
             public string Temporary { get; set; }
         }
 
+        private class SubPost : Post
+        {
+            public string Foo { get; set; }
+        }
+
         private DbConnection _conn;
         private TestDbContext _context;
 
@@ -75,6 +80,17 @@ namespace JSONAPI.EntityFramework.Tests
             // Assert
             keyNames.Count().Should().Be(1);
             keyNames.First().Should().Be("Url");
+        }
+
+        [TestMethod]
+        public void GetKeyNamesForChildClass()
+        {
+            // Act
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(SubPost)).ToArray();
+
+            // Assert
+            keyNames.Count().Should().Be(1);
+            keyNames.First().Should().Be("Id");
         }
 
         [TestMethod]
