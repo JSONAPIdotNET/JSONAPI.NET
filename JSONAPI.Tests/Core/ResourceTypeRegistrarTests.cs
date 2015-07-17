@@ -7,7 +7,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -559,6 +561,24 @@ namespace JSONAPI.Tests.Core
             AssertAttribute(reg, "decimal-field", "0", 0m, "0", g => g.DecimalField);
             AssertAttribute(reg, "decimal-field", "20000000000.1234", 20000000000.1234m, "20000000000.1234", g => g.DecimalField);
             AssertAttribute(reg, "decimal-field", null, 0m, "0", g => g.DecimalField);
+        }
+
+        [TestMethod]
+        public void BuildRegistration_sets_up_correct_attribute_for_Decimal_field_non_en_US()
+        {
+            // Set up non US culture
+            var culture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("se-SE");
+
+            // Arrange
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(new PluralizationService()));
+
+            // Act
+            var reg = registrar.BuildRegistration(typeof(AttributeGrabBag));
+
+            AssertAttribute(reg, "decimal-field", "20000000000.1234", 20000000000.1234m, "20000000000.1234", g => g.DecimalField);
+
+            Thread.CurrentThread.CurrentCulture = culture;
         }
 
         [TestMethod]

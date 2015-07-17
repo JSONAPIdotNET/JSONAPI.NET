@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Web.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
@@ -690,6 +692,19 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_decimal_property_non_en_US()
+        {
+            var currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("se-SE");
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[decimal-field]=4.03");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("170");
+
+            Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
+
+        [TestMethod]
         public void Filters_by_missing_decimal_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[decimal-field]=");
@@ -1040,6 +1055,20 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_single_property_non_en_US()
+        {
+            var currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("se-SE");
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[single-field]=21.56901");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("370");
+
+            Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
+
+
+        [TestMethod]
         public void Filters_by_missing_single_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[single-field]=");
@@ -1072,6 +1101,19 @@ namespace JSONAPI.Tests.ActionFilters
             var returnedArray = GetArray("http://api.example.com/dummies?filter[double-field]=12.3453489012");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("390");
+        }
+
+        [TestMethod]
+        public void Filters_by_matching_double_property_non_en_US()
+        {
+            var currentCulture = Thread.CurrentThread.CurrentCulture;
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("se-SE");
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[double-field]=12.3453489012");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("390");
+
+            Thread.CurrentThread.CurrentCulture = currentCulture;
         }
 
         [TestMethod]
