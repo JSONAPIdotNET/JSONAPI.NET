@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JSONAPI.Documents;
 using JSONAPI.Json;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Tests.Json
 {
@@ -14,23 +12,48 @@ namespace JSONAPI.Tests.Json
     public class ResourceLinkageFormatterTests : JsonApiFormatterTestsBase
     {
         [TestMethod]
-        public async Task Serialize_linkage()
+        public async Task Serialize_present_toMany_linkage()
         {
             var linkageObject = new Mock<IResourceLinkage>(MockBehavior.Strict);
-            linkageObject.Setup(l => l.LinkageToken).Returns("linkage goes here");
+            linkageObject.Setup(l => l.IsToMany).Returns(true);
+            linkageObject.Setup(l => l.Identifiers)
+                .Returns(new IResourceIdentifier[] { new ResourceIdentifier("countries", "11000"), new ResourceIdentifier("cities", "4100") });
 
             var formatter = new ResourceLinkageFormatter();
-            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_linkage.json");
+            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_present_toMany_linkage.json");
         }
 
         [TestMethod]
-        public async Task Serialize_null_linkage()
+        public async Task Serialize_empty_toMany_linkage()
         {
             var linkageObject = new Mock<IResourceLinkage>(MockBehavior.Strict);
-            linkageObject.Setup(l => l.LinkageToken).Returns((JToken)null);
+            linkageObject.Setup(l => l.IsToMany).Returns(true);
+            linkageObject.Setup(l => l.Identifiers).Returns(new IResourceIdentifier[] { });
 
             var formatter = new ResourceLinkageFormatter();
-            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_null_linkage.json");
+            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_empty_toMany_linkage.json");
+        }
+
+        [TestMethod]
+        public async Task Serialize_present_toOne_linkage()
+        {
+            var linkageObject = new Mock<IResourceLinkage>(MockBehavior.Strict);
+            linkageObject.Setup(l => l.IsToMany).Returns(false);
+            linkageObject.Setup(l => l.Identifiers).Returns(new IResourceIdentifier[] { new ResourceIdentifier("countries", "11000") });
+
+            var formatter = new ResourceLinkageFormatter();
+            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_present_toOne_linkage.json");
+        }
+
+        [TestMethod]
+        public async Task Serialize_null_toOne_linkage()
+        {
+            var linkageObject = new Mock<IResourceLinkage>(MockBehavior.Strict);
+            linkageObject.Setup(l => l.IsToMany).Returns(false);
+            linkageObject.Setup(l => l.Identifiers).Returns(new IResourceIdentifier[] { });
+
+            var formatter = new ResourceLinkageFormatter();
+            await AssertSerializeOutput(formatter, linkageObject.Object, "Json/Fixtures/ResourceLinkageFormatter/Serialize_null_toOne_linkage.json");
         }
 
         [TestMethod]
@@ -45,10 +68,10 @@ namespace JSONAPI.Tests.Json
                     "Json/Fixtures/ResourceLinkageFormatter/Deserialize_to_one_linkage.json").Result;
 
             // Assert
-            var linkageToken = (JObject)linkage.LinkageToken;
-            linkageToken.Properties().Count().Should().Be(2);
-            ((string)linkageToken["type"]).Should().Be("people");
-            ((string)linkageToken["id"]).Should().Be("abc123");
+            linkage.IsToMany.Should().BeFalse();
+            linkage.Identifiers.Length.Should().Be(1);
+            linkage.Identifiers[0].Type.Should().Be("people");
+            linkage.Identifiers[0].Id.Should().Be("abc123");
         }
 
         [TestMethod]
@@ -63,7 +86,8 @@ namespace JSONAPI.Tests.Json
                     "Json/Fixtures/ResourceLinkageFormatter/Deserialize_null_to_one_linkage.json").Result;
 
             // Assert
-            linkage.LinkageToken.Should().BeNull();
+            linkage.IsToMany.Should().BeFalse();
+            linkage.Identifiers.Length.Should().Be(0);
         }
 
         [TestMethod]
@@ -78,17 +102,11 @@ namespace JSONAPI.Tests.Json
                     "Json/Fixtures/ResourceLinkageFormatter/Deserialize_to_many_linkage.json").Result;
 
             // Assert
-            var linkageToken = (JArray)linkage.LinkageToken;
-
-            var item1 = (JObject) linkageToken[0];
-            item1.Properties().Count().Should().Be(2);
-            ((string)item1["type"]).Should().Be("posts");
-            ((string)item1["id"]).Should().Be("12");
-
-            var item2 = (JObject)linkageToken[1];
-            item2.Properties().Count().Should().Be(2);
-            ((string)item2["type"]).Should().Be("comments");
-            ((string)item2["id"]).Should().Be("9510");
+            linkage.IsToMany.Should().BeTrue();
+            linkage.Identifiers[0].Type.Should().Be("posts");
+            linkage.Identifiers[0].Id.Should().Be("12");
+            linkage.Identifiers[1].Type.Should().Be("comments");
+            linkage.Identifiers[1].Id.Should().Be("9510");
         }
 
         [TestMethod]

@@ -149,6 +149,8 @@
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_null_document.json" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_document_with_resource.json" />
     <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_null_resource.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_empty_toMany_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_present_toMany_linkage.json" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_only.json" />
     <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_and_metadata.json" />
@@ -168,9 +170,9 @@
     <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_linkage_only.json" />
     <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_all_possible_members.json" />
     <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Serialize_metadata.json" />
-    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_ToOneResourceLinkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_present_toOne_linkage.json" />
     <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_linkage.json" />
-    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_null_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_null_toOne_linkage.json" />
     <EmbeddedResource Include="Json\Fixtures\ErrorFormatter\Serialize_error_with_all_possible_members.json" />
     <EmbeddedResource Include="Json\Fixtures\ErrorFormatter\Serialize_error_with_only_id.json" />
     <EmbeddedResource Include="Json\Fixtures\ErrorDocumentFormatter\Serialize_ErrorDocument.json" />

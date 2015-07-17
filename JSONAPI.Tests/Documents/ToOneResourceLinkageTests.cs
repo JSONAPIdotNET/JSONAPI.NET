@@ -3,7 +3,6 @@ using FluentAssertions;
 using JSONAPI.Documents;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Tests.Documents
 {
@@ -11,7 +10,7 @@ namespace JSONAPI.Tests.Documents
     public class ToOneResourceLinkageTests
     {
         [TestMethod]
-        public void Returns_LinkageToken_for_present_identifier()
+        public void Identifiers_is_correct_for_present_identifier()
         {
             var mockIdentifier = new Mock<IResourceIdentifier>(MockBehavior.Strict);
             mockIdentifier.Setup(i => i.Type).Returns("countries");
@@ -19,24 +18,17 @@ namespace JSONAPI.Tests.Documents
 
             var linkage = new ToOneResourceLinkage(mockIdentifier.Object);
 
-            linkage.LinkageToken.Should().BeOfType<JObject>();
-
-            var obj = (JObject)linkage.LinkageToken;
-            obj.Properties().Count().Should().Be(2);
-
-            var type = (string)obj["type"];
-            type.Should().Be("countries");
-
-            var id = (string)obj["id"];
-            id.Should().Be("1000");
+            linkage.Identifiers.Length.Should().Be(1);
+            linkage.Identifiers.First().Type.Should().Be("countries");
+            linkage.Identifiers.First().Id.Should().Be("1000");
         }
 
         [TestMethod]
-        public void Returns_null_LinkageToken_for_missing_identifier()
+        public void Identifiers_is_correct_for_missing_identifier()
         {
             var linkage = new ToOneResourceLinkage(null);
 
-            linkage.LinkageToken.Should().BeNull();
+            linkage.Identifiers.Length.Should().Be(0);
         }
     }
 }

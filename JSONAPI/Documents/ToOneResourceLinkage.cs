@@ -1,27 +1,20 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace JSONAPI.Documents
+﻿namespace JSONAPI.Documents
 {
     /// <summary>
     /// Describes linkage to a single resource
     /// </summary>
     public class ToOneResourceLinkage : IResourceLinkage
     {
-        public JToken LinkageToken { get; private set; }
-
         /// <summary>
         /// Creates a to-one resource linkage object
         /// </summary>
         /// <param name="resourceIdentifier"></param>
         public ToOneResourceLinkage(IResourceIdentifier resourceIdentifier)
         {
-            if (resourceIdentifier != null)
-            {
-                LinkageToken = new JObject();
-
-                LinkageToken["type"] = resourceIdentifier.Type;
-                LinkageToken["id"] = resourceIdentifier.Id;
-            }
+            Identifiers = resourceIdentifier != null ? new[] {resourceIdentifier} : new IResourceIdentifier[] {};
         }
+
+        public bool IsToMany { get { return false; } }
+        public IResourceIdentifier[] Identifiers { get; private set; }
     }
 }

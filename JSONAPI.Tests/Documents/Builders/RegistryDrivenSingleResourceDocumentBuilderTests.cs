@@ -194,13 +194,11 @@ namespace JSONAPI.Tests.Documents.Builders
             provincesRelationship.Key.Should().Be("provinces");
             provincesRelationship.Value.SelfLink.Href.Should().Be("http://www.example.com/countries/4/relationships/provinces");
             provincesRelationship.Value.RelatedResourceLink.Href.Should().Be("http://www.example.com/countries/4/provinces");
-            provincesRelationship.Value.Linkage.Should().BeOfType<ToManyResourceLinkage>();
-            provincesRelationship.Value.Linkage.LinkageToken.Should().BeOfType<JArray>();
-            var provincesArray = (JArray) provincesRelationship.Value.Linkage.LinkageToken;
-            ((string)provincesArray[0]["type"]).Should().Be("provinces");
-            ((string)provincesArray[0]["id"]).Should().Be("506");
-            ((string)provincesArray[1]["type"]).Should().Be("provinces");
-            ((string)provincesArray[1]["id"]).Should().Be("507");
+            provincesRelationship.Value.Linkage.IsToMany.Should().BeTrue();
+            provincesRelationship.Value.Linkage.Identifiers[0].Type.Should().Be("provinces");
+            provincesRelationship.Value.Linkage.Identifiers[0].Id.Should().Be("506");
+            provincesRelationship.Value.Linkage.Identifiers[1].Type.Should().Be("provinces");
+            provincesRelationship.Value.Linkage.Identifiers[1].Id.Should().Be("507");
 
             var continentRelationship = document.PrimaryData.Relationships.Skip(2).First();
             AssertToOneRelationship(continentRelationship, "continent",
@@ -272,9 +270,10 @@ namespace JSONAPI.Tests.Documents.Builders
             relationshipPair.Key.Should().Be(keyName);
             relationshipPair.Value.SelfLink.Href.Should().Be(selfLink);
             relationshipPair.Value.RelatedResourceLink.Href.Should().Be(relatedResourceLink);
-            relationshipPair.Value.Linkage.Should().BeOfType<ToOneResourceLinkage>();
-            ((string)relationshipPair.Value.Linkage.LinkageToken["type"]).Should().Be(linkageType);
-            ((string)relationshipPair.Value.Linkage.LinkageToken["id"]).Should().Be(linkageId);
+            relationshipPair.Value.Linkage.IsToMany.Should().BeFalse();
+            relationshipPair.Value.Linkage.Identifiers.Length.Should().Be(1);
+            relationshipPair.Value.Linkage.Identifiers[0].Type.Should().Be(linkageType);
+            relationshipPair.Value.Linkage.Identifiers[0].Id.Should().Be(linkageId);
         }
 
         private void AssertEmptyToOneRelationship(KeyValuePair<string, IRelationshipObject> relationshipPair, string keyName, string selfLink, string relatedResourceLink)

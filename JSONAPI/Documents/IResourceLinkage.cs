@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace JSONAPI.Documents
+﻿namespace JSONAPI.Documents
 {
     /// <summary>
     /// Describes a relationship's linkage
@@ -8,8 +6,15 @@ namespace JSONAPI.Documents
     public interface IResourceLinkage
     {
         /// <summary>
-        /// The item determining the linkage 
+        /// Whether the linkage is to-many (true) or to-one (false).
         /// </summary>
-        JToken LinkageToken { get; }
+        bool IsToMany { get; }
+
+        /// <summary>
+        /// The identifiers this linkage refers to. If IsToMany is true, this
+        /// property must return an array of length either 0 or 1. If false,
+        /// the array may be of any length. This property must not return null.
+        /// </summary>
+        IResourceIdentifier[] Identifiers { get; }
     }
 }

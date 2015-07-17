@@ -13,11 +13,37 @@ namespace JSONAPI.Json
     {
         public Task Serialize(IResourceLinkage linkage, JsonWriter writer)
         {
-            if (linkage.LinkageToken == null)
-                writer.WriteNull();
+            if (linkage.IsToMany)
+            {
+                writer.WriteStartArray();
+                foreach (var resourceIdentifier in linkage.Identifiers)
+                {
+                    WriteResourceIdentifier(resourceIdentifier, writer);
+                }
+                writer.WriteEndArray();
+            }
             else
-                linkage.LinkageToken.WriteTo(writer);
+            {
+                var initialIdentifier = linkage.Identifiers.FirstOrDefault();
+                if (initialIdentifier == null)
+                    writer.WriteNull();
+                else
+                {
+                    WriteResourceIdentifier(initialIdentifier, writer);
+                }
+
+            }
             return Task.FromResult(0);
+        }
+
+        private void WriteResourceIdentifier(IResourceIdentifier resourceIdentifier, JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            writer.WritePropertyName("type");
+            writer.WriteValue(resourceIdentifier.Type);
+            writer.WritePropertyName("id");
+            writer.WriteValue(resourceIdentifier.Id);
+            writer.WriteEndObject();
         }
 
         public Task<IResourceLinkage> Deserialize(JsonReader reader, string currentPath)

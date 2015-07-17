@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using JSONAPI.Core;
 using JSONAPI.Documents;
 using JSONAPI.Json;
-using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.EntityFramework
 {
@@ -119,29 +118,17 @@ namespace JSONAPI.EntityFramework
                         throw new DeserializationException("Missing linkage for to-many relationship",
                             "Expected an array for to-many linkage, but no linkage was specified.", "/data/relationships/" + relationshipValue.Key);
 
-                    if (linkage.LinkageToken == null)
-                        throw new DeserializationException("Null linkage for to-many relationship",
-                            "Expected an array for to-many linkage, but got Null.",
-                            "/data/relationships/" + relationshipValue.Key + "/data");
-
-                    var linkageTokenType = linkage.LinkageToken.Type;
-                    if (linkageTokenType != JTokenType.Array)
+                    if (!linkage.IsToMany)
                         throw new DeserializationException("Invalid linkage for to-many relationship",
-                            "Expected an array for to-many linkage, but got " + linkage.LinkageToken.Type,
+                            "Expected an array for to-many linkage.",
                             "/data/relationships/" + relationshipValue.Key + "/data");
 
-                    var linkageArray = (JArray) linkage.LinkageToken;
-                    
                     // TODO: One query per related object is going to be slow. At the very least, we should be able to group the queries by type
                     var newCollection = new List<object>();
-                    foreach (var resourceIdentifier in linkageArray)
+                    foreach (var resourceIdentifier in linkage.Identifiers)
                     {
-                        var resourceIdentifierObject = (JObject) resourceIdentifier;
-                        var relatedType = resourceIdentifierObject["type"].Value<string>();
-                        var relatedId = resourceIdentifierObject["id"].Value<string>();
-                        
-                        var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(relatedType);
-                        var relatedObject = await GetExistingRecord(relatedObjectRegistration, relatedId, null, cancellationToken);
+                        var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(resourceIdentifier.Type);
+                        var relatedObject = await GetExistingRecord(relatedObjectRegistration, resourceIdentifier.Id, null, cancellationToken);
                         newCollection.Add(relatedObject);
                     }
 
@@ -154,25 +141,21 @@ namespace JSONAPI.EntityFramework
                         throw new DeserializationException("Missing linkage for to-one relationship",
                             "Expected an object for to-one linkage, but no linkage was specified.", "/data/relationships/" + relationshipValue.Key);
 
-                    if (linkage.LinkageToken == null)
+                    if (linkage.IsToMany)
+                        throw new DeserializationException("Invalid linkage for to-one relationship",
+                            "Expected an object or null for to-one linkage",
+                            "/data/relationships/" + relationshipValue.Key + "/data");
+
+                    var identifier = linkage.Identifiers.FirstOrDefault();
+                    if (identifier == null)
                     {
                         typeRelationship.Property.SetValue(material, null);
                     }
                     else
                     {
-                        var linkageTokenType = linkage.LinkageToken.Type;
-                        if (linkageTokenType != JTokenType.Object)
-                            throw new DeserializationException("Invalid linkage for to-one relationship",
-                                "Expected an object for to-one linkage, but got " + linkage.LinkageToken.Type,
-                                "/data/relationships/" + relationshipValue.Key + "/data");
-
-                        var linkageObject = (JObject) linkage.LinkageToken;
-                        var relatedType = linkageObject["type"].Value<string>();
-                        var relatedId = linkageObject["id"].Value<string>();
-
-                        var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(relatedType);
+                        var relatedObjectRegistration = _registry.GetRegistrationForResourceTypeName(identifier.Type);
                         var relatedObject =
-                            await GetExistingRecord(relatedObjectRegistration, relatedId, null, cancellationToken);
+                            await GetExistingRecord(relatedObjectRegistration, identifier.Id, null, cancellationToken);
 
                         typeRelationship.Property.SetValue(material, relatedObject);
                     }
