@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -26,7 +27,14 @@ namespace JSONAPI.Core
         {
             var value = _property.GetValue(resource);
             if (value == null) return null;
-            return value.ToString();
+            try
+            {
+                return ((Decimal)value).ToString(CultureInfo.InvariantCulture);
+            }
+            catch (InvalidCastException e)
+            {
+                throw new JsonSerializationException("Could not serialize decimal value.", e);
+            }
         }
 
         public void SetValue(object resource, JToken value)
@@ -37,7 +45,7 @@ namespace JSONAPI.Core
             {
                 var stringTokenValue = value.Value<string>();
                 Decimal d;
-                if (!Decimal.TryParse(stringTokenValue, out d))
+                if (!Decimal.TryParse(stringTokenValue, NumberStyles.Any, CultureInfo.InvariantCulture, out d))
                     throw new JsonSerializationException("Could not parse decimal value.");
                 _property.SetValue(resource, d);
             }

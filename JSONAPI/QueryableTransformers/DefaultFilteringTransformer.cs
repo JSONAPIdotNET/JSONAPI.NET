@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -248,40 +249,40 @@ namespace JSONAPI.QueryableTransformers
             else if (propertyType == typeof(Single))
             {
                 Single value;
-                expr = Single.TryParse(queryValue, out value)
+                expr = Single.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
                     ? GetPropertyExpression(value, prop, param)
                     : Expression.Constant(false);
             }
             else if (propertyType == typeof(Single?))
             {
                 Single tmp;
-                var value = Single.TryParse(queryValue, out tmp) ? tmp : (Single?)null;
+                var value = Single.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Single?)null;
                 expr = GetPropertyExpression(value, prop, param);
             }
             else if (propertyType == typeof(Double))
             {
                 Double value;
-                expr = Double.TryParse(queryValue, out value)
+                expr = Double.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
                     ? GetPropertyExpression(value, prop, param)
                     : Expression.Constant(false);
             }
             else if (propertyType == typeof(Double?))
             {
                 Double tmp;
-                var value = Double.TryParse(queryValue, out tmp) ? tmp : (Double?)null;
+                var value = Double.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Double?)null;
                 expr = GetPropertyExpression(value, prop, param);
             }
             else if (propertyType == typeof(Decimal))
             {
                 Decimal value;
-                expr = Decimal.TryParse(queryValue, out value)
+                expr = Decimal.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
                     ? GetPropertyExpression(value, prop, param)
                     : Expression.Constant(false);
             }
             else if (propertyType == typeof(Decimal?))
             {
                 Decimal tmp;
-                var value = Decimal.TryParse(queryValue, out tmp) ? tmp : (Decimal?)null;
+                var value = Decimal.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Decimal?)null;
                 expr = GetPropertyExpression(value, prop, param);
             }
             else if (propertyType == typeof(DateTime))
