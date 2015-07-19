@@ -128,6 +128,10 @@ namespace JSONAPI.Documents.Builders
 
                             linkage = new ToOneResourceLinkage(identifier);
                         }
+                        else
+                        {
+                            linkage = new ToOneResourceLinkage(null);
+                        }
                     }
                 }
 

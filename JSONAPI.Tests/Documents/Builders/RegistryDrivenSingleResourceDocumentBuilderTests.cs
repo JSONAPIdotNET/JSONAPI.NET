@@ -281,7 +281,8 @@ namespace JSONAPI.Tests.Documents.Builders
             relationshipPair.Key.Should().Be(keyName);
             relationshipPair.Value.SelfLink.Href.Should().Be(selfLink);
             relationshipPair.Value.RelatedResourceLink.Href.Should().Be(relatedResourceLink);
-            relationshipPair.Value.Linkage.Should().BeNull();
+            relationshipPair.Value.Linkage.IsToMany.Should().BeFalse();
+            relationshipPair.Value.Linkage.Identifiers.Length.Should().Be(0);
         }
     }
 }
