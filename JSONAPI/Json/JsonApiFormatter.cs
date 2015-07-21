@@ -50,10 +50,10 @@ namespace JSONAPI.Json
             return true;
         }
 
-        public override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
+        public override async Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
         {
             if (type == typeof(IJsonApiDocument) && value == null)
-                return Task.FromResult(0);
+                return;
 
             var contentHeaders = content == null ? null : content.Headers;
             var effectiveEncoding = SelectCharacterEncoding(contentHeaders);
@@ -64,15 +64,15 @@ namespace JSONAPI.Json
             var errorDocument = value as IErrorDocument;
             if (singleResourceDocument != null)
             {
-                _singleResourceDocumentFormatter.Serialize(singleResourceDocument, writer);
+                await _singleResourceDocumentFormatter.Serialize(singleResourceDocument, writer);
             }
             else if (resourceCollectionDocument != null)
             {
-                _resourceCollectionDocumentFormatter.Serialize(resourceCollectionDocument, writer);
+                await _resourceCollectionDocumentFormatter.Serialize(resourceCollectionDocument, writer);
             }
             else if (errorDocument != null)
             {
-                _errorDocumentFormatter.Serialize(errorDocument, writer);
+                await _errorDocumentFormatter.Serialize(errorDocument, writer);
             }
             else
             {
@@ -80,7 +80,7 @@ namespace JSONAPI.Json
                 if (error != null)
                 {
                     var httpErrorDocument = _errorDocumentBuilder.BuildFromHttpError(error, HttpStatusCode.InternalServerError);
-                    _errorDocumentFormatter.Serialize(httpErrorDocument, writer);
+                    await _errorDocumentFormatter.Serialize(httpErrorDocument, writer);
                 }
                 else
                 {
@@ -89,8 +89,6 @@ namespace JSONAPI.Json
             }
 
             writer.Flush();
-
-            return Task.FromResult(0);
         }
 
         public override async Task<object> ReadFromStreamAsync(Type type, Stream readStream, HttpContent content, IFormatterLogger formatterLogger)
