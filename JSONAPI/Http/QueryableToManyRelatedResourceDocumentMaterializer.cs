@@ -27,12 +27,22 @@ namespace JSONAPI.Http
             CancellationToken cancellationToken)
         {
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken); // TODO: allow implementors to specify includes and metadata
+            var includes = GetIncludePaths();
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken, includes); // TODO: allow implementors to specify metadata
         }
 
         /// <summary>
         /// Gets the query for the related resources
         /// </summary>
         protected abstract Task<IQueryable<TRelated>> GetRelatedQuery(string primaryResourceId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Gets a list of relationship paths to include
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetIncludePaths()
+        {
+            return null;
+        }
     }
 }
