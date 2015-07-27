@@ -77,6 +77,7 @@
     <Compile Include="Core\DefaultNamingConventions.cs" />
     <Compile Include="Core\INamingConventions.cs" />
     <Compile Include="Core\IResourceTypeRegistrar.cs" />
+    <Compile Include="Core\PathVisitor.cs" />
     <Compile Include="Core\ResourceTypeAttribute.cs" />
     <Compile Include="Core\ResourceTypeRegistrar.cs" />
     <Compile Include="Core\ResourceTypeRegistration.cs" />
