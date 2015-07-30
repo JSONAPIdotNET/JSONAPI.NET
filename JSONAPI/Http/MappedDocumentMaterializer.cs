@@ -63,7 +63,7 @@ namespace JSONAPI.Http
             get { return _resourceTypeRegistry.GetRegistrationForType(typeof (TDto)).ResourceTypeName; }
         }
 
-        public async Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
+        public virtual async Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var entityQuery = GetQuery();
             var includePaths = GetIncludePathsForQuery() ?? new Expression<Func<TDto, object>>[] { };
@@ -72,7 +72,7 @@ namespace JSONAPI.Http
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, cancellationToken, jsonApiPaths);
         }
 
-        public async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
+        public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var entityQuery = GetByIdQuery(id);
             var includePaths = GetIncludePathsForSingleResource() ?? new Expression<Func<TDto, object>>[] { };
