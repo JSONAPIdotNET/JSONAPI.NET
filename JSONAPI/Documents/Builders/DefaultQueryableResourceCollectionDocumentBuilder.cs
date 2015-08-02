@@ -1,11 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using JSONAPI.ActionFilters;
 using JSONAPI.Http;
-using JSONAPI.Json;
 using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Documents.Builders
@@ -48,11 +45,11 @@ namespace JSONAPI.Documents.Builders
             var sortedQuery = _sortingTransformer.Sort(filteredQuery, request);
 
             var paginationResults = _paginationTransformer.ApplyPagination(sortedQuery, request);
-            query = paginationResults.PagedQuery;
+            var paginatedQuery = paginationResults.PagedQuery;
 
             var linkBaseUrl = _baseUrlService.GetBaseUrl(request);
 
-            var results = await _enumerationTransformer.Enumerate(query, cancellationToken);
+            var results = await _enumerationTransformer.Enumerate(paginatedQuery, cancellationToken);
             var metadata = await GetDocumentMetadata(query, filteredQuery, sortedQuery, paginationResults, cancellationToken);
             return _resourceCollectionDocumentBuilder.BuildDocument(results, linkBaseUrl, includes, metadata);
         }
