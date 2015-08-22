@@ -1,0 +1,12 @@
+﻿{
+    "data": [
+        "Primary data 1",
+        "Primary data 2"
+    ],
+    "included": [ 
+        "Related data object 1",
+        "Related data object 2",
+        "Related data object 3"
+    ],
+    "meta": "Placeholder metadata object"
+}

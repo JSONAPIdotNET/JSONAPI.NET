@@ -1,0 +1,10 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "404",
+            "title": "Resource not found",
+            "detail": "No resource of type `posts` exists with id `3000`."
+        }
+    ]
+}

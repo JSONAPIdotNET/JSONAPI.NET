@@ -1,0 +1,55 @@
+﻿{
+    "data": [
+        {
+            "type": "posts",
+            "id": "201",
+            "attributes": {
+                "content": "Post 1 content",
+                "created": "2015-01-31T14:00:00.0000000+00:00",
+                "title": "Post 1"
+            },
+            "relationships": {
+                "author": {
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/author",
+                        "related": "https://www.example.com/posts/201/author"
+                    }
+                },
+                "comments": {
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/comments",
+                        "related": "https://www.example.com/posts/201/comments"
+                    }
+                },
+                "tags": {
+                    "links": {
+                        "self": "https://www.example.com/posts/201/relationships/tags",
+                        "related": "https://www.example.com/posts/201/tags"
+                    }
+                }
+            }
+        },
+        {
+            "type": "comments",
+            "id": "101",
+            "attributes": {
+                "created": "2015-01-31T14:30:00.0000000+00:00",
+                "text": "Comment 1"
+            },
+            "relationships": {
+                "author": {
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/author",
+                        "related": "https://www.example.com/comments/101/author"
+                    }
+                },
+                "post": {
+                    "links": {
+                        "self": "https://www.example.com/comments/101/relationships/post",
+                        "related": "https://www.example.com/comments/101/post"
+                    }
+                }
+            }
+        }
+    ]
+}

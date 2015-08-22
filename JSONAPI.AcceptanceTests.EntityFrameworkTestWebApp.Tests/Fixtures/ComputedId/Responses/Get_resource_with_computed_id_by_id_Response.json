@@ -1,0 +1,23 @@
+﻿{
+    "data": {
+        "type": "language-user-links",
+        "id": "9001_402",
+        "attributes": {
+            "fluency-level": "Native"
+        },
+        "relationships": {
+            "language": {
+                "links": {
+                    "self": "https://www.example.com/language-user-links/9001_402/relationships/language",
+                    "related": "https://www.example.com/language-user-links/9001_402/language"
+                }
+            },
+            "user": {
+                "links": {
+                    "self": "https://www.example.com/language-user-links/9001_402/relationships/user",
+                    "related": "https://www.example.com/language-user-links/9001_402/user"
+                }
+            }
+        }
+    }
+}

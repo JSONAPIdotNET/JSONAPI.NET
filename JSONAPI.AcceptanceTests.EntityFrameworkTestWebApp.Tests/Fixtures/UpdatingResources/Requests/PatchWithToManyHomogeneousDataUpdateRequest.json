@@ -1,0 +1,20 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "relationships": {
+            "tags": {
+                "data": [
+                    {
+                        "id": "301",
+                        "type": "tags"
+                    },
+                    { 
+                        "id": "303",
+                        "type": "tags"
+                    }
+                ]
+            }
+        }
+    }
+}

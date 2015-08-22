@@ -1,0 +1,9 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "attributes": {
+            "title": "New post title"
+        }
+    }
+}

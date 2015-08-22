@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Invalid relationship object",
+            "detail": "Expected an object, but found String",
+            "source": { 
+                "pointer": "/data/relationships/author"
+            }
+        }
+    ]
+}

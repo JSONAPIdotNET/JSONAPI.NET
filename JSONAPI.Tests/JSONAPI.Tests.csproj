@@ -80,25 +80,46 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionFilters\DefaultPaginationTransformerTests.cs" />
+    <Compile Include="ActionFilters\FallbackDocumentBuilderAttributeTests.cs" />
     <Compile Include="ActionFilters\QueryableTransformerTestsBase.cs" />
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
-    <Compile Include="Core\MetadataManagerTests.cs" />
-    <Compile Include="Core\ModelManagerTests.cs" />
+    <Compile Include="Core\DefaultNamingConventionsTests.cs" />
+    <Compile Include="Core\ResourceTypeRegistrarTests.cs" />
+    <Compile Include="Core\ResourceTypeRegistryTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
-    <Compile Include="Http\PascalizedControllerSelectorTests.cs" />
-    <Compile Include="Json\ErrorSerializerTests.cs" />
-    <Compile Include="Json\JsonApiMediaFormatterTests.cs" />
-    <Compile Include="Json\LinkTemplateTests.cs" />
+    <Compile Include="Json\JsonApiFormatterTests.cs" />
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\AttributeGrabBag.cs" />
     <Compile Include="Models\Tag.cs" />
-    <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\UserGroup.cs" />
+    <Compile Include="Documents\Builders\FallbackDocumentBuilderTests.cs" />
+    <Compile Include="Documents\Builders\RegistryDrivenSingleResourceDocumentBuilderTests.cs" />
+    <Compile Include="Documents\DefaultLinkConventionsTests.cs" />
+    <Compile Include="Documents\Builders\ErrorDocumentBuilderTests.cs" />
+    <Compile Include="Json\JsonApiFormatterTestsBase.cs" />
+    <Compile Include="Json\ErrorFormatterTests.cs" />
+    <Compile Include="Documents\Builders\RegistryDrivenDocumentBuilderTests.cs" />
+    <Compile Include="Json\ResourceLinkageFormatterTests.cs" />
+    <Compile Include="Json\MetadataFormatterTests.cs" />
+    <Compile Include="Json\RelationshipObjectFormatterTests.cs" />
+    <Compile Include="Json\LinkFormatterTests.cs" />
+    <Compile Include="Json\ResourceObjectFormatterTests.cs" />
+    <Compile Include="Json\ErrorDocumentFormatterTests.cs" />
+    <Compile Include="Json\ResourceCollectionDocumentFormatterTests.cs" />
+    <Compile Include="Json\SingleResourceDocumentFormatterTests.cs" />
+    <Compile Include="Documents\ToManyResourceLinkageTests.cs" />
+    <Compile Include="Documents\ToOneResourceLinkageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Tests.SingleControllerWebApp\JSONAPI.Tests.SingleControllerWebApp.csproj">
+      <Project>{0fe799ec-b6c5-499b-b56c-b97613342f6c}</Project>
+      <Name>JSONAPI.Tests.SingleControllerWebApp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI\JSONAPI.csproj">
       <Project>{52b19fd6-efaa-45b5-9c3e-a652e27608d1}</Project>
       <Name>JSONAPI</Name>
@@ -106,53 +127,62 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Data\EmptyArrayResult.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\NullResourceResult.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\MetadataManagerPropertyWasPresentRequest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\ByteIdSerializationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\DeserializeAttributeRequest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\DeserializeCollectionRequest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\ReformatsRawJsonStringWithUnquotedKeys.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\MalformedRawJsonString.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\FormatterErrorSerializationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\ErrorSerializerTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\LinkTemplateTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\DeserializeRawJsonTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\NonStandardIdTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\AttributeSerializationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\SerializerIntegrationTest.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_SingleResourceDocument.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_ResourceCollectionDocument.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_ErrorDocument.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Serialize_HttpError.json" />
+    <EmbeddedResource Include="Json\Fixtures\JsonApiFormatter\Writes_error_for_anything_else.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Deserialize_empty_document.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Deserialize_document_with_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Deserialize_document_with_primary_data.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Deserialize_document_with_primary_data_and_unknown_top_level_key.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Deserialize_resource_object.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Deserialize_relationship_object.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Deserialize_to_many_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Deserialize_to_one_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Deserialize_fails_on_string.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Deserialize_fails_on_integer.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Deserialize_null_to_one_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Deserialize_null_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Deserialize_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Serialize_null_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_null_document.json" />
+    <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Deserialize_document_with_resource.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_null_resource.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_empty_toMany_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_present_toMany_linkage.json" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_primary_data_and_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_without_attributes.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_attributes.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_relationships.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_only_null_relationships.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_links.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_all_possible_members.json" />
+    <EmbeddedResource Include="Json\Fixtures\LinkFormatter\Serialize_link_without_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\LinkFormatter\Serialize_link_with_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_meta_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_self_link_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_related_link_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_self_link_and_related_link.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_linkage_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\RelationshipObjectFormatter\Serialize_relationship_with_all_possible_members.json" />
+    <EmbeddedResource Include="Json\Fixtures\MetadataFormatter\Serialize_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_present_toOne_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceLinkageFormatter\Serialize_null_toOne_linkage.json" />
+    <EmbeddedResource Include="Json\Fixtures\ErrorFormatter\Serialize_error_with_all_possible_members.json" />
+    <EmbeddedResource Include="Json\Fixtures\ErrorFormatter\Serialize_error_with_only_id.json" />
+    <EmbeddedResource Include="Json\Fixtures\ErrorDocumentFormatter\Serialize_ErrorDocument.json" />
+    <EmbeddedResource Include="Json\Fixtures\SingleResourceDocumentFormatter\Serialize_SingleResourceDocument_for_all_possible_members.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Serialize_ResourceCollectionDocument_for_all_possible_members.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Serialize_ResourceCollectionDocument_for_primary_data_only_and_metadata.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceCollectionDocumentFormatter\Serialize_ResourceCollectionDocument_for_primary_data_only.json" />
+    <EmbeddedResource Include="Json\Fixtures\ResourceObjectFormatter\Serialize_ResourceObject_for_resource_with_unsigned_long_integer_greater_than_int64_maxvalue.json" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -1,0 +1,10 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "relationships": {
+            "author": {
+            }
+        }
+    }
+}

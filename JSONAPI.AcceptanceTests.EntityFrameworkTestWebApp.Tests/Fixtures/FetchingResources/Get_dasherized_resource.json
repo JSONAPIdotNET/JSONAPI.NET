@@ -1,0 +1,19 @@
+﻿{
+    "data": [
+        {
+            "type": "user-groups",
+            "id": "501",
+            "attributes": {
+                "name": "Admin users"
+            },
+            "relationships": {
+                "users": {
+                    "links": {
+                        "self": "https://www.example.com/user-groups/501/relationships/users",
+                        "related": "https://www.example.com/user-groups/501/users"
+                    }
+                }
+            }
+        }
+    ]
+}

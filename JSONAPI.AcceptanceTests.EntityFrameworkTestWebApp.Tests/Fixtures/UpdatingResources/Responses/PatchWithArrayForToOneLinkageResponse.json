@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Invalid linkage for to-one relationship",
+            "detail": "Expected an object or null for to-one linkage",
+            "source": { 
+                "pointer": "/data/relationships/author/data"
+            }
+        }
+    ]
+}

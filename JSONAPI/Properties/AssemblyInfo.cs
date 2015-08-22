@@ -24,7 +24,8 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("JSONAPI.Tests")]
 [assembly: InternalsVisibleTo("JSONAPI.EntityFramework")]
-[assembly: InternalsVisibleTo("JSONAPI.EntityFramework.Tests")]
+[assembly: InternalsVisibleTo("JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests")]
+[assembly: InternalsVisibleTo("JSONAPI.Autofac")]
 
 // This assembly is the default dynamic assembly generated Castle DynamicProxy, 
 // used by Moq. Paste in a single line.   

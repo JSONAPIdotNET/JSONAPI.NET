@@ -25,7 +25,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{021B87
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.TodoMVC.API", "JSONAPI.TodoMVC.API\JSONAPI.TodoMVC.API.csproj", "{ECFA3EC5-47B8-4060-925E-9205146D6562}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.EntityFramework.Tests.TestWebApp", "JSONAPI.EntityFramework.Tests.TestWebApp\JSONAPI.EntityFramework.Tests.TestWebApp.csproj", "{76DEE472-723B-4BE6-8B97-428AC326E30F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp", "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp\JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.csproj", "{76DEE472-723B-4BE6-8B97-428AC326E30F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac", "JSONAPI.Autofac\JSONAPI.Autofac.csproj", "{AF7861F3-550B-4F70-A33E-1E5F48D39333}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac.EntityFramework", "JSONAPI.Autofac.EntityFramework\JSONAPI.Autofac.EntityFramework.csproj", "{64ABE648-EFCB-46EE-9E1A-E163F52BF372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests", "JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests\JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests.csproj", "{58AEF8B8-8D51-4175-AC96-BC622703E8BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSONAPI.Autofac.Tests", "JSONAPI.Autofac.Tests\JSONAPI.Autofac.Tests.csproj", "{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +65,22 @@ Global
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76DEE472-723B-4BE6-8B97-428AC326E30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF7861F3-550B-4F70-A33E-1E5F48D39333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64ABE648-EFCB-46EE-9E1A-E163F52BF372}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64ABE648-EFCB-46EE-9E1A-E163F52BF372}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64ABE648-EFCB-46EE-9E1A-E163F52BF372}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64ABE648-EFCB-46EE-9E1A-E163F52BF372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58AEF8B8-8D51-4175-AC96-BC622703E8BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA3C57B-8360-42FF-95E8-0F3A6BA5BCB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

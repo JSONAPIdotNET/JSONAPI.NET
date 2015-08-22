@@ -1,0 +1,72 @@
+﻿{
+    "data": [
+        {
+            "type": "starship-officers",
+            "id": "NCC-1701-D_12010",
+            "attributes": {
+                "name": "Jean-Luc Picard",
+                "position": "Commanding Officer",
+                "rank": "Captain"
+            },
+            "relationships": {
+                "current-ship": {
+                    "links": { 
+                        "self": "https://www.example.com/starship-officers/NCC-1701-D_12010/relationships/current-ship",
+                        "related": "https://www.example.com/starship-officers/NCC-1701-D_12010/current-ship"
+                    }
+                }
+            }
+        },
+        {
+            "type": "starship-officers",
+            "id": "NCC-1701-D_12011",
+            "attributes": {
+                "name": "William T. Riker",
+                "position": "First Officer",
+                "rank": "Commander"
+            },
+            "relationships": {
+                "current-ship": {
+                    "links": { 
+                        "self": "https://www.example.com/starship-officers/NCC-1701-D_12011/relationships/current-ship",
+                        "related": "https://www.example.com/starship-officers/NCC-1701-D_12011/current-ship"
+                    }
+                }
+            }
+        },
+        {
+            "type": "starship-officers",
+            "id": "NCC-1701-D_12012",
+            "attributes": {
+                "name": "Data",
+                "position": "Second Officer",
+                "rank": "Lt. Commander"
+            },
+            "relationships": {
+                "current-ship": {
+                    "links": { 
+                        "self": "https://www.example.com/starship-officers/NCC-1701-D_12012/relationships/current-ship",
+                        "related": "https://www.example.com/starship-officers/NCC-1701-D_12012/current-ship"
+                    }
+                }
+            }
+        },
+        {
+            "type": "starship-officers",
+            "id": "NCC-1701-D_12013",
+            "attributes": {
+                "name": "Deanna Troi",
+                "position": "Ship's Counselor",
+                "rank": "Lt. Commander"
+            },
+            "relationships": {
+                "current-ship": {
+                    "links": { 
+                        "self": "https://www.example.com/starship-officers/NCC-1701-D_12013/relationships/current-ship",
+                        "related": "https://www.example.com/starship-officers/NCC-1701-D_12013/current-ship"
+                    }
+                }
+            }
+        }
+    ]
+}

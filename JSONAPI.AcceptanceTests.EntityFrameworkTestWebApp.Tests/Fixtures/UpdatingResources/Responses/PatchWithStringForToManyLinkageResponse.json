@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Invalid linkage for relationship",
+            "detail": "Expected an array, object, or null for linkage, but got String",
+            "source": { 
+                "pointer": "/data/relationships/tags/data"
+            }
+        }
+    ]
+}

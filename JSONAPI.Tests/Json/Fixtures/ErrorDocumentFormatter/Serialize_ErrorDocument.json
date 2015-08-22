@@ -1,0 +1,4 @@
+﻿{
+    "errors": [ "first error would go here", "second error would go here" ],
+    "meta": "metadata goes here"
+}

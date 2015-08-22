@@ -30,6 +30,11 @@ namespace JSONAPI.EntityFramework.Tests
             public string Temporary { get; set; }
         }
 
+        private class SubPost : Post
+        {
+            public string Foo { get; set; }
+        }
+
         private DbConnection _conn;
         private TestDbContext _context;
 
@@ -78,11 +83,22 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         [TestMethod]
+        public void GetKeyNamesForChildClass()
+        {
+            // Act
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(SubPost)).ToArray();
+
+            // Assert
+            keyNames.Count().Should().Be(1);
+            keyNames.First().Should().Be("Id");
+        }
+
+        [TestMethod]
         public void GetKeyNamesNotAnEntityTest()
         {
             // Act
             Action action = () => _context.GetKeyNames(typeof (NotAnEntity));
-            action.ShouldThrow<ArgumentException>().Which.Message.Should().Be("The Type NotAnEntity was not found in the DbContext with Type TestDbContext");
+            action.ShouldThrow<Exception>().Which.Message.Should().Be("Failed to identify the key names for NotAnEntity or any of its parent classes.");
         }
     }
 }

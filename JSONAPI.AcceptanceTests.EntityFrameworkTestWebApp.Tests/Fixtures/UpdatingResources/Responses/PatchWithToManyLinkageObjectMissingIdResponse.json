@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Resource identifier missing id",
+            "detail": "The `id` key is missing.",
+            "source": { 
+                "pointer": "/data/relationships/tags/data"
+            }
+        }
+    ]
+}

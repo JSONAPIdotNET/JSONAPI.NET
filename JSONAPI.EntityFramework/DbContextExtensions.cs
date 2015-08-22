@@ -21,20 +21,38 @@ namespace JSONAPI.EntityFramework
         /// <returns></returns>
         public static IEnumerable<string> GetKeyNames(this DbContext dbContext, Type type)
         {
-            var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.NonPublic | BindingFlags.Static);
-            var method = openMethod.MakeGenericMethod(type);
-            try
+            if (dbContext == null) throw new ArgumentNullException("dbContext");
+            if (type == null) throw new ArgumentNullException("type");
+
+            var originalType = type;
+
+            while (type != null)
             {
-                return (IEnumerable<string>)method.Invoke(null, new object[] { dbContext });
+                var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.Public | BindingFlags.Static);
+                var method = openMethod.MakeGenericMethod(type);
+
+                try
+                {
+                    return (IEnumerable<string>) method.Invoke(null, new object[] {dbContext});
+                }
+                catch (TargetInvocationException)
+                {
+                }
+
+                type = type.BaseType;
             }
-            catch (TargetInvocationException ex)
-            {
-                throw ex.InnerException;
-            }
+
+            throw new Exception(string.Format("Failed to identify the key names for {0} or any of its parent classes.", originalType.Name));
         }
 
-        // ReSharper disable once UnusedMember.Local
-        private static IEnumerable<string> GetKeyNamesFromGeneric<T>(this DbContext dbContext) where T : class
+        /// <summary>
+        /// Gets the ID key names for an entity type
+        /// </summary>
+        /// <param name="dbContext"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static IEnumerable<string> GetKeyNamesFromGeneric<T>(this DbContext dbContext) where T : class
         {
             var objectContext = ((IObjectContextAdapter)dbContext).ObjectContext;
             ObjectSet<T> objectSet;

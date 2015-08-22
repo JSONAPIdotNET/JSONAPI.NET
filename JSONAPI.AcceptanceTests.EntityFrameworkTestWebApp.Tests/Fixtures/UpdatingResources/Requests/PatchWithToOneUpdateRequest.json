@@ -1,0 +1,14 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "relationships": {
+            "author": {
+                "data": {
+                    "type": "users",
+                    "id": "403"
+                }
+            }
+        }
+    }
+}

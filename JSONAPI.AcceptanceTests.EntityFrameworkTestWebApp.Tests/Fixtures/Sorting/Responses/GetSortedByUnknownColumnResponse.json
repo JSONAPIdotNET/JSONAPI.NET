@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Attribute not found",
+            "detail": "The attribute \"foobar\" does not exist on type \"users\".",
+            "source": { 
+                "parameter": "sort"
+            }
+        }
+    ]
+}

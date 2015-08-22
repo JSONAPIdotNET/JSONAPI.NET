@@ -1,0 +1,13 @@
+﻿{
+    "errors": [
+        {
+            "id": "{{SOME_GUID}}",
+            "status": "400",
+            "title": "Missing linkage for to-many relationship",
+            "detail": "Expected an array for to-many linkage, but no linkage was specified.",
+            "source": { 
+                "pointer": "/data/relationships/tags"
+            }
+        }
+    ]
+}

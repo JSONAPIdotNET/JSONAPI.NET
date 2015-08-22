@@ -1,0 +1,89 @@
+{
+    "data": [
+        {
+            "type": "samples",
+            "id": "1",
+            "attributes": {
+                "boolean-field": false,
+                "byte-field": 0,
+                "complex-attribute-field": null,
+                "date-time-field": "0001-01-01T00:00:00",
+                "date-time-offset-field": "0001-01-01T00:00:00.0000000+00:00",
+                "decimal-field": "0",
+                "double-field": 0.0,
+                "enum-field": 0,
+                "guid-field": "00000000-0000-0000-0000-000000000000",
+                "int16-field": 0,
+                "int32-field": 0,
+                "int64-field": 0,
+                "nullable-boolean-field": false,
+                "nullable-byte-field": null,
+                "nullable-date-time-field": null,
+                "nullable-date-time-offset-field": null,
+                "nullable-decimal-field": null,
+                "nullable-double-field": null,
+                "nullable-enum-field": null,
+                "nullable-guid-field": null,
+                "nullable-int16-field": null,
+                "nullable-int32-field": null,
+                "nullable-int64-field": null,
+                "nullable-sbyte-field": null,
+                "nullable-single-field": null,
+                "nullable-uint16-field": null,
+                "nullable-uint32-field": null,
+                "nullable-uint64-field": null,
+                "sbyte-field": 0,
+                "single-field": 0.0,
+                "string-field": null,
+                "uint16-field": 0,
+                "uint32-field": 0,
+                "uint64-field": 0
+            }
+        },
+        {
+            "type": "samples",
+            "id": "2",
+            "attributes": {
+                "boolean-field": true,
+                "byte-field": 253,
+                "complex-attribute-field": {
+                    "foo": {
+                        "baz": [ 11 ]
+                    },
+                    "bar": 5
+                },
+                "date-time-field": "1776-07-04T00:00:00",
+                "date-time-offset-field": "1776-07-04T00:00:00.0000000-05:00",
+                "decimal-field": "1056789.123",
+                "double-field": 1056789.123,
+                "enum-field": 1,
+                "guid-field": "6566f9b4-5245-40de-890d-98b40a4ad656",
+                "int16-field": 32000,
+                "int32-field": 2000000000,
+                "int64-field": 9223372036854775807,
+                "nullable-boolean-field": true,
+                "nullable-byte-field": 253,
+                "nullable-date-time-field": "1776-07-04T00:00:00",
+                "nullable-date-time-offset-field": "1776-07-04T00:00:00.0000000-05:00",
+                "nullable-decimal-field": "1056789.123",
+                "nullable-double-field": 1056789.123,
+                "nullable-enum-field": 2,
+                "nullable-guid-field": "3d1fb81e-43ee-4d04-af91-c8a326341293",
+                "nullable-int16-field": 32000,
+                "nullable-int32-field": 2000000000,
+                "nullable-int64-field": 9223372036854775807,
+                "nullable-sbyte-field": 123,
+                "nullable-single-field": 1056789.13,
+                "nullable-uint16-field": 64000,
+                "nullable-uint32-field": 3000000000,
+                "nullable-uint64-field": 9223372036854775808,
+                "sbyte-field": 123,
+                "single-field": 1056789.13,
+                "string-field": "Some string 156",
+                "uint16-field": 64000,
+                "uint32-field": 3000000000,
+                "uint64-field": 9223372036854775808
+            }
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "202",
+        "attributes": {
+            "title": "New post title"
+        },
+        "relationships": {
+            "some-fake-relationship": { 
+                "data": { "type": "author", "id": "45000" }
+            }
+        }
+    }
+}

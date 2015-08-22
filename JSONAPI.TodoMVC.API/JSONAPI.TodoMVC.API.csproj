@@ -40,13 +40,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac.Integration.WebApi, Version=3.4.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Autofac.WebApi2.3.4.0\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin">
@@ -96,7 +103,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\TodosController.cs" />
+    <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Migrations\201502061744049_Initial.cs" />
     <Compile Include="Migrations\201502061744049_Initial.Designer.cs">
       <DependentUpon>201502061744049_Initial.cs</DependentUpon>
@@ -120,6 +127,14 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JSONAPI.Autofac.EntityFramework\JSONAPI.Autofac.EntityFramework.csproj">
+      <Project>{64abe648-efcb-46ee-9e1a-e163f52bf372}</Project>
+      <Name>JSONAPI.Autofac.EntityFramework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JSONAPI.Autofac\JSONAPI.Autofac.csproj">
+      <Project>{af7861f3-550b-4f70-a33e-1e5f48d39333}</Project>
+      <Name>JSONAPI.Autofac</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONAPI.EntityFramework\JSONAPI.EntityFramework.csproj">
       <Project>{E906356C-93F6-41F6-9A0D-73B8A99AA53C}</Project>
       <Name>JSONAPI.EntityFramework</Name>

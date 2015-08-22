@@ -1,0 +1,9 @@
+﻿{
+    "type": "shapes",
+    "id": "1400",
+    "attributes": {
+        "name": "Triangle",
+        "sides": 3,
+        "foo":  null
+    }
+}

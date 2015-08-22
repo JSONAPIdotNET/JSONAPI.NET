@@ -1,0 +1,31 @@
+﻿{
+    "data": {
+        "type": "posts",
+        "id": "205",
+        "attributes": {
+            "content": "Added post content",
+            "created": "2015-03-11T04:31:00.0000000+00:00",
+            "title": "Added post"
+        },
+        "relationships": {
+            "author": {
+                "links": {
+                    "self": "https://www.example.com/posts/205/relationships/author",
+                    "related": "https://www.example.com/posts/205/author"
+                }
+            },
+            "comments": {
+                "links": {
+                    "self": "https://www.example.com/posts/205/relationships/comments",
+                    "related": "https://www.example.com/posts/205/comments"
+                }
+            },
+            "tags": {
+                "links": {
+                    "self": "https://www.example.com/posts/205/relationships/tags",
+                    "related": "https://www.example.com/posts/205/tags"
+                }
+            }
+        }
+    }
+}

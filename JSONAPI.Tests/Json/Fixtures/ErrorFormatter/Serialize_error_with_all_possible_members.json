@@ -1,0 +1,17 @@
+﻿{
+    "id": "654321",
+    "links": {
+        "about": "http://example.com/my-about-link"
+    },
+    "status": "400",
+    "code": "9000",
+    "title": "Some error occurred.",
+    "detail": "The thingamabob fell through the whatsit.",
+    "source": {
+        "pointer": "/data/attributes/bob",
+        "parameter": "sort"
+    },
+    "meta": { 
+        "foo": "qux"
+    }
+}

@@ -1,0 +1,8 @@
+﻿{
+    "type": "states",
+    "id": "1400",
+    "relationships": {
+        "capital": "IRelationship Placeholder - capital",
+        "neighbors": "IRelationship Placeholder - neighbors"
+    }
+}
