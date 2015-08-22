@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 
@@ -43,7 +42,7 @@ namespace JSONAPI.QueryableTransformers
                 sortExpressions = sortParam.Value.Split(',');
             }
 
-            var selectors = new List<Tuple<bool, Expression<Func<T, object>>>>();
+            var selectors = new List<ISelector<T>>();
             var usedProperties = new Dictionary<PropertyInfo, object>();
             
             var registration = _resourceTypeRegistry.GetRegistrationForType(typeof (T));
@@ -91,24 +90,55 @@ namespace JSONAPI.QueryableTransformers
                             string.Format("The attribute \"{0}\" was specified more than once.", fieldName), "sort");
 
                     usedProperties[property] = null;
-
                     sortValueExpression = Expression.Property(paramExpr, property);
                 }
 
-                var selector = Expression.Lambda<Func<T, object>>(sortValueExpression, paramExpr);
-                selectors.Add(Tuple.Create(ascending, selector));
+                var selector = GetSelector<T>(paramExpr, sortValueExpression, !ascending);
+                selectors.Add(selector);
             }
 
             var firstSelector = selectors.First();
 
-            IOrderedQueryable<T> workingQuery =
-                firstSelector.Item1
-                    ? query.OrderBy(firstSelector.Item2)
-                    : query.OrderByDescending(firstSelector.Item2);
+            IOrderedQueryable<T> workingQuery = firstSelector.ApplyInitially(query);
+            return selectors.Skip(1).Aggregate(workingQuery, (current, selector) => selector.ApplySubsequently(current));
+        }
 
-            return selectors.Skip(1).Aggregate(workingQuery,
-                (current, selector) =>
-                    selector.Item1 ? current.ThenBy(selector.Item2) : current.ThenByDescending(selector.Item2));
+        private ISelector<T> GetSelector<T>(ParameterExpression paramExpr, Expression sortValueExpression, bool isDescending)
+        {
+            var lambda = Expression.Lambda(sortValueExpression, paramExpr);
+            var selectorType = typeof (Selector<,>).MakeGenericType(typeof (T), sortValueExpression.Type);
+            var selector = Activator.CreateInstance(selectorType, isDescending, lambda);
+            return (ISelector<T>)selector;
+        }
+    }
+
+    internal interface ISelector<T>
+    {
+        IOrderedQueryable<T> ApplyInitially(IQueryable<T> unsortedQuery);
+        IOrderedQueryable<T> ApplySubsequently(IOrderedQueryable<T> currentQuery);
+    }
+
+    internal class Selector<TResource, TProperty> : ISelector<TResource>
+    {
+        private readonly bool _isDescending;
+        private readonly Expression<Func<TResource, TProperty>> _propertyAccessorExpression;
+
+        public Selector(bool isDescending, Expression<Func<TResource, TProperty>> propertyAccessorExpression)
+        {
+            _isDescending = isDescending;
+            _propertyAccessorExpression = propertyAccessorExpression;
+        }
+
+        public IOrderedQueryable<TResource> ApplyInitially(IQueryable<TResource> unsortedQuery)
+        {
+            if (_isDescending) return unsortedQuery.OrderByDescending(_propertyAccessorExpression);
+            return unsortedQuery.OrderBy(_propertyAccessorExpression);
+        }
+
+        public IOrderedQueryable<TResource> ApplySubsequently(IOrderedQueryable<TResource> currentQuery)
+        {
+            if (_isDescending) return currentQuery.ThenByDescending(_propertyAccessorExpression);
+            return currentQuery.ThenBy(_propertyAccessorExpression);
         }
     }
 }

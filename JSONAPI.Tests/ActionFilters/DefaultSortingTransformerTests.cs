@@ -22,6 +22,8 @@ namespace JSONAPI.Tests.ActionFilters
             public string FirstName { get; set; }
 
             public string LastName { get; set; }
+
+            public DateTime BirthDate { get; set; }
         }
 
         private IList<Dummy> _fixtures;
@@ -32,15 +34,15 @@ namespace JSONAPI.Tests.ActionFilters
         {
             _fixtures = new List<Dummy>
             {
-                new Dummy { Id = "1", FirstName = "Thomas", LastName = "Paine" },
-                new Dummy { Id = "2", FirstName = "Samuel", LastName = "Adams" },
-                new Dummy { Id = "3", FirstName = "George", LastName = "Washington"},
-                new Dummy { Id = "4", FirstName = "Thomas", LastName = "Jefferson" },
-                new Dummy { Id = "5", FirstName = "Martha", LastName = "Washington"},
-                new Dummy { Id = "6", FirstName = "Abraham", LastName = "Lincoln" },
-                new Dummy { Id = "7", FirstName = "Andrew", LastName = "Jackson" },
-                new Dummy { Id = "8", FirstName = "Andrew", LastName = "Johnson" },
-                new Dummy { Id = "9", FirstName = "William", LastName = "Harrison" }
+                new Dummy {Id = "1", FirstName = "Thomas", LastName = "Paine", BirthDate = new DateTime(1737, 2, 9)},
+                new Dummy {Id = "2", FirstName = "Samuel", LastName = "Adams", BirthDate = new DateTime(1722, 9, 27)},
+                new Dummy {Id = "3", FirstName = "George", LastName = "Washington", BirthDate = new DateTime(1732, 2, 22)},
+                new Dummy {Id = "4", FirstName = "Thomas", LastName = "Jefferson", BirthDate = new DateTime(1743, 4, 13)},
+                new Dummy {Id = "5", FirstName = "Martha", LastName = "Washington", BirthDate = new DateTime(1731, 6, 13)},
+                new Dummy {Id = "6", FirstName = "Abraham", LastName = "Lincoln", BirthDate = new DateTime(1809, 2, 12)},
+                new Dummy {Id = "7", FirstName = "Andrew", LastName = "Jackson", BirthDate = new DateTime(1767, 3, 15)},
+                new Dummy {Id = "8", FirstName = "Andrew", LastName = "Johnson", BirthDate = new DateTime(1808, 12, 29)},
+                new Dummy {Id = "9", FirstName = "William", LastName = "Harrison", BirthDate = new DateTime(1773, 2, 9)}
             };
             _fixturesQuery = _fixtures.AsQueryable();
         }
@@ -52,7 +54,7 @@ namespace JSONAPI.Tests.ActionFilters
                 {"Dummy", "Dummies"}
             });
             var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(pluralizationService));
-            var registration = registrar.BuildRegistration(typeof(Dummy));
+            var registration = registrar.BuildRegistration(typeof (Dummy));
             var registry = new ResourceTypeRegistry();
             registry.AddRegistration(registration);
             return new DefaultSortingTransformer(registry);
@@ -131,13 +133,22 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Returns_400_if_no_property_exists()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=foobar", "The attribute \"foobar\" does not exist on type \"dummies\".");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=foobar",
+                "The attribute \"foobar\" does not exist on type \"dummies\".");
         }
 
         [TestMethod]
         public void Returns_400_if_the_same_property_is_specified_more_than_once()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name,last-name", "The attribute \"last-name\" was specified more than once.");
+            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name,last-name",
+                "The attribute \"last-name\" was specified more than once.");
+        }
+
+        [TestMethod]
+        public void Can_sort_by_DateTimeOffset()
+        {
+            var array = GetArray("http://api.example.com/dummies?sort=birth-date");
+            array.Should().BeInAscendingOrder(d => d.BirthDate);
         }
     }
 }
