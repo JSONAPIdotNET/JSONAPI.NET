@@ -26,8 +26,17 @@ namespace JSONAPI.Tests.ActionFilters
             public DateTime BirthDate { get; set; }
         }
 
+        private class Dummy2
+        {
+            public int Id { get; set; }
+
+            public string Name { get; set; }
+        }
+
         private IList<Dummy> _fixtures;
         private IQueryable<Dummy> _fixturesQuery;
+        private IList<Dummy2> _fixtures2;
+        private IQueryable<Dummy2> _fixtures2Query;
 
         [TestInitialize]
         public void SetupFixtures()
@@ -45,25 +54,39 @@ namespace JSONAPI.Tests.ActionFilters
                 new Dummy {Id = "9", FirstName = "William", LastName = "Harrison", BirthDate = new DateTime(1773, 2, 9)}
             };
             _fixturesQuery = _fixtures.AsQueryable();
+
+            _fixtures2 = new List<Dummy2>
+            {
+                new Dummy2 {Id = 45, Name = "France"},
+                new Dummy2 {Id = 52, Name = "Spain"},
+                new Dummy2 {Id = 33, Name = "Mongolia"},
+            };
+            _fixtures2Query = _fixtures2.AsQueryable();
         }
 
         private DefaultSortingTransformer GetTransformer()
         {
-            var pluralizationService = new PluralizationService(new Dictionary<string, string>
-            {
-                {"Dummy", "Dummies"}
-            });
-            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(pluralizationService));
-            var registration = registrar.BuildRegistration(typeof (Dummy));
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(new PluralizationService()));
             var registry = new ResourceTypeRegistry();
-            registry.AddRegistration(registration);
+            registry.AddRegistration(registrar.BuildRegistration(typeof(Dummy), "dummies"));
+            registry.AddRegistration(registrar.BuildRegistration(typeof(Dummy2), "dummy2s"));
             return new DefaultSortingTransformer(registry);
         }
 
-        private Dummy[] GetArray(string uri)
+        private TFixture[] GetArray<TFixture>(string uri, IQueryable<TFixture> fixturesQuery)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            return GetTransformer().Sort(_fixturesQuery, request).ToArray();
+            return GetTransformer().Sort(fixturesQuery, request).ToArray();
+        }
+
+        private Dummy[] GetDummyArray(string uri)
+        {
+            return GetArray<Dummy>(uri, _fixturesQuery);
+        }
+
+        private Dummy2[] GetDummy2Array(string uri)
+        {
+            return GetArray<Dummy2>(uri, _fixtures2Query);
         }
 
         private void RunTransformAndExpectFailure(string uri, string expectedMessage)
@@ -81,28 +104,28 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Sorts_by_attribute_ascending()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=first-name");
+            var array = GetDummyArray("http://api.example.com/dummies?sort=first-name");
             array.Should().BeInAscendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_attribute_descending()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=-first-name");
+            var array = GetDummyArray("http://api.example.com/dummies?sort=-first-name");
             array.Should().BeInDescendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_two_ascending_attributes()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=last-name,first-name");
+            var array = GetDummyArray("http://api.example.com/dummies?sort=last-name,first-name");
             array.Should().ContainInOrder(_fixtures.OrderBy(d => d.LastName + d.FirstName));
         }
 
         [TestMethod]
         public void Sorts_by_two_descending_attributes()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=-last-name,-first-name");
+            var array = GetDummyArray("http://api.example.com/dummies?sort=-last-name,-first-name");
             array.Should().ContainInOrder(_fixtures.OrderByDescending(d => d.LastName + d.FirstName));
         }
 
@@ -147,8 +170,15 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Can_sort_by_DateTimeOffset()
         {
-            var array = GetArray("http://api.example.com/dummies?sort=birth-date");
+            var array = GetDummyArray("http://api.example.com/dummies?sort=birth-date");
             array.Should().BeInAscendingOrder(d => d.BirthDate);
+        }
+
+        [TestMethod]
+        public void Can_sort_by_resource_with_integer_key()
+        {
+            var array = GetDummy2Array("http://api.example.com/dummy2s?sort=name");
+            array.Should().BeInAscendingOrder(d => d.Name);
         }
     }
 }
