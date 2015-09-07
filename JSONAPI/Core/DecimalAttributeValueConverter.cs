@@ -39,7 +39,7 @@ namespace JSONAPI.Core
 
         public void SetValue(object resource, JToken value)
         {
-            if (value == null)
+            if (value == null || value.Type == JTokenType.Null)
                 _property.SetValue(resource, null);
             else
             {
