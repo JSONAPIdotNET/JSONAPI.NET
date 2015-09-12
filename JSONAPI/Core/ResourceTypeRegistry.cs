@@ -57,10 +57,13 @@ namespace JSONAPI.Core
                         throw new InvalidOperationException(String.Format("The type `{0}` has already been registered.",
                             registration.Type.FullName));
 
-                    if (_registrationsByName.ContainsKey(registration.ResourceTypeName))
+                    IResourceTypeRegistration existingRegistration;
+                    if (_registrationsByName.TryGetValue(registration.ResourceTypeName, out existingRegistration))
                         throw new InvalidOperationException(
-                            String.Format("The resource type name `{0}` has already been registered.",
-                                registration.ResourceTypeName));
+                            String.Format("Could not register `{0} under resource type name `{1}` because `{1}` has already been registered by `{2}`.",
+                                registration.Type.FullName,
+                                registration.ResourceTypeName,
+                                existingRegistration.Type.FullName));
 
                     _registrationsByType.Add(registration.Type, registration);
                     _registrationsByName.Add(registration.ResourceTypeName, registration);
