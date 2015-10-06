@@ -84,9 +84,11 @@
     <Compile Include="Core\ResourceTypeRelationship.cs" />
     <Compile Include="Core\ToManyResourceTypeRelationship.cs" />
     <Compile Include="Core\ToOneResourceTypeRelationship.cs" />
+    <Compile Include="Http\DefaultSortExpressionExtractor.cs" />
     <Compile Include="Http\DocumentMaterializerLocator.cs" />
     <Compile Include="Http\IDocumentMaterializerLocator.cs" />
     <Compile Include="Http\IRelatedResourceDocumentMaterializer.cs" />
+    <Compile Include="Http\ISortExpressionExtractor.cs" />
     <Compile Include="Http\MappedDocumentMaterializer.cs" />
     <Compile Include="Http\QueryableToManyRelatedResourceDocumentMaterializer.cs" />
     <Compile Include="Http\QueryableToOneRelatedResourceDocumentMaterializer.cs" />

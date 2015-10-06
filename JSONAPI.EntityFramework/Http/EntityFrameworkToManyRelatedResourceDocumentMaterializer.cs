@@ -28,8 +28,9 @@ namespace JSONAPI.EntityFramework.Http
             ResourceTypeRelationship relationship,
             DbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor,
             IResourceTypeRegistration primaryTypeRegistration)
-            : base(queryableResourceCollectionDocumentBuilder)
+            : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor)
         {
             _relationship = relationship;
             _dbContext = dbContext;

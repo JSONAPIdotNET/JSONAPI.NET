@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using FluentAssertions;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
@@ -73,30 +72,27 @@ namespace JSONAPI.Tests.ActionFilters
             return new DefaultSortingTransformer(registry);
         }
 
-        private TFixture[] GetArray<TFixture>(string uri, IQueryable<TFixture> fixturesQuery)
+        private TFixture[] GetArray<TFixture>(string[] sortExpressions, IQueryable<TFixture> fixturesQuery)
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            return GetTransformer().Sort(fixturesQuery, request).ToArray();
+            return GetTransformer().Sort(fixturesQuery, sortExpressions).ToArray();
         }
 
-        private Dummy[] GetDummyArray(string uri)
+        private Dummy[] GetDummyArray(string[] sortExpressions)
         {
-            return GetArray<Dummy>(uri, _fixturesQuery);
+            return GetArray(sortExpressions, _fixturesQuery);
         }
 
-        private Dummy2[] GetDummy2Array(string uri)
+        private Dummy2[] GetDummy2Array(string[] sortExpressions)
         {
-            return GetArray<Dummy2>(uri, _fixtures2Query);
+            return GetArray(sortExpressions, _fixtures2Query);
         }
 
-        private void RunTransformAndExpectFailure(string uri, string expectedMessage)
+        private void RunTransformAndExpectFailure(string[] sortExpressions, string expectedMessage)
         {
             Action action = () =>
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, uri);
-
                 // ReSharper disable once UnusedVariable
-                var result = GetTransformer().Sort(_fixturesQuery, request).ToArray();
+                var result = GetTransformer().Sort(_fixturesQuery, sortExpressions).ToArray();
             };
             action.ShouldThrow<JsonApiException>().Which.Error.Detail.Should().Be(expectedMessage);
         }
@@ -104,80 +100,87 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Sorts_by_attribute_ascending()
         {
-            var array = GetDummyArray("http://api.example.com/dummies?sort=first-name");
+            var array = GetDummyArray(new [] { "first-name" });
             array.Should().BeInAscendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_attribute_descending()
         {
-            var array = GetDummyArray("http://api.example.com/dummies?sort=-first-name");
+            var array = GetDummyArray(new [] { "-first-name" });
             array.Should().BeInDescendingOrder(d => d.FirstName);
         }
 
         [TestMethod]
         public void Sorts_by_two_ascending_attributes()
         {
-            var array = GetDummyArray("http://api.example.com/dummies?sort=last-name,first-name");
+            var array = GetDummyArray(new [] { "last-name", "first-name" });
             array.Should().ContainInOrder(_fixtures.OrderBy(d => d.LastName + d.FirstName));
         }
 
         [TestMethod]
         public void Sorts_by_two_descending_attributes()
         {
-            var array = GetDummyArray("http://api.example.com/dummies?sort=-last-name,-first-name");
+            var array = GetDummyArray(new [] { "-last-name", "-first-name" });
             array.Should().ContainInOrder(_fixtures.OrderByDescending(d => d.LastName + d.FirstName));
+        }
+
+        [TestMethod]
+        public void Sorts_by_id_when_expressions_are_empty()
+        {
+            var array = GetDummyArray(new string[] { });
+            array.Should().ContainInOrder(_fixtures.OrderBy(d => d.Id));
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_is_empty()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure(new[] { "" }, "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_is_whitespace()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort= ", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure(new [] { " " }, "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_is_empty_descending()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=-", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure(new [] { "-" }, "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_sort_argument_is_whitespace_descending()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=- ", "One of the sort expressions is empty.");
+            RunTransformAndExpectFailure(new[] { "- " }, "One of the sort expressions is empty.");
         }
 
         [TestMethod]
         public void Returns_400_if_no_property_exists()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=foobar",
+            RunTransformAndExpectFailure(new[] { "foobar" },
                 "The attribute \"foobar\" does not exist on type \"dummies\".");
         }
 
         [TestMethod]
         public void Returns_400_if_the_same_property_is_specified_more_than_once()
         {
-            RunTransformAndExpectFailure("http://api.example.com/dummies?sort=last-name,last-name",
+            RunTransformAndExpectFailure(new[] { "last-name", "last-name" },
                 "The attribute \"last-name\" was specified more than once.");
         }
 
         [TestMethod]
         public void Can_sort_by_DateTimeOffset()
         {
-            var array = GetDummyArray("http://api.example.com/dummies?sort=birth-date");
+            var array = GetDummyArray(new [] { "birth-date" });
             array.Should().BeInAscendingOrder(d => d.BirthDate);
         }
 
         [TestMethod]
         public void Can_sort_by_resource_with_integer_key()
         {
-            var array = GetDummy2Array("http://api.example.com/dummy2s?sort=name");
+            var array = GetDummy2Array(new [] { "name" });
             array.Should().BeInAscendingOrder(d => d.Name);
         }
     }

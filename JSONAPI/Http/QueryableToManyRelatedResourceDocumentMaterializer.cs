@@ -14,13 +14,17 @@ namespace JSONAPI.Http
     public abstract class QueryableToManyRelatedResourceDocumentMaterializer<TRelated> : IRelatedResourceDocumentMaterializer
     {
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
+        private readonly ISortExpressionExtractor _sortExpressionExtractor;
 
         /// <summary>
         /// Creates a new QueryableRelatedResourceDocumentMaterializer
         /// </summary>
-        protected QueryableToManyRelatedResourceDocumentMaterializer(IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder)
+        protected QueryableToManyRelatedResourceDocumentMaterializer(
+            IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor)
         {
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
+            _sortExpressionExtractor = sortExpressionExtractor;
         }
 
         public async Task<IJsonApiDocument> GetRelatedResourceDocument(string primaryResourceId, HttpRequestMessage request,
@@ -28,7 +32,8 @@ namespace JSONAPI.Http
         {
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
             var includes = GetIncludePaths();
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken, includes); // TODO: allow implementors to specify metadata
+            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes); // TODO: allow implementors to specify metadata
         }
 
         /// <summary>

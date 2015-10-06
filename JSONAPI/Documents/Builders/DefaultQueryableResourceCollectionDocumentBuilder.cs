@@ -38,11 +38,11 @@ namespace JSONAPI.Documents.Builders
             _baseUrlService = baseUrlService;
         }
 
-        public async Task<IResourceCollectionDocument> BuildDocument<T>(IQueryable<T> query, HttpRequestMessage request, CancellationToken cancellationToken,
+        public async Task<IResourceCollectionDocument> BuildDocument<T>(IQueryable<T> query, HttpRequestMessage request, string[] sortExpressions, CancellationToken cancellationToken,
             string[] includes = null)
         {
             var filteredQuery = _filteringTransformer.Filter(query, request);
-            var sortedQuery = _sortingTransformer.Sort(filteredQuery, request);
+            var sortedQuery = _sortingTransformer.Sort(filteredQuery, sortExpressions);
 
             var paginationResults = _paginationTransformer.ApplyPagination(sortedQuery, request);
             var paginatedQuery = paginationResults.PagedQuery;
