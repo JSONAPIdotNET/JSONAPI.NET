@@ -33,6 +33,8 @@ namespace JSONAPI.Http
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
             var includes = GetIncludePaths();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
+            if (sortExpressions == null || sortExpressions.Length < 1)
+                sortExpressions = GetDefaultSortExpressions();
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes); // TODO: allow implementors to specify metadata
         }
 
@@ -46,6 +48,15 @@ namespace JSONAPI.Http
         /// </summary>
         /// <returns></returns>
         protected virtual string[] GetIncludePaths()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// If the client doesn't request any sort expressions, these expressions will be used for sorting instead.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetDefaultSortExpressions()
         {
             return null;
         }
