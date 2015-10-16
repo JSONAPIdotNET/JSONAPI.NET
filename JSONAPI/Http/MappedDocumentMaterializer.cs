@@ -71,6 +71,9 @@ namespace JSONAPI.Http
             var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
             var mappedQuery = GetMappedQuery(entityQuery, includePaths);
             var sortationPaths = _sortExpressionExtractor.ExtractSortExpressions(request);
+            if (sortationPaths == null || !sortationPaths.Any())
+                sortationPaths = GetDefaultSortExpressions();
+
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, sortationPaths, cancellationToken, jsonApiPaths);
         }
 
@@ -115,6 +118,15 @@ namespace JSONAPI.Http
         protected virtual Expression<Func<TDto, object>>[] GetIncludePathsForSingleResource()
         {
             return null;
+        }
+
+        /// <summary>
+        /// Hook for specifying sort expressions when fetching a collection
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetDefaultSortExpressions()
+        {
+            return new[] { "id" };
         }
 
         /// <summary>
