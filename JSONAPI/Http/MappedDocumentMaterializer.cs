@@ -81,7 +81,7 @@ namespace JSONAPI.Http
                 throw JsonApiException.CreateForNotFound(
                     string.Format("No record exists with type `{0}` and ID `{1}`.", ResourceTypeName, id));
 
-            await OnResourceFetched(primaryResource);
+            await OnResourceFetched(primaryResource, cancellationToken);
 
             var baseUrl = _baseUrlService.GetBaseUrl(request);
             return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
@@ -112,13 +112,14 @@ namespace JSONAPI.Http
         {
             return null;
         }
-        
+
         /// <summary>
         /// Hook for performing any final modifications to the resource before serialization
         /// </summary>
         /// <param name="resource"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected virtual Task OnResourceFetched(TDto resource)
+        protected virtual Task OnResourceFetched(TDto resource, CancellationToken cancellationToken)
         {
             return Task.FromResult(0);
         }
