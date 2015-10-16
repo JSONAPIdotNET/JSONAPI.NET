@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
@@ -83,6 +81,8 @@ namespace JSONAPI.Http
                 throw JsonApiException.CreateForNotFound(
                     string.Format("No record exists with type `{0}` and ID `{1}`.", ResourceTypeName, id));
 
+            await OnResourceFetched(primaryResource);
+
             var baseUrl = _baseUrlService.GetBaseUrl(request);
             return _singleResourceDocumentBuilder.BuildDocument(primaryResource, baseUrl, jsonApiPaths, null);
         }
@@ -112,7 +112,17 @@ namespace JSONAPI.Http
         {
             return null;
         }
-
+        
+        /// <summary>
+        /// Hook for performing any final modifications to the resource before serialization
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <returns></returns>
+        protected virtual Task OnResourceFetched(TDto resource)
+        {
+            return Task.FromResult(0);
+        }
+        
         private string ConvertToJsonKeyPath(Expression<Func<TDto, object>> expression)
         {
             var visitor = new PathVisitor(_resourceTypeRegistry);
