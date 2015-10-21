@@ -636,8 +636,8 @@ namespace JSONAPI.Tests.Core
             var reg = registrar.BuildRegistration(typeof(AttributeGrabBag));
 
             // Assert
-            AssertAttribute(reg, "date-time-field", "1776-07-04", new DateTime(1776, 07, 04), "1776-07-04T00:00:00", g => g.DateTimeField);
-            AssertAttribute(reg, "date-time-field", "1776-07-04T00:00:00", new DateTime(1776, 07, 04), "1776-07-04T00:00:00", g => g.DateTimeField);
+            AssertAttribute(reg, "date-time-field", "1776-07-04", new DateTime(1776, 07, 04, 0, 0, 0, DateTimeKind.Utc), "1776-07-04T00:00:00", g => g.DateTimeField);
+            AssertAttribute(reg, "date-time-field", "1776-07-04T00:00:00", new DateTime(1776, 07, 04, 0, 0, 0, DateTimeKind.Utc), "1776-07-04T00:00:00", g => g.DateTimeField);
             AssertAttribute(reg, "date-time-field", null, new DateTime(), "0001-01-01T00:00:00", g => g.DateTimeField);
         }
 
@@ -651,8 +651,8 @@ namespace JSONAPI.Tests.Core
             var reg = registrar.BuildRegistration(typeof(AttributeGrabBag));
 
             // Assert
-            AssertAttribute(reg, "nullable-date-time-field", "1776-07-04", new DateTime(1776, 07, 04), "1776-07-04T00:00:00", g => g.NullableDateTimeField);
-            AssertAttribute(reg, "nullable-date-time-field", "1776-07-04T00:00:00", new DateTime(1776, 07, 04), "1776-07-04T00:00:00", g => g.NullableDateTimeField);
+            AssertAttribute(reg, "nullable-date-time-field", "1776-07-04", new DateTime(1776, 07, 04, 0, 0, 0, DateTimeKind.Utc), "1776-07-04T00:00:00", g => g.NullableDateTimeField);
+            AssertAttribute(reg, "nullable-date-time-field", "1776-07-04T00:00:00", new DateTime(1776, 07, 04, 0, 0, 0, DateTimeKind.Utc), "1776-07-04T00:00:00", g => g.NullableDateTimeField);
             AssertAttribute(reg, "nullable-date-time-field", null, null, (DateTime?)null, g => g.NullableDateTimeField);
         }
 

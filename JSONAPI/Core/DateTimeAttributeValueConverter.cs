@@ -41,6 +41,7 @@ namespace JSONAPI.Core
             else
             {
                 var dateTimeValue = value.Value<DateTime>();
+                if (dateTimeValue.Kind == DateTimeKind.Local) dateTimeValue = dateTimeValue.ToUniversalTime();
                 _property.SetValue(resource, dateTimeValue);
             }
         }
