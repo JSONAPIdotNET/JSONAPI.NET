@@ -30,7 +30,7 @@ namespace JSONAPI.Core
         public JToken GetValue(object resource)
         {
             var value = _property.GetValue(resource);
-            if (value != null) return (int) value;
+            if (value != null) return Convert.ToInt64(value);
             if (_isNullable) return null;
             return 0;
         }
