@@ -176,7 +176,7 @@ namespace JSONAPI.Tests.Documents.Builders
 
             // Act
             var documentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(mockRegistry.Object, linkConventions);
-            var document = documentBuilder.BuildDocument(country, "http://www.example.com", new[] { "provinces.capital", "continent" }, metadata);
+            var document = documentBuilder.BuildDocument(country, "http://www.example.com", new[] { "provinces.capital", "continent" }, metadata, null);
 
             // Assert
             document.PrimaryData.Id.Should().Be("4");
@@ -258,7 +258,7 @@ namespace JSONAPI.Tests.Documents.Builders
 
             // Act
             var documentBuilder = new RegistryDrivenSingleResourceDocumentBuilder(mockRegistry.Object, linkConventions);
-            var document = documentBuilder.BuildDocument(null, "http://www.example.com", null, null);
+            var document = documentBuilder.BuildDocument(null, "http://www.example.com", null, null, null);
 
             // Assert
             document.PrimaryData.Should().BeNull();

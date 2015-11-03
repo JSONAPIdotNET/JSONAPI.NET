@@ -51,7 +51,7 @@ namespace JSONAPI.Documents.Builders
 
             var results = await _enumerationTransformer.Enumerate(paginatedQuery, cancellationToken);
             var metadata = await GetDocumentMetadata(query, filteredQuery, sortedQuery, paginationResults, cancellationToken);
-            return _resourceCollectionDocumentBuilder.BuildDocument(results, linkBaseUrl, includes, metadata);
+            return _resourceCollectionDocumentBuilder.BuildDocument(results, linkBaseUrl, includes, metadata, null);
         }
 
         /// <summary>

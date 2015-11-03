@@ -19,11 +19,12 @@ namespace JSONAPI.Documents.Builders
         {
         }
 
-        public IResourceCollectionDocument BuildDocument<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata)
+        public IResourceCollectionDocument BuildDocument<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata,
+            IDictionary<object, IMetadata> resourceMetadata = null)
         {
             var idDictionariesByType = new Dictionary<string, IDictionary<string, ResourceObject>>();
             var primaryDataResources =
-                primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions, linkBaseUrl))
+                primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions, linkBaseUrl, resourceMetadata))
                     .ToArray();
 
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();

@@ -15,8 +15,10 @@ namespace JSONAPI.Documents.Builders
         /// <param name="includePathExpressions">A list of dot-separated paths to include in the compound document.
         /// If this collection is null or empty, no linkage will be included.</param>
         /// <param name="metadata">Metadata for the top-level</param>
+        /// <param name="resourceMetadata">Metadata to associate with individual resource objects</param>
         /// <typeparam name="TModel"></typeparam>
         /// <returns></returns>
-        IResourceCollectionDocument BuildDocument<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata);
+        IResourceCollectionDocument BuildDocument<TModel>(IEnumerable<TModel> primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata metadata,
+            IDictionary<object, IMetadata> resourceMetadata = null);
     }
 }

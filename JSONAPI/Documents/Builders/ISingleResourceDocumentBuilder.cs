@@ -1,4 +1,6 @@
-﻿namespace JSONAPI.Documents.Builders
+﻿using System.Collections.Generic;
+
+namespace JSONAPI.Documents.Builders
 {
     /// <summary>
     /// Builds a response document from primary data objects
@@ -13,7 +15,9 @@
         /// <param name="includePathExpressions">A list of dot-separated paths to include in the compound document.
         /// If this collection is null or empty, no linkage will be included.</param>
         /// <param name="topLevelMetadata">Metadata to serialize at the top level of the document</param>
+        /// <param name="resourceMetadata">Metadata about individual resource objects</param>
         /// <returns></returns>
-        ISingleResourceDocument BuildDocument(object primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata topLevelMetadata);
+        ISingleResourceDocument BuildDocument(object primaryData, string linkBaseUrl, string[] includePathExpressions, IMetadata topLevelMetadata,
+            IDictionary<object, IMetadata> resourceMetadata = null);
     }
 }

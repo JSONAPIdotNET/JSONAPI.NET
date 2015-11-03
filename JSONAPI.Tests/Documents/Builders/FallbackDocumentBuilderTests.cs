@@ -32,7 +32,7 @@ namespace JSONAPI.Tests.Documents.Builders
             var mockDocument = new Mock<ISingleResourceDocument>(MockBehavior.Strict);
 
             var singleResourceDocumentBuilder = new Mock<ISingleResourceDocumentBuilder>(MockBehavior.Strict);
-            singleResourceDocumentBuilder.Setup(b => b.BuildDocument(objectContent, It.IsAny<string>(), null, null)).Returns(mockDocument.Object);
+            singleResourceDocumentBuilder.Setup(b => b.BuildDocument(objectContent, It.IsAny<string>(), null, null, null)).Returns(mockDocument.Object);
 
             var mockQueryableDocumentBuilder = new Mock<IQueryableResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             var mockResourceCollectionDocumentBuilder = new Mock<IResourceCollectionDocumentBuilder>(MockBehavior.Strict);
@@ -113,7 +113,7 @@ namespace JSONAPI.Tests.Documents.Builders
             var mockQueryableDocumentBuilder = new Mock<IQueryableResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             var mockResourceCollectionDocumentBuilder = new Mock<IResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             mockResourceCollectionDocumentBuilder
-                .Setup(b => b.BuildDocument(items, "https://www.example.com/", It.IsAny<string[]>(), It.IsAny<IMetadata>()))
+                .Setup(b => b.BuildDocument(items, "https://www.example.com/", It.IsAny<string[]>(), It.IsAny<IMetadata>(), null))
                 .Returns(() => (mockDocument.Object));
 
             // Act

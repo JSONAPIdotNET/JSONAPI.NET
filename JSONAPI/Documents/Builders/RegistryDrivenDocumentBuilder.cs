@@ -46,9 +46,10 @@ namespace JSONAPI.Documents.Builders
         /// <param name="currentPath"></param>
         /// <param name="includePathExpressions"></param>
         /// <param name="linkBaseUrl"></param>
+        /// <param name="resourceObjectMetadata"></param>
         /// <returns></returns>
         protected ResourceObject CreateResourceObject(object modelObject, IDictionary<string, IDictionary<string, ResourceObject>> idDictionariesByType,
-            string currentPath, string[] includePathExpressions, string linkBaseUrl)
+            string currentPath, string[] includePathExpressions, string linkBaseUrl, IDictionary<object, IMetadata> resourceObjectMetadata)
         {
             if (modelObject == null) return null;
 
@@ -97,7 +98,7 @@ namespace JSONAPI.Documents.Builders
                                 if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
                                 {
                                     relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
-                                        childPath, includePathExpressions, linkBaseUrl);
+                                        childPath, includePathExpressions, linkBaseUrl, resourceObjectMetadata);
                                     idDictionary[identifier.Id] = relatedResourceObject;
                                 }
                             }
@@ -122,7 +123,7 @@ namespace JSONAPI.Documents.Builders
                             if (!idDictionary.TryGetValue(identifier.Id, out relatedResourceObject))
                             {
                                 relatedResourceObject = CreateResourceObject(relatedResource, idDictionariesByType,
-                                    childPath, includePathExpressions, linkBaseUrl);
+                                    childPath, includePathExpressions, linkBaseUrl, resourceObjectMetadata);
                                 idDictionary[identifier.Id] = relatedResourceObject;
                             }
 
@@ -142,7 +143,13 @@ namespace JSONAPI.Documents.Builders
             }
 
             var resourceId = resourceTypeRegistration.GetIdForResource(modelObject);
-            return new ResourceObject(resourceTypeRegistration.ResourceTypeName, resourceId, attributes, relationships);
+
+            IMetadata thisResourceObjectsMetadata;
+            if (resourceObjectMetadata != null)
+                resourceObjectMetadata.TryGetValue(modelObject, out thisResourceObjectsMetadata);
+            else
+                thisResourceObjectsMetadata = null;
+            return new ResourceObject(resourceTypeRegistration.ResourceTypeName, resourceId, attributes, relationships, metadata: thisResourceObjectsMetadata);
         }
 
         /// <summary>

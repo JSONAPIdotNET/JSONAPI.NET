@@ -80,7 +80,7 @@ namespace JSONAPI.Documents.Builders
                 var buildDocumentMethod =
                     _openBuildDocumentFromEnumerableMethod.Value.MakeGenericMethod(enumerableElementType);
                 return
-                    (dynamic)buildDocumentMethod.Invoke(_resourceCollectionDocumentBuilder, new[] { obj, linkBaseUrl, new string[] { }, null });
+                    (dynamic)buildDocumentMethod.Invoke(_resourceCollectionDocumentBuilder, new[] { obj, linkBaseUrl, new string[] { }, null, null });
             }
 
             // Single resource object
