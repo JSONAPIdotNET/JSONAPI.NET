@@ -85,6 +85,7 @@
     <Compile Include="ActionFilters\DefaultSortingTransformerTests.cs" />
     <Compile Include="ActionFilters\DefaultFilteringTransformerTests.cs" />
     <Compile Include="Core\DefaultNamingConventionsTests.cs" />
+    <Compile Include="Core\PrimitiveTypeAttributeValueConverterTests.cs" />
     <Compile Include="Core\EnumAttributeValueConverterTests.cs" />
     <Compile Include="Core\ResourceTypeRegistrarTests.cs" />
     <Compile Include="Core\ResourceTypeRegistryTests.cs" />
