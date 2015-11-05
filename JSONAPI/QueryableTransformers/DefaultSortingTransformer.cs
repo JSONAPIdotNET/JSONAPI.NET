@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
 using System.Reflection;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
@@ -25,22 +24,10 @@ namespace JSONAPI.QueryableTransformers
             _resourceTypeRegistry = resourceTypeRegistry;
         }
         
-        private const string SortQueryParamKey = "sort";
-
-        public IOrderedQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request)
+        public IOrderedQueryable<T> Sort<T>(IQueryable<T> query, string[] sortExpressions)
         {
-            var queryParams = request.GetQueryNameValuePairs();
-            var sortParam = queryParams.FirstOrDefault(kvp => kvp.Key == SortQueryParamKey);
-
-            string[] sortExpressions;
-            if (sortParam.Key != SortQueryParamKey)
-            {
-                sortExpressions = new[] { "id" }; // We have to sort by something, so make it the ID.
-            }
-            else
-            {
-                sortExpressions = sortParam.Value.Split(',');
-            }
+            if (sortExpressions == null || sortExpressions.Length == 0)
+                sortExpressions = new [] { "id" };
 
             var selectors = new List<ISelector<T>>();
             var usedProperties = new Dictionary<PropertyInfo, object>();

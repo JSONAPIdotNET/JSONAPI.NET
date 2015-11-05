@@ -23,6 +23,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IEntityFrameworkResourceObjectMaterializer _entityFrameworkResourceObjectMaterializer;
+        private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
 
         /// <summary>
@@ -34,6 +35,7 @@ namespace JSONAPI.EntityFramework.Http
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
+            ISortExpressionExtractor sortExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
             _dbContext = dbContext;
@@ -41,13 +43,15 @@ namespace JSONAPI.EntityFramework.Http
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _entityFrameworkResourceObjectMaterializer = entityFrameworkResourceObjectMaterializer;
+            _sortExpressionExtractor = sortExpressionExtractor;
             _baseUrlService = baseUrlService;
         }
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var query = _dbContext.Set<T>().AsQueryable();
-            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken);
+            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
+            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
@@ -127,8 +131,9 @@ namespace JSONAPI.EntityFramework.Http
                     _resourceTypeRegistration.ResourceTypeName, id));
 
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
+            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
 
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, cancellationToken);
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, sortExpressions, cancellationToken);
         }
 
         /// <summary>

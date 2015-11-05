@@ -17,6 +17,7 @@ namespace JSONAPI.Documents.Builders
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly IResourceCollectionDocumentBuilder _resourceCollectionDocumentBuilder;
+        private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
         private readonly Lazy<MethodInfo> _openBuildDocumentFromQueryableMethod;
         private readonly Lazy<MethodInfo> _openBuildDocumentFromEnumerableMethod;
@@ -27,11 +28,13 @@ namespace JSONAPI.Documents.Builders
         public FallbackDocumentBuilder(ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             IResourceCollectionDocumentBuilder resourceCollectionDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _resourceCollectionDocumentBuilder = resourceCollectionDocumentBuilder;
+            _sortExpressionExtractor = sortExpressionExtractor;
             _baseUrlService = baseUrlService;
 
             _openBuildDocumentFromQueryableMethod =
@@ -60,8 +63,10 @@ namespace JSONAPI.Documents.Builders
                 var buildDocumentMethod =
                     _openBuildDocumentFromQueryableMethod.Value.MakeGenericMethod(queryableElementType);
 
+                var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(requestMessage);
+
                 dynamic materializedQueryTask = buildDocumentMethod.Invoke(_queryableResourceCollectionDocumentBuilder,
-                    new[] { obj, requestMessage, cancellationToken, null });
+                    new[] { obj, requestMessage, sortExpressions, cancellationToken, null });
 
                 return await materializedQueryTask;
             }

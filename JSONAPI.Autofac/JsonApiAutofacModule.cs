@@ -157,6 +157,8 @@ namespace JSONAPI.Autofac
             builder.RegisterType<JsonApiExceptionFilterAttribute>().SingleInstance();
             builder.RegisterType<DefaultQueryableResourceCollectionDocumentBuilder>().As<IQueryableResourceCollectionDocumentBuilder>();
 
+            // Misc
+            builder.RegisterType<DefaultSortExpressionExtractor>().As<ISortExpressionExtractor>().SingleInstance();
         }
     }
 }

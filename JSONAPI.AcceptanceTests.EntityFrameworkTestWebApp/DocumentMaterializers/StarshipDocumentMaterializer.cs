@@ -21,10 +21,11 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
             TestDbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             IBaseUrlService baseUrlService, ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor,
             IQueryableEnumerationTransformer queryableEnumerationTransformer, IResourceTypeRegistry resourceTypeRegistry)
             : base(
                 queryableResourceCollectionDocumentBuilder, baseUrlService, singleResourceDocumentBuilder,
-                queryableEnumerationTransformer, resourceTypeRegistry)
+                queryableEnumerationTransformer, sortExpressionExtractor, resourceTypeRegistry)
         {
             _dbContext = dbContext;
         }

@@ -14,13 +14,17 @@ namespace JSONAPI.Http
     public abstract class QueryableToManyRelatedResourceDocumentMaterializer<TRelated> : IRelatedResourceDocumentMaterializer
     {
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
+        private readonly ISortExpressionExtractor _sortExpressionExtractor;
 
         /// <summary>
         /// Creates a new QueryableRelatedResourceDocumentMaterializer
         /// </summary>
-        protected QueryableToManyRelatedResourceDocumentMaterializer(IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder)
+        protected QueryableToManyRelatedResourceDocumentMaterializer(
+            IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor)
         {
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
+            _sortExpressionExtractor = sortExpressionExtractor;
         }
 
         public async Task<IJsonApiDocument> GetRelatedResourceDocument(string primaryResourceId, HttpRequestMessage request,
@@ -28,7 +32,10 @@ namespace JSONAPI.Http
         {
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
             var includes = GetIncludePaths();
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, cancellationToken, includes); // TODO: allow implementors to specify metadata
+            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
+            if (sortExpressions == null || sortExpressions.Length < 1)
+                sortExpressions = GetDefaultSortExpressions();
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes); // TODO: allow implementors to specify metadata
         }
 
         /// <summary>
@@ -41,6 +48,15 @@ namespace JSONAPI.Http
         /// </summary>
         /// <returns></returns>
         protected virtual string[] GetIncludePaths()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// If the client doesn't request any sort expressions, these expressions will be used for sorting instead.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetDefaultSortExpressions()
         {
             return null;
         }

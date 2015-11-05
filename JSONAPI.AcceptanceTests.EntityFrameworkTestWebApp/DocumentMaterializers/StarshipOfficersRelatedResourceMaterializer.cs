@@ -6,6 +6,7 @@ using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 using JSONAPI.EntityFramework.Http;
+using JSONAPI.Http;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializers
 {
@@ -15,8 +16,9 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
 
         public StarshipOfficersRelatedResourceMaterializer(ResourceTypeRelationship relationship, DbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
+            ISortExpressionExtractor sortExpressionExtractor,
             IResourceTypeRegistration primaryTypeRegistration)
-            : base(relationship, dbContext, queryableResourceCollectionDocumentBuilder, primaryTypeRegistration)
+            : base(relationship, dbContext, queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, primaryTypeRegistration)
         {
             _dbContext = dbContext;
         }

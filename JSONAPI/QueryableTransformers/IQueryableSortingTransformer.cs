@@ -12,9 +12,9 @@ namespace JSONAPI.QueryableTransformers
         /// Sorts the provided queryable based on information from the request message.
         /// </summary>
         /// <param name="query">The input query</param>
-        /// <param name="request">The request message</param>
+        /// <param name="sortExpressions">The expressions to sort by</param>
         /// <typeparam name="T">The element type of the query</typeparam>
         /// <returns>The sorted query</returns>
-        IOrderedQueryable<T> Sort<T>(IQueryable<T> query, HttpRequestMessage request);
+        IOrderedQueryable<T> Sort<T>(IQueryable<T> query, string[] sortExpressions);
     }
 }

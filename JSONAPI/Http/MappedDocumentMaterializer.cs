@@ -22,6 +22,7 @@ namespace JSONAPI.Http
         private readonly IBaseUrlService _baseUrlService;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IQueryableEnumerationTransformer _queryableEnumerationTransformer;
+        private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
 
         /// <summary>
@@ -47,12 +48,14 @@ namespace JSONAPI.Http
             IBaseUrlService baseUrlService,
             ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IQueryableEnumerationTransformer queryableEnumerationTransformer,
+            ISortExpressionExtractor sortExpressionExtractor,
             IResourceTypeRegistry resourceTypeRegistry)
         {
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _baseUrlService = baseUrlService;
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _queryableEnumerationTransformer = queryableEnumerationTransformer;
+            _sortExpressionExtractor = sortExpressionExtractor;
             _resourceTypeRegistry = resourceTypeRegistry;
         }
 
@@ -67,7 +70,11 @@ namespace JSONAPI.Http
             var includePaths = GetIncludePathsForQuery() ?? new Expression<Func<TDto, object>>[] { };
             var jsonApiPaths = includePaths.Select(ConvertToJsonKeyPath).ToArray();
             var mappedQuery = GetMappedQuery(entityQuery, includePaths);
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, cancellationToken, jsonApiPaths);
+            var sortationPaths = _sortExpressionExtractor.ExtractSortExpressions(request);
+            if (sortationPaths == null || !sortationPaths.Any())
+                sortationPaths = GetDefaultSortExpressions();
+
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(mappedQuery, request, sortationPaths, cancellationToken, jsonApiPaths);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
@@ -111,6 +118,15 @@ namespace JSONAPI.Http
         protected virtual Expression<Func<TDto, object>>[] GetIncludePathsForSingleResource()
         {
             return null;
+        }
+
+        /// <summary>
+        /// Hook for specifying sort expressions when fetching a collection
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetDefaultSortExpressions()
+        {
+            return new[] { "id" };
         }
 
         /// <summary>
