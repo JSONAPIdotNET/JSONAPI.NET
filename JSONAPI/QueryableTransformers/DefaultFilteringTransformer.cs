@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Web.Http;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Documents.Builders;
 
 namespace JSONAPI.QueryableTransformers
 {
@@ -79,11 +80,14 @@ namespace JSONAPI.QueryableTransformers
                 }
                 catch (TypeRegistrationNotFoundException)
                 {
-                    throw new HttpResponseException(HttpStatusCode.BadRequest);
+                    throw JsonApiException.CreateForBadRequest("No registration exists for the specified type");
                 }
 
                 var resourceTypeField = registration.GetFieldByName(filterField);
-                
+                if (resourceTypeField == null)
+                    throw JsonApiException.CreateForBadRequest(
+                        string.Format("No attribute {0} exists on the specified type.", filterField));
+
                 var queryValue = queryPair.Value;
                 if (string.IsNullOrWhiteSpace(queryValue))
                     queryValue = null;
@@ -100,7 +104,8 @@ namespace JSONAPI.QueryableTransformers
                 if (relationshipModelProperty != null)
                     expr = GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
 
-                if (expr == null) throw new HttpResponseException(HttpStatusCode.BadRequest);
+                if (expr == null) throw JsonApiException.CreateForBadRequest(
+                    string.Format("The attribute {0} is unsupported for filtering.", filterField));
 
                 workingExpr = workingExpr == null ? expr : Expression.AndAlso(workingExpr, expr);
             }
@@ -344,7 +349,7 @@ namespace JSONAPI.QueryableTransformers
             }
             catch (TypeRegistrationNotFoundException)
             {
-                throw new HttpResponseException(HttpStatusCode.BadRequest);
+                throw JsonApiException.CreateForBadRequest("No registration exists for the specified type");
             }
 
             var prop = resourceTypeProperty.Property;

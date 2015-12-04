@@ -9,6 +9,7 @@ using System.Web.Http;
 using FluentAssertions;
 using JSONAPI.ActionFilters;
 using JSONAPI.Core;
+using JSONAPI.Documents.Builders;
 using JSONAPI.QueryableTransformers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -1147,7 +1148,7 @@ namespace JSONAPI.Tests.ActionFilters
         public void Does_not_filter_unknown_type()
         {
             Action action = () => GetArray("http://api.example.com/dummies?filter[unknownTypeField]=asdfasd");
-            action.ShouldThrow<HttpResponseException>().Which.Response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            action.ShouldThrow<JsonApiException>().Which.Error.Status.Should().Be(HttpStatusCode.BadRequest);
         }
 
         #endregion
