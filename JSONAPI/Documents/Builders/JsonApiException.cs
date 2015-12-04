@@ -56,6 +56,21 @@ namespace JSONAPI.Documents.Builders
         }
 
         /// <summary>
+        /// Creates a JsonApiException to send a 400 Bad Request error.
+        /// </summary>
+        public static JsonApiException CreateForBadRequest(string detail = null)
+        {
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Status = HttpStatusCode.BadRequest,
+                Title = "Bad request",
+                Detail = detail
+            };
+            return new JsonApiException(error);
+        }
+
+        /// <summary>
         /// Creates a JsonApiException to send a 404 Not Found error.
         /// </summary>
         public static JsonApiException CreateForNotFound(string detail = null)
