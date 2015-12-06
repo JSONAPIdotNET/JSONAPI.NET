@@ -11,8 +11,8 @@
         bool IsToMany { get; }
 
         /// <summary>
-        /// The identifiers this linkage refers to. If IsToMany is true, this
-        /// property must return an array of length either 0 or 1. If false,
+        /// The identifiers this linkage refers to. If IsToMany is false, this
+        /// property must return an array of length either 0 or 1. If true,
         /// the array may be of any length. This property must not return null.
         /// </summary>
         IResourceIdentifier[] Identifiers { get; }
