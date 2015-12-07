@@ -74,7 +74,11 @@
     <Compile Include="Configuration\JsonApiConfiguration.cs" />
     <Compile Include="Configuration\ResourceTypeConfiguration.cs" />
     <Compile Include="Configuration\ResourceTypeRelationshipConfiguration.cs" />
+    <Compile Include="Core\DefaultEphemeralRelatedResourceCreator.cs" />
     <Compile Include="Core\DefaultNamingConventions.cs" />
+    <Compile Include="Core\EphemeralRelatedResourceReader.cs" />
+    <Compile Include="Core\IEphemeralRelatedResourceCreator.cs" />
+    <Compile Include="Core\IEphemeralRelatedResourceReader.cs" />
     <Compile Include="Core\INamingConventions.cs" />
     <Compile Include="Core\IResourceTypeRegistrar.cs" />
     <Compile Include="Core\PathVisitor.cs" />
