@@ -81,6 +81,7 @@
     <Compile Include="Core\IEphemeralRelatedResourceReader.cs" />
     <Compile Include="Core\INamingConventions.cs" />
     <Compile Include="Core\IResourceTypeRegistrar.cs" />
+    <Compile Include="Core\ObjectComplexAttributeValueConverter.cs" />
     <Compile Include="Core\PathVisitor.cs" />
     <Compile Include="Core\ResourceTypeAttribute.cs" />
     <Compile Include="Core\ResourceTypeRegistrar.cs" />

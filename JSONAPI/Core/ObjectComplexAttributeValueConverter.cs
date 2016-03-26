@@ -5,32 +5,35 @@ namespace JSONAPI.Core
 {
     /// <summary>
     /// Implementation of <see cref="IAttributeValueConverter" /> suitable for
-    /// use with complex attributes that deserialize to strings.
+    /// use with complex attributes that deserialize to custom types.
     /// </summary>
-    public class ComplexAttributeValueConverter : IAttributeValueConverter
+    public class ObjectComplexAttributeValueConverter : IAttributeValueConverter
     {
         private readonly PropertyInfo _property;
+        private readonly bool _isToMany;
 
         /// <summary>
         /// Creates a new ComplexAttributeValueConverter
         /// </summary>
         /// <param name="property"></param>
-        public ComplexAttributeValueConverter(PropertyInfo property)
+        /// <param name="isToMany"></param>
+        public ObjectComplexAttributeValueConverter(PropertyInfo property, bool isToMany)
         {
             _property = property;
+            _isToMany = isToMany;
         }
 
         public JToken GetValue(object resource)
         {
             var value = _property.GetValue(resource);
             if (value == null) return null;
-            return JToken.Parse(value.ToString());
+            return _isToMany ? (JToken)JArray.FromObject(value) : JObject.FromObject(value);
         }
 
         public void SetValue(object resource, JToken value)
         {
-            var serializedValue = value.ToString(); // TODO: this won't work if this converter is used for non-string properties
-            _property.SetValue(resource, serializedValue);
+            var deserialized = value?.ToObject(_property.PropertyType);
+            _property.SetValue(resource, deserialized);
         }
     }
 }

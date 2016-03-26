@@ -101,7 +101,15 @@ namespace JSONAPI.Core
         {
             var serializeAsComplexAttribute = prop.GetCustomAttribute<SerializeAsComplexAttribute>();
             if (serializeAsComplexAttribute != null)
-                return new ComplexAttributeValueConverter(prop);
+            {
+                if (prop.PropertyType == typeof (string))
+                    return new ComplexAttributeValueConverter(prop);
+
+                var isToMany =
+                    prop.PropertyType.IsArray ||
+                    (prop.PropertyType.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && prop.PropertyType.IsGenericType);
+                return new ObjectComplexAttributeValueConverter(prop, isToMany);
+            }
 
             if (prop.PropertyType == typeof(DateTime))
                 return new DateTimeAttributeValueConverter(prop, false);
@@ -150,7 +158,7 @@ namespace JSONAPI.Core
 
             var type = prop.PropertyType;
 
-            if (prop.PropertyType.CanWriteAsJsonApiAttribute())
+            if (prop.PropertyType.CanWriteAsJsonApiAttribute() || prop.GetCustomAttributes<SerializeAsComplexAttribute>().Any())
             {
                 var converter = GetValueConverterForProperty(prop);
                 return new ResourceTypeAttribute(converter, prop, jsonKey);
