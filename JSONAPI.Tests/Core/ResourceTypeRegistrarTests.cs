@@ -188,24 +188,37 @@ namespace JSONAPI.Tests.Core
         private void AssertAttribute<TPropertyType, TTokenType>(IResourceTypeRegistration reg, string attributeName,
             JToken tokenToSet, TPropertyType expectedPropertyValue, TTokenType expectedTokenAfterSet, Func<AttributeGrabBag, TPropertyType> getPropertyFunc)
         {
+            AssertAttributeHelper(reg, attributeName, tokenToSet, grabBag =>
+            {
+                var propertyValueAfterSet = getPropertyFunc(grabBag);
+                propertyValueAfterSet.Should().Be(expectedPropertyValue);
+            }, token =>
+            {
+                if (expectedTokenAfterSet == null)
+                    token.Should().BeNull();
+                else
+                {
+                    var convertedTokenValue = token.Value<TTokenType>();
+                    convertedTokenValue.Should().Be(expectedTokenAfterSet);
+                }
+            });
+        }
+
+        private void AssertAttributeHelper(IResourceTypeRegistration reg, string attributeName,
+            JToken tokenToSet, Action<AttributeGrabBag> testPropertyValueAfterSet,
+            Action<JToken> testTokenAfterSetAndGet)
+        {
             var grabBag = InitializeGrabBag();
 
             var field = reg.GetFieldByName(attributeName);
-            var attribute = (ResourceTypeAttribute) field;
+            var attribute = (ResourceTypeAttribute)field;
             attribute.JsonKey.Should().Be(attributeName);
 
             attribute.SetValue(grabBag, tokenToSet);
-            var propertyValueAfterSet = getPropertyFunc(grabBag);
-            propertyValueAfterSet.Should().Be(expectedPropertyValue);
-            
+            testPropertyValueAfterSet(grabBag);
+
             var convertedToken = attribute.GetValue(grabBag);
-            if (expectedTokenAfterSet == null)
-                convertedToken.Should().BeNull();
-            else
-            {
-                var convertedTokenValue = convertedToken.Value<TTokenType>();
-                convertedTokenValue.Should().Be(expectedTokenAfterSet);
-            }
+            testTokenAfterSetAndGet(convertedToken);
         }
 
         [TestMethod]
@@ -732,6 +745,69 @@ namespace JSONAPI.Tests.Core
             // Assert
             AssertAttribute(reg, "nullable-enum-field", (int)SampleEnum.Value1, SampleEnum.Value1, (int)SampleEnum.Value1, g => g.NullableEnumField);
             AssertAttribute(reg, "nullable-enum-field", null, null, (SampleEnum?)null, g => g.NullableEnumField);
+        }
+
+        [TestMethod]
+        public void BuildRegistration_sets_up_correct_attribute_for_to_one_complex_field()
+        {
+            // Arrange
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(new PluralizationService()));
+
+            // Act
+            var reg = registrar.BuildRegistration(typeof(AttributeGrabBag));
+
+            // Assert
+            AssertAttributeHelper(reg, "to-one-complex-type-field",
+                new JObject { { "intProp", 32 }, { "StringProp", "qux" } },
+                grabBag =>
+                {
+                    grabBag.ToOneComplexTypeField.Should().NotBeNull();
+                    grabBag.ToOneComplexTypeField.IntProp.Should().Be(32);
+                    grabBag.ToOneComplexTypeField.StringProp.Should().Be("qux");
+                },
+                token =>
+                {
+                    ((int)token["intProp"]).Should().Be(32);
+                    ((string)token["StringProp"]).Should().Be("qux");
+                });
+            AssertAttribute(reg, "to-one-complex-type-field", null, null, (SampleComplexType)null, g => g.ToOneComplexTypeField);
+        }
+
+        [TestMethod]
+        public void BuildRegistration_sets_up_correct_attribute_for_to_many_complex_field()
+        {
+            // Arrange
+            var registrar = new ResourceTypeRegistrar(new DefaultNamingConventions(new PluralizationService()));
+
+            // Act
+            var reg = registrar.BuildRegistration(typeof(AttributeGrabBag));
+
+            // Assert
+            AssertAttributeHelper(reg, "to-many-complex-type-field",
+                new JArray
+                {
+                    new JObject { { "intProp", 49 }, { "StringProp", "blue" } },
+                    new JObject { { "intProp", 67 }, { "StringProp", "orange" } }
+                },
+                grabBag =>
+                {
+                    var result = grabBag.ToManyComplexTypeField.ToArray();
+                    result.Length.Should().Be(2);
+                    result[0].IntProp.Should().Be(49);
+                    result[0].StringProp.Should().Be("blue");
+                    result[1].IntProp.Should().Be(67);
+                    result[1].StringProp.Should().Be("orange");
+                },
+                token =>
+                {
+                    var jarray = (JArray) token;
+                    jarray.Count.Should().Be(2);
+                    ((int)jarray[0]["intProp"]).Should().Be(49);
+                    ((string)jarray[0]["StringProp"]).Should().Be("blue");
+                    ((int)jarray[1]["intProp"]).Should().Be(67);
+                    ((string)jarray[1]["StringProp"]).Should().Be("orange");
+                });
+            AssertAttribute(reg, "to-many-complex-type-field", null, null, (SampleComplexType[])null, g => g.ToManyComplexTypeField);
         }
     }
 }

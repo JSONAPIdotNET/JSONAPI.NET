@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using JSONAPI.Attributes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace JSONAPI.Tests.Models
 {
@@ -7,6 +10,13 @@ namespace JSONAPI.Tests.Models
     {
         Value1 = 1,
         Value2 = 2
+    }
+
+    public class SampleComplexType
+    {
+        [JsonProperty("intProp")]
+        public Int32 IntProp { get; set; }
+        public string StringProp { get; set; }
     }
 
     public class AttributeGrabBag
@@ -48,5 +58,11 @@ namespace JSONAPI.Tests.Models
 
         [SerializeAsComplex]
         public string ComplexAttributeField { get; set; }
+
+        [SerializeAsComplex]
+        public SampleComplexType ToOneComplexTypeField { get; set; }
+
+        [SerializeAsComplex]
+        public virtual ICollection<SampleComplexType> ToManyComplexTypeField { get; set; }
     }
 }
