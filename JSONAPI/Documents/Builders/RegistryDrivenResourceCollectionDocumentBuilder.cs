@@ -27,8 +27,14 @@ namespace JSONAPI.Documents.Builders
                 primaryData.Select(d => (IResourceObject)CreateResourceObject(d, idDictionariesByType, null, includePathExpressions, linkBaseUrl, resourceMetadata))
                     .ToArray();
 
+            var primaryResourceIdentifiers = primaryDataResources.Select(r => new { r.Id, r.Type }).ToArray();
+
             var relatedData = idDictionariesByType.Values.SelectMany(d => d.Values).Cast<IResourceObject>().ToArray();
-            var document = new ResourceCollectionDocument(primaryDataResources, relatedData, metadata);
+            var relatedDataNotInPrimaryData = relatedData
+                .Where(r => !primaryResourceIdentifiers.Any(pri => pri.Id == r.Id && pri.Type == r.Type))
+                .ToArray();
+
+            var document = new ResourceCollectionDocument(primaryDataResources, relatedDataNotInPrimaryData, metadata);
             return document;
         }
     }
