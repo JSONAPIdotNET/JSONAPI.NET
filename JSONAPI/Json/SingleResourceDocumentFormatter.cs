@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -10,11 +11,18 @@ namespace JSONAPI.Json
     /// </summary>
     public class SingleResourceDocumentFormatter : ISingleResourceDocumentFormatter
     {
-        private readonly IResourceObjectFormatter _resourceObjectFormatter;
-        private readonly IMetadataFormatter _metadataFormatter;
+        private IResourceObjectFormatter _resourceObjectFormatter;
+        private IMetadataFormatter _metadataFormatter;
         private const string PrimaryDataKeyName = "data";
         private const string RelatedDataKeyName = "included";
         private const string MetaKeyName = "meta";
+
+        /// <summary>
+        /// Creates a SingleResourceDocumentFormatter with default parameters
+        /// </summary>
+        public SingleResourceDocumentFormatter()
+        {
+        }
 
         /// <summary>
         /// Creates a SingleResourceDocumentFormatter
@@ -27,13 +35,47 @@ namespace JSONAPI.Json
             _metadataFormatter = metadataFormatter;
         }
 
+        /// <summary>
+        /// The formatter to use for resource objects found in this document
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IResourceObjectFormatter ResourceObjectFormatter
+        {
+            get
+            {
+                return _resourceObjectFormatter ?? (_resourceObjectFormatter = new ResourceObjectFormatter());
+            }
+            set
+            {
+                if (_resourceObjectFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _resourceObjectFormatter = value;
+            }
+        }
+
+        /// <summary>
+        /// The formatter to use for document-level metadata
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IMetadataFormatter MetadataFormatter
+        {
+            get
+            {
+                return _metadataFormatter ?? (_metadataFormatter = new MetadataFormatter());
+            }
+            set
+            {
+                if (_metadataFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _metadataFormatter = value;
+            }
+        }
+
         public Task Serialize(ISingleResourceDocument document, JsonWriter writer)
         {
             writer.WriteStartObject();
 
             writer.WritePropertyName(PrimaryDataKeyName);
 
-            _resourceObjectFormatter.Serialize(document.PrimaryData, writer);
+            ResourceObjectFormatter.Serialize(document.PrimaryData, writer);
 
             if (document.RelatedData != null && document.RelatedData.Any())
             {
@@ -41,7 +83,7 @@ namespace JSONAPI.Json
                 writer.WriteStartArray();
                 foreach (var resourceObject in document.RelatedData)
                 {
-                    _resourceObjectFormatter.Serialize(resourceObject, writer);
+                    ResourceObjectFormatter.Serialize(resourceObject, writer);
                 }
                 writer.WriteEndArray();
             }
@@ -49,7 +91,7 @@ namespace JSONAPI.Json
             if (document.Metadata != null)
             {
                 writer.WritePropertyName(MetaKeyName);
-                _metadataFormatter.Serialize(document.Metadata, writer);
+                MetadataFormatter.Serialize(document.Metadata, writer);
             }
 
             writer.WriteEndObject();
@@ -83,7 +125,7 @@ namespace JSONAPI.Json
                         primaryData = await DeserializePrimaryData(reader, currentPath + "/" + PrimaryDataKeyName);
                         break;
                     case MetaKeyName:
-                        metadata = await _metadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
+                        metadata = await MetadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
                         break;
                     default:
                         reader.Skip();
@@ -98,7 +140,7 @@ namespace JSONAPI.Json
         {
             if (reader.TokenType == JsonToken.Null) return null;
 
-            var primaryData = await _resourceObjectFormatter.Deserialize(reader, currentPath);
+            var primaryData = await ResourceObjectFormatter.Deserialize(reader, currentPath);
             return primaryData;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -12,9 +13,9 @@ namespace JSONAPI.Json
     /// </summary>
     public class ResourceObjectFormatter : IResourceObjectFormatter
     {
-        private readonly IRelationshipObjectFormatter _relationshipObjectFormatter;
-        private readonly ILinkFormatter _linkFormatter;
-        private readonly IMetadataFormatter _metadataFormatter;
+        private IRelationshipObjectFormatter _relationshipObjectFormatter;
+        private ILinkFormatter _linkFormatter;
+        private IMetadataFormatter _metadataFormatter;
         private const string TypeKeyName = "type";
         private const string IdKeyName = "id";
         private const string AttributesKeyName = "attributes";
@@ -24,7 +25,15 @@ namespace JSONAPI.Json
         private const string SelfLinkKeyName = "self";
 
         /// <summary>
-        /// Constructs a new resourceObjectFormatter
+        /// Constructs a new ResourceObjectFormatter
+        /// </summary>
+        public ResourceObjectFormatter()
+        {
+            
+        }
+
+        /// <summary>
+        /// Constructs a new ResourceObjectFormatter
         /// </summary>
         /// <param name="relationshipObjectFormatter">The formatter to use for relationship objects</param>
         /// <param name="linkFormatter">The formatter to use for links</param>
@@ -34,6 +43,57 @@ namespace JSONAPI.Json
             _relationshipObjectFormatter = relationshipObjectFormatter;
             _linkFormatter = linkFormatter;
             _metadataFormatter = metadataFormatter;
+        }
+
+        /// <summary>
+        /// The formatter to use for relationship objects belonging to this resource
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IRelationshipObjectFormatter RelationshipObjectFormatter
+        {
+            get
+            {
+                return _relationshipObjectFormatter ?? (_relationshipObjectFormatter = new RelationshipObjectFormatter());
+            }
+            set
+            {
+                if (_relationshipObjectFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _relationshipObjectFormatter = value;
+            }
+        }
+
+        /// <summary>
+        /// The formatter to use for links
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public ILinkFormatter LinkFormatter
+        {
+            get
+            {
+                return _linkFormatter ?? (_linkFormatter = new LinkFormatter());
+            }
+            set
+            {
+                if (_linkFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _linkFormatter = value;
+            }
+        }
+
+        /// <summary>
+        /// The formatter to use for metadata that belongs to this resource object
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IMetadataFormatter MetadataFormatter
+        {
+            get
+            {
+                return _metadataFormatter ?? (_metadataFormatter = new MetadataFormatter());
+            }
+            set
+            {
+                if (_metadataFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _metadataFormatter = value;
+            }
         }
 
         public Task Serialize(IResourceObject resourceObject, JsonWriter writer)
@@ -88,7 +148,7 @@ namespace JSONAPI.Json
                     {
                         if (relationship.Value == null) continue;
                         writer.WritePropertyName(relationship.Key);
-                        _relationshipObjectFormatter.Serialize(relationship.Value, writer);
+                        RelationshipObjectFormatter.Serialize(relationship.Value, writer);
                     }
                     writer.WriteEndObject();
                 }
@@ -99,14 +159,14 @@ namespace JSONAPI.Json
                 writer.WritePropertyName(LinksKeyName);
                 writer.WriteStartObject();
                 writer.WritePropertyName(SelfLinkKeyName);
-                _linkFormatter.Serialize(resourceObject.SelfLink, writer);
+                LinkFormatter.Serialize(resourceObject.SelfLink, writer);
                 writer.WriteEndObject();
             }
 
             if (resourceObject.Metadata != null)
             {
                 writer.WritePropertyName(MetaKeyName);
-                _metadataFormatter.Serialize(resourceObject.Metadata, writer);
+                MetadataFormatter.Serialize(resourceObject.Metadata, writer);
             }
 
             writer.WriteEndObject();
@@ -142,7 +202,7 @@ namespace JSONAPI.Json
                         id = (string) reader.Value;
                         break;
                     case MetaKeyName:
-                        metadata = await _metadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
+                        metadata = await MetadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
                         break;
                     case AttributesKeyName:
                         attributes = DeserializeAttributes(reader, currentPath + "/" + AttributesKeyName);
@@ -202,7 +262,7 @@ namespace JSONAPI.Json
                 var relationshipName = (string)reader.Value;
                 reader.Read();
 
-                var relationship = await _relationshipObjectFormatter.Deserialize(reader, currentPath + "/" + relationshipName);
+                var relationship = await RelationshipObjectFormatter.Deserialize(reader, currentPath + "/" + relationshipName);
                 relationships.Add(relationshipName, relationship);
             }
 
