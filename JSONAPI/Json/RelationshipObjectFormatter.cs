@@ -16,9 +16,17 @@ namespace JSONAPI.Json
         private const string LinkageKeyName = "data";
         private const string MetaKeyName = "meta";
 
-        private readonly ILinkFormatter _linkFormatter;
-        private readonly IResourceLinkageFormatter _resourceLinkageFormatter;
-        private readonly IMetadataFormatter _metadataFormatter;
+        private ILinkFormatter _linkFormatter;
+        private IResourceLinkageFormatter _resourceLinkageFormatter;
+        private IMetadataFormatter _metadataFormatter;
+
+        /// <summary>
+        /// Creates a new RelationshipObjectFormatter
+        /// </summary>
+        public RelationshipObjectFormatter ()
+        {
+            
+        }
 
         /// <summary>
         /// Creates a new RelationshipObjectFormatter
@@ -28,6 +36,45 @@ namespace JSONAPI.Json
             _linkFormatter = linkFormatter;
             _resourceLinkageFormatter = resourceLinkageFormatter;
             _metadataFormatter = metadataFormatter;
+        }
+
+        private ILinkFormatter LinkFormatter
+        {
+            get
+            {
+                return _linkFormatter ?? (_linkFormatter = new LinkFormatter());
+            }
+            set
+            {
+                if (_linkFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _linkFormatter = value;
+            }
+        }
+
+        private IResourceLinkageFormatter ResourceLinkageFormatter
+        {
+            get
+            {
+                return _resourceLinkageFormatter ?? (_resourceLinkageFormatter = new ResourceLinkageFormatter());
+            }
+            set
+            {
+                if (_resourceLinkageFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _resourceLinkageFormatter = value;
+            }
+        }
+
+        private IMetadataFormatter MetadataFormatter
+        {
+            get
+            {
+                return _metadataFormatter ?? (_metadataFormatter = new MetadataFormatter());
+            }
+            set
+            {
+                if (_metadataFormatter != null) throw new InvalidOperationException("This property can only be set once.");
+                _metadataFormatter = value;
+            }
         }
 
         public Task Serialize(IRelationshipObject relationshipObject, JsonWriter writer)
@@ -60,12 +107,12 @@ namespace JSONAPI.Json
                 if (relationshipObject.SelfLink != null)
                 {
                     writer.WritePropertyName(SelfLinkKeyName);
-                    _linkFormatter.Serialize(relationshipObject.SelfLink, writer);
+                    LinkFormatter.Serialize(relationshipObject.SelfLink, writer);
                 }
                 if (relationshipObject.RelatedResourceLink != null)
                 {
                     writer.WritePropertyName(RelatedLinkKeyName);
-                    _linkFormatter.Serialize(relationshipObject.RelatedResourceLink, writer);
+                    LinkFormatter.Serialize(relationshipObject.RelatedResourceLink, writer);
                 }
 
                 writer.WriteEndObject();
@@ -80,7 +127,7 @@ namespace JSONAPI.Json
             if (relationshipObject.Linkage != null)
             {
                 writer.WritePropertyName(LinkageKeyName);
-                _resourceLinkageFormatter.Serialize(relationshipObject.Linkage, writer);
+                ResourceLinkageFormatter.Serialize(relationshipObject.Linkage, writer);
             }
         }
 
@@ -92,7 +139,7 @@ namespace JSONAPI.Json
             if (relationshipObject.Metadata != null)
             {
                 writer.WritePropertyName(MetaKeyName);
-                _metadataFormatter.Serialize(relationshipObject.Metadata, writer);
+                MetadataFormatter.Serialize(relationshipObject.Metadata, writer);
             }
         }
 
@@ -114,10 +161,10 @@ namespace JSONAPI.Json
                 switch (propertyName)
                 {
                     case LinkageKeyName:
-                        linkage = await _resourceLinkageFormatter.Deserialize(reader, currentPath + "/" + LinkageKeyName);
+                        linkage = await ResourceLinkageFormatter.Deserialize(reader, currentPath + "/" + LinkageKeyName);
                         break;
                     case MetaKeyName:
-                        metadata = await _metadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
+                        metadata = await MetadataFormatter.Deserialize(reader, currentPath + "/" + MetaKeyName);
                         break;
                 }
             }
