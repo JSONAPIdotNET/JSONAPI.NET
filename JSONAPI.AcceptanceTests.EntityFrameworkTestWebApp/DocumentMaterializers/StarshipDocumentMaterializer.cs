@@ -62,7 +62,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
             throw new NotImplementedException();
         }
 
-        public override Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken)
+        public override Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
