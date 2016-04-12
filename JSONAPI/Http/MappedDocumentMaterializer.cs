@@ -102,8 +102,8 @@ namespace JSONAPI.Http
             HttpRequestMessage request,
             CancellationToken cancellationToken);
 
-        public abstract Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken);
-
+        public abstract Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken);
+        
         /// <summary>
         /// Returns a list of property paths to be included when constructing a query for this resource type
         /// </summary>

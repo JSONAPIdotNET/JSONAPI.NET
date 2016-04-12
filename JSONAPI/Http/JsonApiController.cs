@@ -78,7 +78,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> Delete(string resourceType, string id, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
-            var document = await materializer.DeleteRecord(id, cancellationToken);
+            var document = await materializer.DeleteRecord(id, Request, cancellationToken);
             return Ok(document);
         }
     }

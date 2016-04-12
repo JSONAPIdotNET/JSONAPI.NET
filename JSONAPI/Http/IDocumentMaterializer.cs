@@ -39,6 +39,6 @@ namespace JSONAPI.Http
         /// <summary>
         /// Deletes the record corresponding to the given id.
         /// </summary>
-        Task<IJsonApiDocument> DeleteRecord(string id, CancellationToken cancellationToken);
+        Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken);
     }
 }
