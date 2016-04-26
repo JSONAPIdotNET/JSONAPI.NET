@@ -2,11 +2,8 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Web.Http;
-using JSONAPI.ActionFilters;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 
@@ -83,41 +80,50 @@ namespace JSONAPI.QueryableTransformers
                     throw JsonApiException.CreateForBadRequest("No registration exists for the specified type");
                 }
 
-                var resourceTypeField = registration.GetFieldByName(filterField);
-                if (resourceTypeField == null)
-                    throw JsonApiException.CreateForBadRequest(
-                        string.Format("No attribute {0} exists on the specified type.", filterField));
-
-                var queryValue = queryPair.Value;
-                if (string.IsNullOrWhiteSpace(queryValue))
-                    queryValue = null;
-
-                Expression expr = null;
-
-                // See if it is a field property
-                var fieldModelProperty = resourceTypeField as ResourceTypeAttribute;
-                if (fieldModelProperty != null)
-                    expr = GetPredicateBodyForField(fieldModelProperty, queryValue, param);
-
-                // See if it is a relationship property
-                var relationshipModelProperty = resourceTypeField as ResourceTypeRelationship;
-                if (relationshipModelProperty != null)
-                    expr = GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
-
-                if (expr == null) throw JsonApiException.CreateForBadRequest(
-                    string.Format("The attribute {0} is unsupported for filtering.", filterField));
-
+                var expr = GetPredicate(filterField, registration, param, queryPair.Value);
                 workingExpr = workingExpr == null ? expr : Expression.AndAlso(workingExpr, expr);
             }
 
             return workingExpr ?? Expression.Constant(true); // No filters, so return everything
         }
 
+        private Expression GetPredicate(string filterField, IResourceTypeRegistration registration, ParameterExpression param, string queryValue)
+        {
+            if (filterField == "id")
+                return GetPredicateBodyForProperty(registration.IdProperty, queryValue, param);
+
+            var resourceTypeField = registration.GetFieldByName(filterField);
+            if (resourceTypeField == null)
+                throw JsonApiException.CreateForBadRequest(
+                    string.Format("No attribute {0} exists on the specified type.", filterField));
+
+            if (string.IsNullOrWhiteSpace(queryValue))
+                queryValue = null;
+
+            // See if it is a field property
+            var fieldModelProperty = resourceTypeField as ResourceTypeAttribute;
+            if (fieldModelProperty != null)
+                return GetPredicateBodyForField(fieldModelProperty, queryValue, param);
+
+            // See if it is a relationship property
+            var relationshipModelProperty = resourceTypeField as ResourceTypeRelationship;
+            if (relationshipModelProperty != null)
+                return GetPredicateBodyForRelationship(relationshipModelProperty, queryValue, param);
+
+            throw JsonApiException.CreateForBadRequest(
+                string.Format("The attribute {0} is unsupported for filtering.", filterField));
+        }
+        
+        private Expression GetPredicateBodyForField(ResourceTypeAttribute resourceTypeAttribute, string queryValue,
+            ParameterExpression param)
+        {
+            return GetPredicateBodyForProperty(resourceTypeAttribute.Property, queryValue, param);
+        }
+
         // ReSharper disable once FunctionComplexityOverflow
         // TODO: should probably break this method up
-        private Expression GetPredicateBodyForField(ResourceTypeAttribute resourceTypeAttribute, string queryValue, ParameterExpression param)
+        private Expression GetPredicateBodyForProperty(PropertyInfo prop, string queryValue, ParameterExpression param)
         {
-            var prop = resourceTypeAttribute.Property;
             var propertyType = prop.PropertyType;
 
             Expression expr;

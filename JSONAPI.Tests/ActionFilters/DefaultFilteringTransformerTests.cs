@@ -560,6 +560,21 @@ namespace JSONAPI.Tests.ActionFilters
         #region String
 
         [TestMethod]
+        public void Filters_by_matching_string_id_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[id]=100");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+
+        [TestMethod]
+        public void Filters_by_missing_string_id_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[id]=");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
         public void Filters_by_matching_string_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=String value 1");
