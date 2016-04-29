@@ -47,7 +47,9 @@ namespace JSONAPI.Core
         public string GetIdForResource(object resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            return IdProperty.GetValue(resource).ToString();
+            var resourceId = IdProperty.GetValue(resource);
+            if (resourceId == null) throw new ArgumentException($"The ID for the provided `{ResourceTypeName}` resource is null.");
+            return resourceId.ToString();
         }
 
         public void SetIdForResource(object resource, string id)
