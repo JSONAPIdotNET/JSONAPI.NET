@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using JSONAPI.Http;
 
 namespace JSONAPI.Core
 {
@@ -22,6 +21,9 @@ namespace JSONAPI.Core
             Func<ParameterExpression, string, BinaryExpression> filterByIdExpressionFactory,
             Func<ParameterExpression, Expression> sortByIdExpressionFactory)
         {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (idProperty == null) throw new ArgumentNullException(nameof(idProperty));
+            if (resourceTypeName == null) throw new ArgumentNullException(nameof(resourceTypeName));
             IdProperty = idProperty;
             Type = type;
             ResourceTypeName = resourceTypeName;
@@ -44,11 +46,13 @@ namespace JSONAPI.Core
 
         public string GetIdForResource(object resource)
         {
+            if (resource == null) throw new ArgumentNullException(nameof(resource));
             return IdProperty.GetValue(resource).ToString();
         }
 
         public void SetIdForResource(object resource, string id)
         {
+            if (resource == null) throw new ArgumentNullException(nameof(resource));
             IdProperty.SetValue(resource, id); // TODO: handle classes with non-string ID types
         }
 
