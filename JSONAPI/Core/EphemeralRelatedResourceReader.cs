@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using JSONAPI.Documents;
 using JSONAPI.Json;
 
@@ -13,11 +11,34 @@ namespace JSONAPI.Core
     /// Populates property values on an ephemeral resource
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Obsolete]
     public class EphemeralRelatedResourceReader<T> : IEphemeralRelatedResourceReader<T>
+    {
+        private readonly IEphemeralRelatedResourceReader _ephemeralRelatedResourceReader;
+
+        /// <summary>
+        /// Creates a new EphemeralRelatedResourceReader
+        /// </summary>
+        /// <param name="ephemeralRelatedResourceReader"></param>
+        public EphemeralRelatedResourceReader(IEphemeralRelatedResourceReader ephemeralRelatedResourceReader)
+        {
+            _ephemeralRelatedResourceReader = ephemeralRelatedResourceReader;
+        }
+
+        public void SetProperty(T ephemeralResource, string jsonKey, IRelationshipObject relationshipObject)
+        {
+            _ephemeralRelatedResourceReader.SetProperty(ephemeralResource, jsonKey, relationshipObject);
+        }
+    }
+
+    /// <summary>
+    /// Populates property values on an ephemeral resource
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class EphemeralRelatedResourceReader : IEphemeralRelatedResourceReader
     {
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
         private readonly IEphemeralRelatedResourceCreator _ephemeralRelatedResourceCreator;
-        private readonly Lazy<IResourceTypeRegistration> _resourceTypeRegistration;
         private readonly MethodInfo _openSetToManyRelationshipValueMethod;
 
         /// <summary>
@@ -29,14 +50,14 @@ namespace JSONAPI.Core
         {
             _resourceTypeRegistry = resourceTypeRegistry;
             _ephemeralRelatedResourceCreator = ephemeralRelatedResourceCreator;
-            _resourceTypeRegistration = new Lazy<IResourceTypeRegistration>(() => _resourceTypeRegistry.GetRegistrationForType(typeof(T)));
             _openSetToManyRelationshipValueMethod = GetType()
                 .GetMethod("SetToManyRelationshipValue", BindingFlags.NonPublic | BindingFlags.Instance);
         }
 
-        public void SetProperty(T ephemeralResource, string jsonKey, IRelationshipObject relationshipObject)
+        public void SetProperty<T>(T ephemeralResource, string jsonKey, IRelationshipObject relationshipObject)
         {
-            var relationship = _resourceTypeRegistration.Value.GetFieldByName(jsonKey) as ResourceTypeRelationship;
+            var resourceTypeRegistration = new Lazy<IResourceTypeRegistration>(() => _resourceTypeRegistry.GetRegistrationForType(typeof(T)));
+            var relationship = resourceTypeRegistration.Value.GetFieldByName(jsonKey) as ResourceTypeRelationship;
             if (relationship == null) return;
 
             if (relationship.IsToMany)
@@ -45,7 +66,7 @@ namespace JSONAPI.Core
                 SetPropertyForToOneRelationship(ephemeralResource, relationship, relationshipObject.Linkage);
         }
 
-        protected virtual void SetPropertyForToOneRelationship(T ephemeralResource, ResourceTypeRelationship relationship, IResourceLinkage linkage)
+        protected virtual void SetPropertyForToOneRelationship<T>(T ephemeralResource, ResourceTypeRelationship relationship, IResourceLinkage linkage)
         {
             if (linkage == null)
                 throw new DeserializationException("Missing linkage for to-one relationship",
@@ -70,7 +91,7 @@ namespace JSONAPI.Core
             }
         }
 
-        protected virtual void SetPropertyForToManyRelationship(T ephemeralResource, ResourceTypeRelationship relationship,
+        protected virtual void SetPropertyForToManyRelationship<T>(T ephemeralResource, ResourceTypeRelationship relationship,
             IResourceLinkage linkage)
         {
             if (linkage == null)
