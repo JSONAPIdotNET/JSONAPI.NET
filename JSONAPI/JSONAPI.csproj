@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\LinkSettingsAttribute.cs" />
     <Compile Include="Configuration\IResourceTypeConfiguration.cs" />
     <Compile Include="Configuration\IResourceTypeConfigurator.cs" />
     <Compile Include="Configuration\IResourceTypeRelationshipConfiguration.cs" />

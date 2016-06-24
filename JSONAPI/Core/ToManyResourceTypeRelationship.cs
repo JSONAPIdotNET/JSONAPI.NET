@@ -9,8 +9,8 @@ namespace JSONAPI.Core
     public sealed class ToManyResourceTypeRelationship : ResourceTypeRelationship
     {
         internal ToManyResourceTypeRelationship(PropertyInfo property, string jsonKey, Type relatedType,
-            string selfLinkTemplate, string relatedResourceLinkTemplate)
-            : base(property, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true)
+            string selfLinkTemplate, string relatedResourceLinkTemplate, bool serializeRelationshipLink = true, bool serializeRelatedResourceLink = true)
+            : base(property, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate, true, serializeRelationshipLink, serializeRelatedResourceLink)
         {
         }
     }

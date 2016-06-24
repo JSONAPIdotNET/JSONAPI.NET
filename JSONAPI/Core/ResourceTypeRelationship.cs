@@ -9,13 +9,16 @@ namespace JSONAPI.Core
     public abstract class ResourceTypeRelationship : ResourceTypeField
     {
         internal ResourceTypeRelationship(PropertyInfo property, string jsonKey, Type relatedType,
-            string selfLinkTemplate, string relatedResourceLinkTemplate, bool isToMany)
+            string selfLinkTemplate, string relatedResourceLinkTemplate, bool isToMany,
+            bool serializeRelationshipLink = true, bool serializeRelatedResourceLink = true)
             : base(property, jsonKey)
         {
             RelatedType = relatedType;
             SelfLinkTemplate = selfLinkTemplate;
             RelatedResourceLinkTemplate = relatedResourceLinkTemplate;
             IsToMany = isToMany;
+            SerializeRelationshipLink = serializeRelationshipLink;
+            SerializeRelatedResourceLink = serializeRelatedResourceLink;
         }
 
         /// <summary>
@@ -41,5 +44,17 @@ namespace JSONAPI.Core
         /// relationship belongs to.
         /// </summary>
         public string RelatedResourceLinkTemplate { get; private set; }
+
+        /// <summary>
+        /// Whether to include a link to the relationship URL when serializing relationship objects for
+        /// this relationship
+        /// </summary>
+        public bool SerializeRelationshipLink { get; private set; }
+
+        /// <summary>
+        /// Whether to include a link to the related resource URL when serializing relationship objects for
+        /// this relationship
+        /// </summary>
+        public bool SerializeRelatedResourceLink { get; private set; }
     }
 }

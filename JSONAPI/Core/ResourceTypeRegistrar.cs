@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using JSONAPI.Attributes;
-using JSONAPI.Configuration;
 using JSONAPI.Extensions;
 using Newtonsoft.Json;
 
@@ -165,17 +164,23 @@ namespace JSONAPI.Core
             }
 
             var selfLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelationshipLinkTemplate>().FirstOrDefault();
-            var selfLinkTemplate = selfLinkTemplateAttribute == null ? null : selfLinkTemplateAttribute.TemplateString;
+            var selfLinkTemplate = selfLinkTemplateAttribute?.TemplateString;
             var relatedResourceLinkTemplateAttribute = prop.GetCustomAttributes().OfType<RelatedResourceLinkTemplate>().FirstOrDefault();
-            var relatedResourceLinkTemplate = relatedResourceLinkTemplateAttribute == null ? null : relatedResourceLinkTemplateAttribute.TemplateString;
+            var relatedResourceLinkTemplate = relatedResourceLinkTemplateAttribute?.TemplateString;
 
             var isToMany =
                 type.IsArray ||
                 (type.GetInterfaces().Contains(typeof(System.Collections.IEnumerable)) && type.IsGenericType);
 
-            if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, type, selfLinkTemplate, relatedResourceLinkTemplate);
+            var linkSettingsAttribute = prop.GetCustomAttributes().OfType<LinkSettingsAttribute>().FirstOrDefault();
+            var serializeRelationshipLink = linkSettingsAttribute == null || linkSettingsAttribute.SerializeRelationshipLink;
+            var serializeRelatedResourceLink = linkSettingsAttribute == null || linkSettingsAttribute.SerializeRelatedResourceLink;
+
+            if (!isToMany) return new ToOneResourceTypeRelationship(prop, jsonKey, type, selfLinkTemplate, relatedResourceLinkTemplate,
+                serializeRelationshipLink, serializeRelatedResourceLink);
             var relatedType = type.IsGenericType ? type.GetGenericArguments()[0] : type.GetElementType();
-            return new ToManyResourceTypeRelationship(prop, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate);
+            return new ToManyResourceTypeRelationship(prop, jsonKey, relatedType, selfLinkTemplate, relatedResourceLinkTemplate,
+                serializeRelationshipLink, serializeRelatedResourceLink);
         }
 
         /// <summary>

@@ -10,6 +10,8 @@ namespace JSONAPI.Documents
     {
         public ILink GetRelationshipLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl)
         {
+            if (!property.SerializeRelationshipLink) return null;
+
             var url = BuildRelationshipUrl(relationshipOwner, resourceTypeRegistry, property, baseUrl);
             var metadata = GetMetadataForRelationshipLink(relationshipOwner, property);
             return new Link(url, metadata);
@@ -17,6 +19,8 @@ namespace JSONAPI.Documents
 
         public ILink GetRelatedResourceLink<TResource>(TResource relationshipOwner, IResourceTypeRegistry resourceTypeRegistry, ResourceTypeRelationship property, string baseUrl)
         {
+            if (!property.SerializeRelatedResourceLink) return null;
+
             var url = BuildRelatedResourceUrl(relationshipOwner, resourceTypeRegistry, property, baseUrl);
             var metadata = GetMetadataForRelatedResourceLink(relationshipOwner, property);
             return new Link(url, metadata);
