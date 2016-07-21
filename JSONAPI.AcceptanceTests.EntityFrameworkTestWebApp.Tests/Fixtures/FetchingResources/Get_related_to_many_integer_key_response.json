@@ -1,0 +1,34 @@
+﻿{
+    "data": [
+        {
+            "type": "children",
+            "id": "7501",
+            "attributes": {
+                "child-description": "Child 2 Description"
+            },
+            "relationships": {
+                "master": {
+                    "links": {
+                        "self": "https://www.example.com/children/7501/relationships/master",
+                        "related": "https://www.example.com/children/7501/master"
+                    }
+                }
+            }
+        },
+        {
+            "type": "children",
+            "id": "7502",
+            "attributes": {
+                "child-description": "Child 3 Description"
+            },
+            "relationships": {
+                "master": {
+                    "links": {
+                        "self": "https://www.example.com/children/7502/relationships/master",
+                        "related": "https://www.example.com/children/7502/master"
+                    }
+                }
+            }
+        }
+    ]
+}

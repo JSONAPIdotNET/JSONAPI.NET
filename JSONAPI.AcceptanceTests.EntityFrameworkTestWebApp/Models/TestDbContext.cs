@@ -47,5 +47,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
         public DbSet<StarshipClass> StarshipClasses { get; set; }
         public DbSet<Officer> Officers { get; set; }
         public DbSet<StarshipOfficerLink> StarshipOfficerLinks { get; set; }
+        public DbSet<Master> Masters { get; set; }
+        public DbSet<Child> Children { get; set; }
     }
 }

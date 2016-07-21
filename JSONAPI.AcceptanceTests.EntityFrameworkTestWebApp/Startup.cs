@@ -13,6 +13,7 @@ using JSONAPI.Configuration;
 using JSONAPI.EntityFramework;
 using JSONAPI.EntityFramework.Configuration;
 using Owin;
+using System.Collections.Generic;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 {
@@ -33,7 +34,9 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 
         public void Configuration(IAppBuilder app)
         {
-            var configuration = new JsonApiConfiguration();
+            var configuration = new JsonApiConfiguration(
+                new Core.PluralizationService( 
+                    new Dictionary<string, string> { { "Child", "Children" } }));
             configuration.RegisterEntityFrameworkResourceType<Building>();
             configuration.RegisterEntityFrameworkResourceType<City>();
             configuration.RegisterEntityFrameworkResourceType<Comment>();
@@ -58,6 +61,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                     rc => rc.UseMaterializer<StarshipShipCounselorRelatedResourceMaterializer>());
             }); // Example of a resource that is mapped from a DB entity
             configuration.RegisterResourceType<StarshipOfficerDto>();
+            configuration.RegisterEntityFrameworkResourceType<Master>();
+            configuration.RegisterEntityFrameworkResourceType<Child>();
 
             var configurator = new JsonApiHttpAutofacConfigurator();
             configurator.OnApplicationLifetimeScopeCreating(builder =>
