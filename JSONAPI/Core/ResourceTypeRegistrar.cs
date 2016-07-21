@@ -77,7 +77,7 @@ namespace JSONAPI.Core
                 filterByIdFactory = (param, id) =>
                 {
                     var propertyExpr = Expression.Property(param, idProperty);
-                    var idExpr = Expression.Constant(id);
+                    var idExpr = Expression.Constant(Convert.ChangeType(id, idProperty.PropertyType));
                     return Expression.Equal(propertyExpr, idExpr);
                 };
             }

@@ -183,5 +183,18 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
                     HttpStatusCode.OK);
             }
         }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\Master.csv", @"Data")]
+        [DeploymentItem(@"Data\Child.csv", @"Data")]
+        public async Task Get_related_to_many_integer_key()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "masters/1501/children");
+                                                                   
+                await AssertResponseContent(response, @"Fixtures\FetchingResources\Get_related_to_many_integer_key_response.json", HttpStatusCode.OK);
+            }
+        }
     }
 }
