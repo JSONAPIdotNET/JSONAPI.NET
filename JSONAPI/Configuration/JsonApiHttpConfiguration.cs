@@ -34,7 +34,8 @@ namespace JSONAPI.Configuration
         /// Applies the running configuration to an HttpConfiguration instance
         /// </summary>
         /// <param name="httpConfig">The HttpConfiguration to apply this JsonApiHttpConfiguration to</param>
-        public void Apply(HttpConfiguration httpConfig)
+        /// <param name="jsonApiConfiguration">configuration holding BaseUrlService wich could provide a context path.</param>
+        public void Apply(HttpConfiguration httpConfig, IJsonApiConfiguration jsonApiConfiguration)
         {
             httpConfig.Formatters.Clear();
             httpConfig.Formatters.Add(_formatter);
@@ -42,10 +43,16 @@ namespace JSONAPI.Configuration
             httpConfig.Filters.Add(_fallbackDocumentBuilderAttribute);
             httpConfig.Filters.Add(_jsonApiExceptionFilterAttribute);
 
+            var contextPath = jsonApiConfiguration.CustomBaseUrlService?.GetContextPath();
+            if (contextPath != null && !contextPath.Equals(string.Empty))
+            {
+                contextPath += "/";
+            }
+
             // Web API routes
-            httpConfig.Routes.MapHttpRoute("ResourceCollection", "{resourceType}", new { controller = "Main" });
-            httpConfig.Routes.MapHttpRoute("Resource", "{resourceType}/{id}", new { controller = "Main" });
-            httpConfig.Routes.MapHttpRoute("RelatedResource", "{resourceType}/{id}/{relationshipName}", new { controller = "Main" });
+            httpConfig.Routes.MapHttpRoute("ResourceCollection", contextPath + "{resourceType}", new { controller = "Main" });
+            httpConfig.Routes.MapHttpRoute("Resource", contextPath + "{resourceType}/{id}", new { controller = "Main" });
+            httpConfig.Routes.MapHttpRoute("RelatedResource", contextPath + "{resourceType}/{id}/{relationshipName}", new { controller = "Main" });
         }
     }
 }
