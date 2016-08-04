@@ -132,6 +132,12 @@
     <None Include="Data\Officer.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\PostLongId.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\PostID.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\StarshipOfficerLink.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -240,6 +246,14 @@
     <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_one_response.json" />
     <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_many_response.json" />
     <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_integer_key_response.json" />
+    <EmbeddedResource Include="Fixtures\CreatingResources\Requests\PostID_with_client_provided_id_Request.json" />
+    <EmbeddedResource Include="Fixtures\CreatingResources\Responses\PostID_with_client_provided_id_Response.json" />
+    <EmbeddedResource Include="Fixtures\CreatingResources\Requests\PostLongId_with_client_provided_id_Request.json" />
+    <EmbeddedResource Include="Fixtures\CreatingResources\Responses\PostLongId_with_client_provided_id_Response.json" />
+    <EmbeddedResource Include="Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestID.json" />
+    <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseID.json" />
+    <EmbeddedResource Include="Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestLongId.json" />
+    <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseLongId.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
