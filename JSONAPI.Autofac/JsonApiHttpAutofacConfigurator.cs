@@ -52,7 +52,7 @@ namespace JSONAPI.Autofac
                 _appLifetimeScopeBegunAction(applicationLifetimeScope);
 
             var jsonApiHttpConfiguration = applicationLifetimeScope.Resolve<JsonApiHttpConfiguration>();
-            jsonApiHttpConfiguration.Apply(httpConfiguration);
+            jsonApiHttpConfiguration.Apply(httpConfiguration, jsonApiConfiguration);
             httpConfiguration.DependencyResolver = new AutofacWebApiDependencyResolver(applicationLifetimeScope);
         }
 
