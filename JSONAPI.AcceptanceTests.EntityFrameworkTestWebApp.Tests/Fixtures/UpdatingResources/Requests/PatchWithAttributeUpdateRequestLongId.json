@@ -1,0 +1,9 @@
+﻿{
+    "data": {
+        "type": "post-long-ids",
+        "id": "202",
+        "attributes": {
+            "title": "New post title"
+        }
+    }
+}

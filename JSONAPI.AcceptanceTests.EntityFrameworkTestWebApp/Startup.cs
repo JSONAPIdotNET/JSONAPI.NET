@@ -48,6 +48,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                 c.OverrideDefaultSortById(LanguageUserLinkSortByIdFactory);
             });
             configuration.RegisterResourceType<Post>();
+            configuration.RegisterResourceType<PostID>();
+            configuration.RegisterResourceType<PostLongId>();
             configuration.RegisterEntityFrameworkResourceType<State>();
             configuration.RegisterEntityFrameworkResourceType<Tag>();
             configuration.RegisterEntityFrameworkResourceType<User>();

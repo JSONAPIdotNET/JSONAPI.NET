@@ -40,6 +40,52 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\PostID.csv", @"Data")]
+        public async Task PostID_with_client_provided_id()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPost(effortConnection, "post-i-ds", @"Fixtures\CreatingResources\Requests\PostID_with_client_provided_id_Request.json");
+
+                await AssertResponseContent(response, @"Fixtures\CreatingResources\Responses\PostID_with_client_provided_id_Response.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.PostsID.ToArray();
+                    allPosts.Length.Should().Be(5);
+                    var actualPost = allPosts.First(t => t.ID == "205");
+                    actualPost.ID.Should().Be("205");
+                    actualPost.Title.Should().Be("Added post");
+                    actualPost.Content.Should().Be("Added post content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 03, 11, 04, 31, 0, new TimeSpan(0)));
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\PostLongId.csv", @"Data")]
+        public async Task PostLongId_with_client_provided_id()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPost(effortConnection, "post-long-ids", @"Fixtures\CreatingResources\Requests\PostLongId_with_client_provided_id_Request.json");
+
+                await AssertResponseContent(response, @"Fixtures\CreatingResources\Responses\PostLongId_with_client_provided_id_Response.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.PostsLongId.ToArray();
+                    allPosts.Length.Should().Be(5);
+                    var actualPost = allPosts.First(t => t.Id == 205);
+                    actualPost.Id.Should().Be(205);
+                    actualPost.Title.Should().Be("Added post");
+                    actualPost.Content.Should().Be("Added post content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 03, 11, 04, 31, 0, new TimeSpan(0)));
+                }
+            }
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\Comment.csv", @"Data")]
         [DeploymentItem(@"Data\Post.csv", @"Data")]
         [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]

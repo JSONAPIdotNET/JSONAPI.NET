@@ -17,6 +17,7 @@ namespace JSONAPI.EntityFramework.Tests
         {
             public DbSet<Backlink> Backlinks { get; set; }
             public DbSet<Post> Posts { get; set; }
+            public DbSet<PostID> PostIDs { get; set; }
 
             public TestDbContext(DbConnection conn) : base(conn, true)
             {
@@ -31,6 +32,10 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         private class SubPost : Post
+        {
+            public string Foo { get; set; }
+        }
+        private class SubPostID : PostID
         {
             public string Foo { get; set; }
         }
@@ -72,6 +77,17 @@ namespace JSONAPI.EntityFramework.Tests
         }
 
         [TestMethod]
+        public void GetKeyNamesStandardIDTest()
+        {
+            // Act
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(PostID)).ToArray();
+
+            // Assert
+            keyNames.Count().Should().Be(1);
+            keyNames.First().Should().Be("ID");
+        }
+
+        [TestMethod]
         public void GetKeyNamesNonStandardIdTest()
         {
             // Act
@@ -91,6 +107,17 @@ namespace JSONAPI.EntityFramework.Tests
             // Assert
             keyNames.Count().Should().Be(1);
             keyNames.First().Should().Be("Id");
+        }
+
+        [TestMethod]
+        public void GetKeyNamesForChildClassID()
+        {
+            // Act
+            IEnumerable<string> keyNames = _context.GetKeyNames(typeof(SubPostID)).ToArray();
+
+            // Assert
+            keyNames.Count().Should().Be(1);
+            keyNames.First().Should().Be("ID");
         }
 
         [TestMethod]
