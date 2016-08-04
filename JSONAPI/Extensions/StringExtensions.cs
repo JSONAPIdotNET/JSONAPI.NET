@@ -2,7 +2,7 @@
 
 namespace JSONAPI.Extensions
 {
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         private static readonly Regex PascalizeRegex = new Regex(@"(?:^|_|\-|\.)(.)");
 
