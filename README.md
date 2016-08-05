@@ -64,3 +64,42 @@ A `JSONAPI.IMaterializer` object can be added to that `ApiController` to broker 
 # Didn't I read something about using Entity Framework?
 
 The classes in the `JSONAPI.EntityFramework` namespace take great advantage of the patterns set out in the `JSONAPI` namespace. The `EntityFrameworkMaterializer` is an `IMaterializer` that can operate with your own `DbContext` class to retrieve objects by Id/Primary Key, and can retrieve and update existing objects from your context in a way that Entity Framework expects for change tracking…that means, in theory, you can use the provided `JSONAPI.EntityFramework.ApiController` base class to handle GET, PUT, POST, and DELETE without writing any additional code! You will still almost certainly subclass `ApiController` to implement your business logic, but that means you only have to worry about your business logic--not implementing the JSON API spec or messing with your persistence layer.
+
+
+
+# Configuration JSONAPI.EntityFramework
+
+- [ ] Add some hints about the configuration of JSONAPI.EntityFramework
+
+## Set the context path of JSONAPI.EntityFramework
+
+Per default the routes created for the registered models from EntityFramework will appear in root folder. This can conflict with folders of the file system or other routes you may want to serve from the same project.
+To solve the issue we can create an instance of the `BaseUrlService` and put it in the configuration.
+The `BaseUrlService` can be created with the context path parameter which will be used to register the routes and put into responses.
+
+```C#
+var configuration = new JsonApiConfiguration();
+configuration.RegisterEntityFrameworkResourceType<Post>();
+// ... registration stuff you need
+
+// this makes JSONAPI.NET create the route 'api/posts'
+configuration.CustomBaseUrlService = new BaseUrlService("api");
+```
+
+## Set the public origin host of JSONAPI
+Since JSONAPI.NET returns urls it could result wrong links if JSONAPI runs behind a reverse proxy. Configure the public origin address as follows:
+```C#
+var configuration = new JsonApiConfiguration();
+configuration.RegisterEntityFrameworkResourceType<Post>();
+// ... registration stuff you need
+
+// this makes JSONAPI.NET to set the urls in responses to https://api.example.com/posts
+// Important: don't leave the second string parameter! see below.
+configuration.CustomBaseUrlService = new BaseUrlService(new Uri("https://api.example.com/"), "");
+
+// this can also be combined with the context paht for routing like that:
+// this makes JSONAPI.NET create the route 'api/posts' and response urls to be https://api.example.com:9443/api/posts
+configuration.CustomBaseUrlService = new BaseUrlService(new Uri("https://api.example.com:9443/"), "api");
+
+```
+
