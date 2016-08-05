@@ -9,23 +9,61 @@ namespace JSONAPI.Http
     public class BaseUrlService : IBaseUrlService
     {
         private string _contextPath = string.Empty;
+        private Uri _publicOrigin;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         public BaseUrlService() { }
 
+        /// <summary>
+        /// Constructor which provides a context path for the routes of JSONAPI.NET
+        /// </summary>
+        /// <param name="contextPath">context path for the routes</param>
         public BaseUrlService(string contextPath)
         {
             CleanContextPath(contextPath);
         }
 
+        /// <summary>
+        /// Constructor which provides a public origin host and a context path for the routes of JSONAPI.NET.
+        /// If only public origin is desired provide emtpy string to contextPath.
+        /// </summary>
+        /// <param name="publicOrigin">public hostname</param>
+        /// <param name="contextPath">context path for the routes</param>
+        public BaseUrlService(Uri publicOrigin, string contextPath)
+        {
+            CleanContextPath(contextPath);
+            this._publicOrigin = publicOrigin;
+        }
 
+        /// <summary>
+        /// Retrieve the base path to provide in responses.
+        /// </summary>
+        /// <param name="requestMessage"></param>
+        /// <returns></returns>
         public virtual string GetBaseUrl(HttpRequestMessage requestMessage)
         {
-            var pathAndQuery = requestMessage.RequestUri.PathAndQuery;
+            string pathAndQuery;
+            string absolutUri = requestMessage.RequestUri.AbsoluteUri;
+            if (_publicOrigin != null)
+            {
+                var publicUriBuilder = new UriBuilder(absolutUri)
+                {
+                    Host = _publicOrigin.Host,
+                    Scheme = _publicOrigin.Scheme,
+                    Port = _publicOrigin.Port
+                };
+                absolutUri = publicUriBuilder.Uri.AbsoluteUri;
+                pathAndQuery = publicUriBuilder.Uri.PathAndQuery;
+            }
+            else
+            {
+                pathAndQuery = requestMessage.RequestUri.PathAndQuery;
+            }
             pathAndQuery = RemoveFromBegin(pathAndQuery, GetContextPath());
-            var baseUrl = RemoveFromEnd(requestMessage.RequestUri.AbsoluteUri, pathAndQuery);
+            pathAndQuery= pathAndQuery.TrimStart('/');
+            var baseUrl = RemoveFromEnd(absolutUri, pathAndQuery);
             return baseUrl;
         }
 
