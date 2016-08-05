@@ -106,6 +106,7 @@
     <Compile Include="CreatingResourcesTests.cs" />
     <Compile Include="DeletingResourcesTests.cs" />
     <Compile Include="ErrorsTests.cs" />
+    <Compile Include="PaginationTests.cs" />
     <Compile Include="FetchingResourcesTests.cs" />
     <Compile Include="HeterogeneousTests.cs" />
     <Compile Include="MappedTests.cs" />
@@ -275,8 +276,13 @@
     <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_include_response.json" />
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_empty_id_and_include_author_Response.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateWithIncludeResponse.json" />
+    <EmbeddedResource Include="Fixtures\Pagination\GetAllResponsePaged-2-2.json" />
+    <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-2-1.json" />
+    <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted.json" />
+    <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted-desc.json" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

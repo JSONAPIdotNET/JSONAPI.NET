@@ -1,0 +1,36 @@
+﻿{
+  "meta": {
+    "total-pages": 3,
+    "total-count": 3
+  },
+  "data": [
+    {
+      "type": "users",
+      "id": "409",
+      "attributes": {
+        "first-name": "Charlie",
+        "last-name": "Burns"
+      },
+      "relationships": {
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/users/409/relationships/comments",
+            "related": "https://www.example.com/users/409/comments"
+          }
+        },
+        "posts": {
+          "links": {
+            "self": "https://www.example.com/users/409/relationships/posts",
+            "related": "https://www.example.com/users/409/posts"
+          }
+        },
+        "user-groups": {
+          "links": {
+            "self": "https://www.example.com/users/409/relationships/user-groups",
+            "related": "https://www.example.com/users/409/user-groups"
+          }
+        }
+      }
+    }
+  ]
+}
