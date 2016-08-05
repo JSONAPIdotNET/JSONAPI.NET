@@ -14,6 +14,7 @@ namespace JSONAPI.Configuration
         private readonly IResourceTypeRegistrar _resourceTypeRegistrar;
         public ILinkConventions LinkConventions { get; private set; }
         public IEnumerable<IResourceTypeConfiguration> ResourceTypeConfigurations { get { return _resourceTypeConfigurations; } }
+        public IBaseUrlService CustomBaseUrlService { get; set; }
 
         private readonly IList<IResourceTypeConfiguration> _resourceTypeConfigurations;
 
@@ -104,5 +105,10 @@ namespace JSONAPI.Configuration
         /// by the ResourceTypeRegistrar
         /// </summary>
         IEnumerable<IResourceTypeConfiguration> ResourceTypeConfigurations { get; }
+
+        /// <summary>
+        /// A custom configured <see cref="BaseUrlService"/>
+        /// </summary>
+        IBaseUrlService CustomBaseUrlService { get; }
     }
 }

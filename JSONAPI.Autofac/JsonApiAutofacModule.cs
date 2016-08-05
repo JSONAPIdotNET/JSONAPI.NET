@@ -126,7 +126,14 @@ namespace JSONAPI.Autofac
             });
 
             builder.RegisterType<JsonApiHttpConfiguration>().SingleInstance();
-            builder.RegisterType<BaseUrlService>().As<IBaseUrlService>().SingleInstance();
+            if (_jsonApiConfiguration.CustomBaseUrlService != null)
+            {
+                builder.Register(c => _jsonApiConfiguration.CustomBaseUrlService).As<IBaseUrlService>().SingleInstance();
+            }
+            else
+            {
+                builder.RegisterType<BaseUrlService>().As<IBaseUrlService>().SingleInstance();
+            }
             builder.RegisterType<DocumentMaterializerLocator>().As<IDocumentMaterializerLocator>().InstancePerRequest();
 
             // Serialization
