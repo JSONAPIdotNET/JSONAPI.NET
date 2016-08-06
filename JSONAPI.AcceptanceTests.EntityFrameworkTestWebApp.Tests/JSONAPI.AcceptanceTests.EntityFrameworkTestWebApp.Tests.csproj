@@ -123,12 +123,6 @@
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_client_provided_id_Response.json" />
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_empty_id_Response.json" />
     <None Include="App.config" />
-    <None Include="Data\Child.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\Master.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Data\Officer.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -239,7 +233,6 @@
     <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_resource_by_id_that_doesnt_exist.json" />
     <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_one_response.json" />
     <EmbeddedResource Include="Fixtures\Mapped\Responses\Get_related_to_many_response.json" />
-    <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_integer_key_response.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
