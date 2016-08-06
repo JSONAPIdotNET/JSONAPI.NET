@@ -13,6 +13,7 @@ using JSONAPI.Configuration;
 using JSONAPI.EntityFramework;
 using JSONAPI.EntityFramework.Configuration;
 using Owin;
+using System.Collections.Generic;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 {
@@ -33,7 +34,35 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 
         public void Configuration(IAppBuilder app)
         {
-            var configuration = new JsonApiConfiguration();
+            /* these steps are divided in multiple methods to support better acceptance tests
+             * in production all the steps can be made inside the Configuration method.
+            */
+            var configuration = BuildConfiguration();
+
+            var configurator = BuildAutofacConfigurator(app);
+
+            var httpConfig = BuildHttpConfiguration();
+
+            MergeAndSetupConfiguration(app, configurator, httpConfig, configuration);
+        }
+
+        internal void MergeAndSetupConfiguration(IAppBuilder app, JsonApiHttpAutofacConfigurator configurator,
+            HttpConfiguration httpConfig, JsonApiConfiguration configuration)
+        {
+            configurator.Apply(httpConfig, configuration);
+            app.UseWebApi(httpConfig);
+            app.UseAutofacWebApi(httpConfig);
+        }
+
+        /// <summary>
+        /// Build up the <see cref="JsonApiConfiguration"/> which registers all the model types and their mappings.
+        /// </summary>
+        /// <returns></returns>
+        internal JsonApiConfiguration BuildConfiguration()
+        {
+            var configuration = new JsonApiConfiguration(
+                new Core.PluralizationService(
+                    new Dictionary<string, string> { { "Child", "Children" } }));
             configuration.RegisterEntityFrameworkResourceType<Building>();
             configuration.RegisterEntityFrameworkResourceType<City>();
             configuration.RegisterEntityFrameworkResourceType<Comment>();
@@ -45,6 +74,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                 c.OverrideDefaultSortById(LanguageUserLinkSortByIdFactory);
             });
             configuration.RegisterResourceType<Post>();
+            configuration.RegisterResourceType<PostID>();
+            configuration.RegisterResourceType<PostLongId>();
             configuration.RegisterEntityFrameworkResourceType<State>();
             configuration.RegisterEntityFrameworkResourceType<Tag>();
             configuration.RegisterEntityFrameworkResourceType<User>();
@@ -58,7 +89,18 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                     rc => rc.UseMaterializer<StarshipShipCounselorRelatedResourceMaterializer>());
             }); // Example of a resource that is mapped from a DB entity
             configuration.RegisterResourceType<StarshipOfficerDto>();
+            configuration.RegisterEntityFrameworkResourceType<Master>();
+            configuration.RegisterEntityFrameworkResourceType<Child>();
+            return configuration;
+        }
 
+        /// <summary>
+        /// Build up the <see cref="JsonApiHttpAutofacConfigurator"/> which registers <see cref="DbContext"/>, modules and materializer
+        /// </summary>
+        /// <param name="app"></param>
+        /// <returns></returns>
+        internal JsonApiHttpAutofacConfigurator BuildAutofacConfigurator(IAppBuilder app)
+        {
             var configurator = new JsonApiHttpAutofacConfigurator();
             configurator.OnApplicationLifetimeScopeCreating(builder =>
             {
@@ -76,7 +118,15 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                 // TODO: is this a candidate for spinning into a JSONAPI.Autofac.WebApi.Owin package? Yuck
                 app.UseAutofacMiddleware(applicationLifetimeScope);
             });
+            return configurator;
+        }
 
+        /// <summary>
+        /// Build up the <see cref="HttpConfiguration"/> with additional routes
+        /// </summary>
+        /// <returns></returns>
+        internal HttpConfiguration BuildHttpConfiguration()
+        {
             var httpConfig = new HttpConfiguration
             {
                 IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always
@@ -86,11 +136,9 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
             httpConfig.Routes.MapHttpRoute("Samples", "samples", new { Controller = "Samples" });
             httpConfig.Routes.MapHttpRoute("Search", "search", new { Controller = "Search" });
             httpConfig.Routes.MapHttpRoute("Trees", "trees", new { Controller = "Trees" });
-
-            configurator.Apply(httpConfig, configuration);
-            app.UseWebApi(httpConfig);
-            app.UseAutofacWebApi(httpConfig);
+            return httpConfig;
         }
+
 
         private BinaryExpression LanguageUserLinkFilterByIdFactory(ParameterExpression param, string id)
         {

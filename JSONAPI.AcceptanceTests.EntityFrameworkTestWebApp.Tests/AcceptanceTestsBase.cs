@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -10,6 +11,7 @@ using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Json;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Owin;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
 {
@@ -20,19 +22,18 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         private static readonly Regex GuidRegex = new Regex(@"\b[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-F0-9]{12}\b", RegexOptions.IgnoreCase);
         //private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace"":[\s]*""[\w\:\\\.\s\,\-]*""");
         private static readonly Regex StackTraceRegex = new Regex(@"""stackTrace""[\s]*:[\s]*"".*?""");
-        private static readonly Uri BaseUri = new Uri("https://www.example.com");
+        protected static Uri BaseUri = new Uri("https://www.example.com");
 
         protected static DbConnection GetEffortConnection()
         {
             return TestHelpers.GetEffortConnection(@"Data");
         }
 
-        protected static async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode, bool redactErrorData = false)
+        protected virtual async Task AssertResponseContent(HttpResponseMessage response, string expectedResponseTextResourcePath, HttpStatusCode expectedStatusCode, bool redactErrorData = false)
         {
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            var expectedResponse =
-                JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
+            var expectedResponse = ExpectedResponse(expectedResponseTextResourcePath);
             string actualResponse;
             if (redactErrorData)
             {
@@ -51,6 +52,13 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             response.StatusCode.Should().Be(expectedStatusCode);
         }
 
+        protected virtual string ExpectedResponse(string expectedResponseTextResourcePath)
+        {
+            var expectedResponse =
+                JsonHelpers.MinifyJson(TestHelpers.ReadEmbeddedFile(expectedResponseTextResourcePath));
+            return expectedResponse;
+        }
+
         #region GET
 
         protected async Task<HttpResponseMessage> SubmitGet(DbConnection effortConnection, string requestPath)
@@ -58,7 +66,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             using (var server = TestServer.Create(app =>
             {
                 var startup = new Startup(() => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
+                StartupConfiguration(startup, app);
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
@@ -75,7 +83,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             using (var server = TestServer.Create(app =>
             {
                 var startup = new Startup(() => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
+                StartupConfiguration(startup, app);
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
@@ -100,7 +108,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             using (var server = TestServer.Create(app =>
             {
                 var startup = new Startup(() => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
+                StartupConfiguration(startup, app);
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
@@ -124,7 +132,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             using (var server = TestServer.Create(app =>
             {
                 var startup = new Startup(() => new TestDbContext(effortConnection, false));
-                startup.Configuration(app);
+                StartupConfiguration(startup, app);
             }))
             {
                 var uri = new Uri(BaseUri, requestPath);
@@ -134,6 +142,23 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
                     .SendAsync("DELETE");
                 return response;
             }
+        }
+
+        #endregion
+
+ 
+
+        #region configure startup
+
+        /// <summary>
+        /// Startup process was divided into 4 steps to support better acceptance tests.
+        /// This method can be overridden by subclass to change behavior of setup.
+        /// </summary>
+        /// <param name="startup"></param>
+        /// <param name="app"></param>
+        protected virtual void StartupConfiguration(Startup startup, IAppBuilder app)
+        {
+            startup.Configuration(app);
         }
 
         #endregion

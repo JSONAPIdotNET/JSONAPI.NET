@@ -69,8 +69,10 @@ namespace JSONAPI.EntityFramework
         /// </summary>
         protected virtual Task SetIdForNewResource(IResourceObject resourceObject, object newObject, IResourceTypeRegistration typeRegistration)
         {
-            typeRegistration.IdProperty.SetValue(newObject, resourceObject.Id);
-
+            if (resourceObject.Id != null)
+            {
+                typeRegistration.IdProperty.SetValue(newObject, Convert.ChangeType(resourceObject.Id, typeRegistration.IdProperty.PropertyType));
+            }
             return Task.FromResult(0);
         }
 
@@ -82,7 +84,7 @@ namespace JSONAPI.EntityFramework
             ResourceTypeRelationship[] relationshipsToInclude, CancellationToken cancellationToken)
         {
             var method = _openGetExistingRecordGenericMethod.MakeGenericMethod(registration.Type);
-            var result = (dynamic) method.Invoke(this, new object[] {registration, id, relationshipsToInclude, cancellationToken});
+            var result = (dynamic) method.Invoke(this, new object[] {registration, id, relationshipsToInclude, cancellationToken}); // no convert needed => see GetExistingRecordGeneric => filterByIdFactory will do it
             return await result;
         }
 
@@ -170,7 +172,7 @@ namespace JSONAPI.EntityFramework
             string id, ResourceTypeRelationship[] relationshipsToInclude, CancellationToken cancellationToken) where TRecord : class
         {
             var param = Expression.Parameter(registration.Type);
-            var filterExpression = registration.GetFilterByIdExpression(param, id);
+            var filterExpression = registration.GetFilterByIdExpression(param, id); // no conversion of id => filterByIdFactory will do it
             var lambda = Expression.Lambda<Func<TRecord, bool>>(filterExpression, param);
             var query = _dbContext.Set<TRecord>().AsQueryable()
                 .Where(lambda);

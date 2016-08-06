@@ -119,6 +119,7 @@
     <Compile Include="Models\Author.cs" />
     <Compile Include="Models\Backlink.cs" />
     <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\PostID.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

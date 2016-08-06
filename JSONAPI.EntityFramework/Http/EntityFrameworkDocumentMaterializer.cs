@@ -88,7 +88,7 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual async Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, id);
+            var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType));
             _dbContext.Set<T>().Remove(singleResource);
             await _dbContext.SaveChangesAsync(cancellationToken);
 

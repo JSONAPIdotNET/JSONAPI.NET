@@ -40,6 +40,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<PostID> PostsID { get; set; }
+        public DbSet<PostLongId> PostsLongId { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<LanguageUserLink> LanguageUserLinks { get; set; }
@@ -47,5 +49,7 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
         public DbSet<StarshipClass> StarshipClasses { get; set; }
         public DbSet<Officer> Officers { get; set; }
         public DbSet<StarshipOfficerLink> StarshipOfficerLinks { get; set; }
+        public DbSet<Master> Masters { get; set; }
+        public DbSet<Child> Children { get; set; }
     }
 }

@@ -131,11 +131,15 @@
     <Compile Include="DocumentMaterializers\StarshipShipCounselorRelatedResourceMaterializer.cs" />
     <Compile Include="DocumentMaterializers\StarshipOfficersRelatedResourceMaterializer.cs" />
     <Compile Include="Models\Building.cs" />
+    <Compile Include="Models\Child.cs" />
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Company.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\LanguageUserLink.cs" />
+    <Compile Include="Models\Master.cs" />
     <Compile Include="Models\Officer.cs" />
+    <Compile Include="Models\PostLongId.cs" />
+    <Compile Include="Models\PostID.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Sample.cs" />
     <Compile Include="Models\Starship.cs" />

@@ -77,7 +77,14 @@ namespace JSONAPI.Core
                 filterByIdFactory = (param, id) =>
                 {
                     var propertyExpr = Expression.Property(param, idProperty);
-                    var idExpr = Expression.Constant(id);
+                    object obj = id;
+                    if (obj == null)
+                    {
+                        var t = propertyExpr.Type;
+                        if (t.IsValueType)
+                            obj = Activator.CreateInstance(t);
+                    }
+                    var idExpr = Expression.Constant(Convert.ChangeType(obj, propertyExpr.Type));
                     return Expression.Equal(propertyExpr, idExpr);
                 };
             }
@@ -194,7 +201,7 @@ namespace JSONAPI.Core
                 type
                     .GetProperties()
                     .FirstOrDefault(p => p.CustomAttributes.Any(attr => attr.AttributeType == typeof(UseAsIdAttribute)))
-                ?? type.GetProperty("Id");
+                ?? type.GetProperty("Id") ?? type.GetProperty("ID");
         }
     }
 }

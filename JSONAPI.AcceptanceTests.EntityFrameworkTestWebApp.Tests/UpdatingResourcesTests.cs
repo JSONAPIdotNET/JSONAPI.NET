@@ -42,6 +42,52 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\PostID.csv", @"Data")]
+        public async Task PatchWithAttributeUpdateID()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "post-i-ds/202", @"Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestID.json");
+
+                await AssertResponseContent(response, @"Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseID.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.PostsID;
+                    allPosts.Count().Should().Be(4);
+                    var actualPost = allPosts.First(t => t.ID == "202");
+                    actualPost.ID.Should().Be("202");
+                    actualPost.Title.Should().Be("New post title");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                }
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Data\PostLongId.csv", @"Data")]
+        public async Task PatchWithAttributeUpdateLongId()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "post-long-ids/202", @"Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestLongId.json");
+
+                await AssertResponseContent(response, @"Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseLongId.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.PostsLongId;
+                    allPosts.Count().Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == 202);
+                    actualPost.Id.Should().Be(202);
+                    actualPost.Title.Should().Be("New post title");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                }
+            }
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\Comment.csv", @"Data")]
         [DeploymentItem(@"Data\Post.csv", @"Data")]
         [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
