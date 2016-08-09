@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Net.Http;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -26,6 +27,8 @@ namespace JSONAPI.Http
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _sortExpressionExtractor = sortExpressionExtractor;
         }
+
+        public IPrincipal Principal { get; set; }
 
         public async Task<IJsonApiDocument> GetRelatedResourceDocument(string primaryResourceId, HttpRequestMessage request,
             CancellationToken cancellationToken)

@@ -27,6 +27,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> GetResourceCollection(string resourceType, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.GetRecords(Request, cancellationToken);
             return Ok(document);
         }
@@ -37,6 +38,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> Get(string resourceType, string id, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.GetRecordById(id, Request, cancellationToken);
             return Ok(document);
         }
@@ -48,6 +50,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> GetRelatedResource(string resourceType, string id, string relationshipName, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetRelatedResourceMaterializer(resourceType, relationshipName);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.GetRelatedResourceDocument(id, Request, cancellationToken);
             return Ok(document);
         }
@@ -58,6 +61,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> Post(string resourceType, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.CreateRecord(requestDocument, Request, cancellationToken);
             return Ok(document);
         }
@@ -68,6 +72,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> Patch(string resourceType, string id, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.UpdateRecord(id, requestDocument, Request, cancellationToken);
             return Ok(document);
         }
@@ -78,6 +83,7 @@ namespace JSONAPI.Http
         public virtual async Task<IHttpActionResult> Delete(string resourceType, string id, CancellationToken cancellationToken)
         {
             var materializer = _documentMaterializerLocator.GetMaterializerByResourceTypeName(resourceType);
+            materializer.Principal = RequestContext.Principal;
             var document = await materializer.DeleteRecord(id, Request, cancellationToken);
             return Ok(document);
         }
