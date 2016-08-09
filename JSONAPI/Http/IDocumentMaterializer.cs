@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Documents;
@@ -11,13 +10,6 @@ namespace JSONAPI.Http
     /// </summary>
     public interface IDocumentMaterializer
     {
-
-        /// <summary>
-        /// Holds the current users principal and will be set by <see cref="JsonApiController"/> after locating the materializer.
-        /// </summary>
-        /// <returns></returns>
-        IPrincipal Principal { get; set; }
-
         /// <summary>
         /// Returns a document containing records that are filtered, sorted,
         /// and paginated according to query parameters present in the provided request.

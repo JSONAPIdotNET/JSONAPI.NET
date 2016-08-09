@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
@@ -48,8 +47,6 @@ namespace JSONAPI.EntityFramework.Http
             _baseUrlService = baseUrlService;
         }
 
-        public IPrincipal Principal { get; set; }
-
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var query = DbContext.Set<T>().AsQueryable();
@@ -71,7 +68,7 @@ namespace JSONAPI.EntityFramework.Http
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var newRecord = await OnCreate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken), Principal);
+            var newRecord = await OnCreate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken));
             await DbContext.SaveChangesAsync(cancellationToken);
             var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
 
@@ -83,7 +80,7 @@ namespace JSONAPI.EntityFramework.Http
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var newRecord = await OnUpdate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken), Principal);
+            var newRecord = await OnUpdate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken));
             var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
             await DbContext.SaveChangesAsync(cancellationToken);
 
@@ -92,7 +89,7 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual async Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var singleResource = await OnDelete(DbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType)), Principal);
+            var singleResource = await OnDelete(DbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType)));
             DbContext.Set<T>().Remove(singleResource);
             await DbContext.SaveChangesAsync(cancellationToken);
 
@@ -164,9 +161,8 @@ namespace JSONAPI.EntityFramework.Http
         /// Manipulate entity before create.
         /// </summary>
         /// <param name="record"></param>
-        /// <param name="principal"></param>
         /// <returns></returns>
-        protected virtual async Task<T> OnCreate(Task<T> record, IPrincipal principal)
+        protected virtual async Task<T> OnCreate(Task<T> record)
         {
             return await record;
         }
@@ -175,9 +171,8 @@ namespace JSONAPI.EntityFramework.Http
         /// Manipulate entity before update.
         /// </summary>
         /// <param name="record"></param>
-        /// <param name="principal"></param>
         /// <returns></returns>
-        protected virtual async Task<T> OnUpdate(Task<T> record, IPrincipal principal)
+        protected virtual async Task<T> OnUpdate(Task<T> record)
         {
             return await record;
         }
@@ -185,9 +180,8 @@ namespace JSONAPI.EntityFramework.Http
         /// Manipulate entity before delete.
         /// </summary>
         /// <param name="record"></param>
-        /// <param name="principal"></param>
         /// <returns></returns>
-        protected virtual async Task<T> OnDelete(Task<T> record, IPrincipal principal)
+        protected virtual async Task<T> OnDelete(Task<T> record)
         {
             return await record;
         }

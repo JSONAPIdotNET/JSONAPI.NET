@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
-using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
@@ -64,8 +63,6 @@ namespace JSONAPI.Http
         {
             get { return _resourceTypeRegistry.GetRegistrationForType(typeof (TDto)).ResourceTypeName; }
         }
-
-        public IPrincipal Principal { get; set; }
 
         public virtual async Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
