@@ -19,7 +19,7 @@ namespace JSONAPI.EntityFramework.Http
     /// </summary>
     public class EntityFrameworkDocumentMaterializer<T> : IDocumentMaterializer where T : class
     {
-        private readonly DbContext _dbContext;
+        protected readonly DbContext DbContext;
         private readonly IResourceTypeRegistration _resourceTypeRegistration;
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
@@ -39,7 +39,7 @@ namespace JSONAPI.EntityFramework.Http
             ISortExpressionExtractor sortExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
             _resourceTypeRegistration = resourceTypeRegistration;
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
@@ -52,7 +52,7 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var query = _dbContext.Set<T>().AsQueryable();
+            var query = DbContext.Set<T>().AsQueryable();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
             return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken);
         }
@@ -72,7 +72,7 @@ namespace JSONAPI.EntityFramework.Http
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await OnCreate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken), Principal);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
             var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
 
             return returnDocument;
@@ -85,16 +85,16 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = await OnUpdate(MaterializeAsync(requestDocument.PrimaryData, cancellationToken), Principal);
             var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return returnDocument;
         }
 
         public virtual async Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var singleResource = await OnDelete(_dbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType)), Principal);
-            _dbContext.Set<T>().Remove(singleResource);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var singleResource = await OnDelete(DbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType)), Principal);
+            DbContext.Set<T>().Remove(singleResource);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return null;
         }
@@ -195,7 +195,7 @@ namespace JSONAPI.EntityFramework.Http
         private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
-            IQueryable<TResource> query = _dbContext.Set<TResource>();
+            IQueryable<TResource> query = DbContext.Set<TResource>();
             if (includes != null && includes.Any())
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
 
