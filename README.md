@@ -71,6 +71,42 @@ The classes in the `JSONAPI.EntityFramework` namespace take great advantage of t
 
 - [ ] Add some hints about the configuration of JSONAPI.EntityFramework
 
+## Manipulate entities before JSONAPI.EntityFramework persists them
+To change your entities before they get persisted you can extend the `EntityFrameworkDocumentMaterializer<T>` class. You need to register your custom DocumentMaterializer in your `JsonApiConfiguration` like that: 
+```C#
+configuration.RegisterEntityFrameworkResourceType<MyEntityType>(c =>c.UseDocumentMaterializer<CustomDocumentMaterializer>());
+```  
+Afterwards you can override the `OnCreate`, `OnUpdate` or `OnDelete` methods in your `CustomDocumentMaterializer`.
+
+```C#
+protected override async Task OnCreate(Task<MyEntityType> record)
+{
+    await base.OnUpdate(record);
+    var entity = await record;
+    entity.CreatedOn = DateTime.Now;
+    entity.CreatedBy = Principal?.Identity;
+}
+```
+
+> :information_source: HINT: To get the `Principal` you can add the following part into your `Startup.cs` which registers the `Principal` in Autofac and define a constructor Parameter on your `CustomDocumentMaterializer` of type `IPrincipal`.
+
+```C#
+
+configurator.OnApplicationLifetimeScopeCreating(builder =>
+{
+// ... 
+builder.Register(ctx => HttpContext.Current.GetOwinContext()).As<IOwinContext>();
+builder.Register((c, p) =>
+    {
+        var owin = c.Resolve<IOwinContext>();
+        return owin.Authentication.User;
+    })
+    .As<IPrincipal>()
+    .InstancePerRequest();
+}
+```
+
+
 ## Set the context path of JSONAPI.EntityFramework
 
 Per default the routes created for the registered models from EntityFramework will appear in root folder. This can conflict with folders of the file system or other routes you may want to serve from the same project.

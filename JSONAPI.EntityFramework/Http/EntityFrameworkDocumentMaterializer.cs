@@ -18,7 +18,7 @@ namespace JSONAPI.EntityFramework.Http
     /// </summary>
     public class EntityFrameworkDocumentMaterializer<T> : IDocumentMaterializer where T : class
     {
-        private readonly DbContext _dbContext;
+        protected readonly DbContext DbContext;
         private readonly IResourceTypeRegistration _resourceTypeRegistration;
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
@@ -38,7 +38,7 @@ namespace JSONAPI.EntityFramework.Http
             ISortExpressionExtractor sortExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
-            _dbContext = dbContext;
+            DbContext = dbContext;
             _resourceTypeRegistration = resourceTypeRegistration;
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
@@ -49,7 +49,7 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var query = _dbContext.Set<T>().AsQueryable();
+            var query = DbContext.Set<T>().AsQueryable();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
             return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken);
         }
@@ -68,29 +68,33 @@ namespace JSONAPI.EntityFramework.Http
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var newRecord = await MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
+            var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
+            await OnCreate(newRecord);
+            await DbContext.SaveChangesAsync(cancellationToken);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
 
             return returnDocument;
         }
+
 
         public virtual async Task<ISingleResourceDocument> UpdateRecord(string id, ISingleResourceDocument requestDocument,
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var newRecord = await MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(newRecord, apiBaseUrl, null, null);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
+            await OnUpdate(newRecord);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return returnDocument;
         }
 
         public virtual async Task<IJsonApiDocument> DeleteRecord(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var singleResource = await _dbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType));
-            _dbContext.Set<T>().Remove(singleResource);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var singleResource = DbContext.Set<T>().FindAsync(cancellationToken, Convert.ChangeType(id, _resourceTypeRegistration.IdProperty.PropertyType));
+            await OnDelete(singleResource);
+            DbContext.Set<T>().Remove(await singleResource);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return null;
         }
@@ -107,9 +111,9 @@ namespace JSONAPI.EntityFramework.Http
         /// Convert a resource object into a material record managed by EntityFramework.
         /// </summary>
         /// <returns></returns>
-        protected virtual async Task<object> MaterializeAsync(IResourceObject resourceObject, CancellationToken cancellationToken)
+        protected virtual async Task<T> MaterializeAsync(IResourceObject resourceObject, CancellationToken cancellationToken)
         {
-            return await _entityFrameworkResourceObjectMaterializer.MaterializeResourceObject(resourceObject, cancellationToken);
+            return (T) await _entityFrameworkResourceObjectMaterializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
 
         /// <summary>
@@ -155,10 +159,40 @@ namespace JSONAPI.EntityFramework.Http
             return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null, null);
         }
 
+
+        /// <summary>
+        /// Manipulate entity before create.
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        protected virtual async Task OnCreate(Task<T> record)
+        {
+            await record;
+        }
+
+        /// <summary>
+        /// Manipulate entity before update.
+        /// </summary>
+        /// <param name="record"></param>
+        protected virtual async Task OnUpdate(Task<T> record)
+        {
+            await record;
+        }
+
+        /// <summary>
+        /// Manipulate entity before delete.
+        /// </summary>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        protected virtual async Task OnDelete(Task<T> record)
+        {
+            await record;
+        }
+
         private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
-            IQueryable<TResource> query = _dbContext.Set<TResource>();
+            IQueryable<TResource> query = DbContext.Set<TResource>();
             if (includes != null && includes.Any())
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
 
