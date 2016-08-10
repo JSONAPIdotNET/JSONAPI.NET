@@ -79,12 +79,12 @@ configuration.RegisterEntityFrameworkResourceType<MyEntityType>(c =>c.UseDocumen
 Afterwards you can override the `OnCreate`, `OnUpdate` or `OnDelete` methods in your `CustomDocumentMaterializer`.
 
 ```C#
-protected override async Task<T> OnCreate(Task<T> record)
+protected override async Task OnCreate(Task<MyEntityType> record)
 {
-    var entity = await base.OnUpdate(record);
+    await base.OnUpdate(record);
+    var entity = await record;
     entity.CreatedOn = DateTime.Now;
     entity.CreatedBy = Principal?.Identity;
-    return entity;
 }
 ```
 
