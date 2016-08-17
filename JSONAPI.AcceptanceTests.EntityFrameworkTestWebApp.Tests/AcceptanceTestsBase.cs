@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Data.Common;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +13,9 @@ using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
 using JSONAPI.Json;
 using Microsoft.Owin.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
 using Owin;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
@@ -39,13 +44,28 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             {
                 var redactedResponse = GuidRegex.Replace(responseContent, "{{SOME_GUID}}");
                 actualResponse = StackTraceRegex.Replace(redactedResponse, "\"stackTrace\":\"{{STACK_TRACE}}\"");
+                actualResponse.Should().Be(expectedResponse);
             }
             else
             {
                 actualResponse = responseContent;
+                JsonSerializerSettings settings = new JsonSerializerSettings
+                {
+                    DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                    DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffff+00:00",
+                    Culture = CultureInfo.InvariantCulture,
+                    Formatting = Formatting.Indented
+                };
+
+                var actualResponseJObject = JsonConvert.DeserializeObject(actualResponse) as JObject;
+                var expectedResponseJObject = JsonConvert.DeserializeObject(expectedResponse) as JObject;
+                var equals = JToken.DeepEquals(actualResponseJObject, expectedResponseJObject);
+                if (!equals)
+                {
+                    Assert.Fail("should be: " + JsonConvert.SerializeObject(expectedResponseJObject, settings) + "\n but was: " + JsonConvert.SerializeObject(actualResponseJObject, settings));
+                }
             }
 
-            actualResponse.Should().Be(expectedResponse);
             response.Content.Headers.ContentType.MediaType.Should().Be(JsonApiContentType);
             response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
 
