@@ -24,6 +24,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IEntityFrameworkResourceObjectMaterializer _entityFrameworkResourceObjectMaterializer;
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
+        private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace JSONAPI.EntityFramework.Http
             ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
             DbContext = dbContext;
@@ -44,6 +46,7 @@ namespace JSONAPI.EntityFramework.Http
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _entityFrameworkResourceObjectMaterializer = entityFrameworkResourceObjectMaterializer;
             _sortExpressionExtractor = sortExpressionExtractor;
+            _includeExpressionExtractor = includeExpressionExtractor;
             _baseUrlService = baseUrlService;
         }
 
@@ -51,7 +54,8 @@ namespace JSONAPI.EntityFramework.Http
         {
             var query = DbContext.Set<T>().AsQueryable();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
-            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
@@ -61,7 +65,8 @@ namespace JSONAPI.EntityFramework.Http
             if (singleResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     _resourceTypeRegistration.ResourceTypeName, id));
-            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null, null);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, includes, null);
         }
 
         public virtual async Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument,

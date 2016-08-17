@@ -271,6 +271,7 @@
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseID.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestLongId.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseLongId.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResources\Get_included_to_one_response.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

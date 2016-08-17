@@ -115,6 +115,23 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             }
         }
 
+
+        [TestMethod]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
+        public async Task Get_included_to_one()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "posts/201?include=author");
+
+                await AssertResponseContent(response, @"Fixtures\FetchingResources\Get_included_to_one_response.json", HttpStatusCode.OK);
+            }
+        }
+
         [TestMethod]
         [DeploymentItem(@"Data\Comment.csv", @"Data")]
         [DeploymentItem(@"Data\Post.csv", @"Data")]
