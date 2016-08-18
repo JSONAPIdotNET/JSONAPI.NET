@@ -6,7 +6,7 @@ namespace JSONAPI.Http
     /// <summary>
     /// Default implementation of <see cref="IIncludeExpressionExtractor" />
     /// </summary>
-    public class DefauktIncludeExpressionExtractor: IIncludeExpressionExtractor
+    public class DefaultIncludeExpressionExtractor: IIncludeExpressionExtractor
     {
         private const string IncludeQueryParamKey = "include";
 
