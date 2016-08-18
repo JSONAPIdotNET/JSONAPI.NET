@@ -142,7 +142,9 @@ namespace JSONAPI.EntityFramework.Http
             var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
 
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, sortExpressions, cancellationToken);
+            var includeExpresion = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, sortExpressions, cancellationToken,includeExpresion);
         }
 
         /// <summary>

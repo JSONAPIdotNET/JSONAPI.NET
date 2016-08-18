@@ -29,8 +29,9 @@ namespace JSONAPI.EntityFramework.Http
             DbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IResourceTypeRegistration primaryTypeRegistration)
-            : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor)
+            : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, includeExpressionExtractor)
         {
             _relationship = relationship;
             _dbContext = dbContext;
