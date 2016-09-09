@@ -46,5 +46,13 @@ namespace JSONAPI.Http
         /// </summary>
         protected abstract Task<IQueryable<TRelated>> GetRelatedQuery(string primaryResourceId, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// If the client doesn't request any sort expressions, these expressions will be used for sorting instead.
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] GetDefaultSortExpressions()
+        {
+            return null;
+        }
     }
 }
