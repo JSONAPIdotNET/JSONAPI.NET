@@ -42,6 +42,35 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
         }
 
         [TestMethod]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
+        public async Task PatchWithAttributeUpdateAndInclude()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPatch(effortConnection, "posts/202?include=author", @"Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequest.json");
+
+                await AssertResponseContent(response, @"Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateWithIncludeResponse.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.Include(p => p.Tags).ToArray();
+                    allPosts.Length.Should().Be(4);
+                    var actualPost = allPosts.First(t => t.Id == "202");
+                    actualPost.Id.Should().Be("202");
+                    actualPost.Title.Should().Be("New post title");
+                    actualPost.Content.Should().Be("Post 2 content");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 02, 05, 08, 10, 0, new TimeSpan(0)));
+                    actualPost.AuthorId.Should().Be("401");
+                    actualPost.Tags.Select(t => t.Id).Should().BeEquivalentTo("302", "303");
+                }
+            }
+        }
+
+        [TestMethod]
         [DeploymentItem(@"Data\PostID.csv", @"Data")]
         public async Task PatchWithAttributeUpdateID()
         {

@@ -1,0 +1,65 @@
+﻿{
+  "data": {
+    "type": "posts",
+    "id": "230",
+    "attributes": {
+      "content": "The server generated my ID",
+      "created": "2015-04-13T09:09:00.0000000+00:00",
+      "title": "New post"
+    },
+    "relationships": {
+      "author": {
+        "links": {
+          "self": "https://www.example.com/posts/230/relationships/author",
+          "related": "https://www.example.com/posts/230/author"
+        },
+        "data": {
+          "type": "users",
+          "id": "401"
+        }
+      },
+      "comments": {
+        "links": {
+          "self": "https://www.example.com/posts/230/relationships/comments",
+          "related": "https://www.example.com/posts/230/comments"
+        }
+      },
+      "tags": {
+        "links": {
+          "self": "https://www.example.com/posts/230/relationships/tags",
+          "related": "https://www.example.com/posts/230/tags"
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "type": "users",
+      "id": "401",
+      "attributes": {
+        "first-name": "Alice",
+        "last-name": "Smith"
+      },
+      "relationships": {
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/users/401/relationships/comments",
+            "related": "https://www.example.com/users/401/comments"
+          }
+        },
+        "posts": {
+          "links": {
+            "self": "https://www.example.com/users/401/relationships/posts",
+            "related": "https://www.example.com/users/401/posts"
+          }
+        },
+        "user-groups": {
+          "links": {
+            "self": "https://www.example.com/users/401/relationships/user-groups",
+            "related": "https://www.example.com/users/401/user-groups"
+          }
+        }
+      }
+    }
+  ]
+}

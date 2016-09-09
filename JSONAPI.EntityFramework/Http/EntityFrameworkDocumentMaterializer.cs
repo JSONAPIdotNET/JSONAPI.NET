@@ -76,7 +76,8 @@ namespace JSONAPI.EntityFramework.Http
             var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
             await OnCreate(newRecord);
             await DbContext.SaveChangesAsync(cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, includes, null);
 
             return returnDocument;
         }
@@ -88,8 +89,9 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
             await OnUpdate(newRecord);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
             await DbContext.SaveChangesAsync(cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, includes, null);
 
             return returnDocument;
         }
