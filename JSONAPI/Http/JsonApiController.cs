@@ -63,7 +63,7 @@ namespace JSONAPI.Http
         }
 
         /// <summary>
-        /// Updates the record with the given ID with data from the request payloaad.
+        /// Updates the record with the given ID with data from the request payload.
         /// </summary>
         public virtual async Task<IHttpActionResult> Patch(string resourceType, string id, [FromBody]ISingleResourceDocument requestDocument, CancellationToken cancellationToken)
         {
