@@ -123,52 +123,7 @@ namespace JSONAPI.EntityFramework.Http
             return (T) await _entityFrameworkResourceObjectMaterializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
 
-        /// <summary>
-        /// Generic method for getting the related resources for a to-many relationship
-        /// </summary>
-        protected async Task<IResourceCollectionDocument> GetRelatedToMany<TRelated>(string id,
-            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var param = Expression.Parameter(typeof(T));
-            var accessorExpr = Expression.Property(param, relationship.Property);
-            var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
-
-            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
-
-            // We have to see if the resource even exists, so we can throw a 404 if it doesn't
-            var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
-            if (relatedResource == null)
-                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    _resourceTypeRegistration.ResourceTypeName, id));
-
-            var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
-            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
-
-            var includeExpresion = _includeExpressionExtractor.ExtractIncludeExpressions(request);
-
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, sortExpressions, cancellationToken,includeExpresion);
-        }
-
-        /// <summary>
-        /// Generic method for getting the related resources for a to-one relationship
-        /// </summary>
-        protected async Task<ISingleResourceDocument> GetRelatedToOne<TRelated>(string id,
-            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var param = Expression.Parameter(typeof(T));
-            var accessorExpr = Expression.Property(param, relationship.Property);
-            var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
-
-            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
-            var primaryEntityExists = await primaryEntityQuery.AnyAsync(cancellationToken);
-            if (!primaryEntityExists)
-                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    _resourceTypeRegistration.ResourceTypeName, id));
-            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
-            return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null, null);
-        }
-
-
+      
         /// <summary>
         /// Manipulate entity before create.
         /// </summary>
