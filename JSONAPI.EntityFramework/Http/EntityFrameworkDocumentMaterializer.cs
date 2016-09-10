@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using JSONAPI.Core;
 using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
+using JSONAPI.Extensions;
 using JSONAPI.Http;
 
 namespace JSONAPI.EntityFramework.Http
@@ -52,20 +53,20 @@ namespace JSONAPI.EntityFramework.Http
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var query = DbContext.Set<T>().AsQueryable();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
             var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var query = QueryIncludeNavigationProperties(null, GetNavigationPropertiesIncludes<T>(includes));
             return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var singleResource = await FilterById<T>(id, _resourceTypeRegistration).FirstOrDefaultAsync(cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var singleResource = await FilterById(id, _resourceTypeRegistration, GetNavigationPropertiesIncludes<T>(includes)).FirstOrDefaultAsync(cancellationToken);
             if (singleResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     _resourceTypeRegistration.ResourceTypeName, id));
-            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
             return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, includes, null);
         }
 
@@ -153,11 +154,34 @@ namespace JSONAPI.EntityFramework.Http
             await record;
         }
 
-        private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
+        /// <summary>
+        /// This method allows to include <see cref="QueryableExtensions.Include{T}"/> into query.
+        /// This can reduce the number of queries (eager loading)
+        /// </summary>
+        /// <typeparam name="TResource"></typeparam>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        protected virtual Expression<Func<TResource, object>>[] GetNavigationPropertiesIncludes<TResource>(string[] includes)
+        {
+            List<Expression<Func<TResource, object>>> list = new List<Expression<Func<TResource, object>>>();
+            foreach (var include in includes)
+            {
+                var incl = include.Pascalize();
+                var param = Expression.Parameter(typeof(TResource));
+                var lambda =
+                    Expression.Lambda<Func<TResource, object>>(
+                        Expression.PropertyOrField(param, incl),param);
+                    list.Add(lambda);
+            }
+            return list.ToArray();
+        }
+
+
+        private IQueryable<TResource> QueryIncludeNavigationProperties<TResource>(Expression<Func<TResource, bool>> predicate,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
             IQueryable<TResource> query = DbContext.Set<TResource>();
-            if (includes != null && includes.Any())
+            if (includes != null && includes.Any()) // eager loading
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
 
             if (predicate != null)
@@ -172,7 +196,7 @@ namespace JSONAPI.EntityFramework.Http
             var param = Expression.Parameter(typeof(TResource));
             var filterByIdExpression = resourceTypeRegistration.GetFilterByIdExpression(param, id);
             var predicate = Expression.Lambda<Func<TResource, bool>>(filterByIdExpression, param);
-            return Filter(predicate, includes);
+            return QueryIncludeNavigationProperties(predicate, includes);
         }
     }
 }
