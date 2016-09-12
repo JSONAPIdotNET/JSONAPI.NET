@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Http;
 using JSONAPI.QueryableTransformers;
-using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Documents.Builders
 {
@@ -62,13 +60,6 @@ namespace JSONAPI.Documents.Builders
         protected virtual Task<IMetadata> GetDocumentMetadata<T>(IQueryable<T> originalQuery, IQueryable<T> filteredQuery, IOrderedQueryable<T> sortedQuery,
             IPaginationTransformResult<T> paginationResult, CancellationToken cancellationToken)
         {
-            var metadata = new Metadata();
-            if (paginationResult.PaginationWasApplied) { 
-                metadata.MetaObject.Add("total-pages", (int)Math.Ceiling((decimal)filteredQuery.Count() / paginationResult.PageSize));
-                metadata.MetaObject.Add("total-count", filteredQuery.Count());
-            }
-            if (metadata.MetaObject.HasValues)
-                return Task.FromResult((IMetadata)metadata);
             return Task.FromResult((IMetadata) null);
         }
     }
