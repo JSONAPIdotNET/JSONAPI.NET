@@ -16,6 +16,10 @@ namespace JSONAPI.Http
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
+        /// <summary>
+        /// List of includes given by url.
+        /// </summary>
+        protected string[] Includes = {};
 
         /// <summary>
         /// Creates a new QueryableRelatedResourceDocumentMaterializer
@@ -33,12 +37,12 @@ namespace JSONAPI.Http
         public async Task<IJsonApiDocument> GetRelatedResourceDocument(string primaryResourceId, HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
+            Includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
-            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
 
 
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes); // TODO: allow implementors to specify metadata
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, Includes); // TODO: allow implementors to specify metadata
         }
 
         /// <summary>
