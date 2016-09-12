@@ -40,6 +40,8 @@ namespace JSONAPI.Http
             Includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
+            if (sortExpressions == null || sortExpressions.Length < 1)
+                sortExpressions = GetDefaultSortExpressions();
 
 
             return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, Includes); // TODO: allow implementors to specify metadata
