@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using JSONAPI.Core;
 using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
+using JSONAPI.Extensions;
 using JSONAPI.Http;
 
 namespace JSONAPI.EntityFramework.Http
@@ -24,6 +25,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly ISingleResourceDocumentBuilder _singleResourceDocumentBuilder;
         private readonly IEntityFrameworkResourceObjectMaterializer _entityFrameworkResourceObjectMaterializer;
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
+        private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
 
         /// <summary>
@@ -36,6 +38,7 @@ namespace JSONAPI.EntityFramework.Http
             ISingleResourceDocumentBuilder singleResourceDocumentBuilder,
             IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
             DbContext = dbContext;
@@ -44,24 +47,27 @@ namespace JSONAPI.EntityFramework.Http
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _entityFrameworkResourceObjectMaterializer = entityFrameworkResourceObjectMaterializer;
             _sortExpressionExtractor = sortExpressionExtractor;
+            _includeExpressionExtractor = includeExpressionExtractor;
             _baseUrlService = baseUrlService;
         }
 
         public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var query = DbContext.Set<T>().AsQueryable();
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
-            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var query = QueryIncludeNavigationProperties(null, GetNavigationPropertiesIncludes<T>(includes));
+            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var apiBaseUrl = GetBaseUrlFromRequest(request);
-            var singleResource = await FilterById<T>(id, _resourceTypeRegistration).FirstOrDefaultAsync(cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var singleResource = await FilterById(id, _resourceTypeRegistration, GetNavigationPropertiesIncludes<T>(includes)).FirstOrDefaultAsync(cancellationToken);
             if (singleResource == null)
                 throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
                     _resourceTypeRegistration.ResourceTypeName, id));
-            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, null, null);
+            return _singleResourceDocumentBuilder.BuildDocument(singleResource, apiBaseUrl, includes, null);
         }
 
         public virtual async Task<ISingleResourceDocument> CreateRecord(ISingleResourceDocument requestDocument,
@@ -71,7 +77,8 @@ namespace JSONAPI.EntityFramework.Http
             var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
             await OnCreate(newRecord);
             await DbContext.SaveChangesAsync(cancellationToken);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, includes, null);
 
             return returnDocument;
         }
@@ -83,8 +90,9 @@ namespace JSONAPI.EntityFramework.Http
             var apiBaseUrl = GetBaseUrlFromRequest(request);
             var newRecord = MaterializeAsync(requestDocument.PrimaryData, cancellationToken);
             await OnUpdate(newRecord);
-            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, null, null);
             await DbContext.SaveChangesAsync(cancellationToken);
+            var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            var returnDocument = _singleResourceDocumentBuilder.BuildDocument(await newRecord, apiBaseUrl, includes, null);
 
             return returnDocument;
         }
@@ -116,50 +124,7 @@ namespace JSONAPI.EntityFramework.Http
             return (T) await _entityFrameworkResourceObjectMaterializer.MaterializeResourceObject(resourceObject, cancellationToken);
         }
 
-        /// <summary>
-        /// Generic method for getting the related resources for a to-many relationship
-        /// </summary>
-        protected async Task<IResourceCollectionDocument> GetRelatedToMany<TRelated>(string id,
-            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var param = Expression.Parameter(typeof(T));
-            var accessorExpr = Expression.Property(param, relationship.Property);
-            var lambda = Expression.Lambda<Func<T, IEnumerable<TRelated>>>(accessorExpr, param);
-
-            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
-
-            // We have to see if the resource even exists, so we can throw a 404 if it doesn't
-            var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
-            if (relatedResource == null)
-                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    _resourceTypeRegistration.ResourceTypeName, id));
-
-            var relatedResourceQuery = primaryEntityQuery.SelectMany(lambda);
-            var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
-
-            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(relatedResourceQuery, request, sortExpressions, cancellationToken);
-        }
-
-        /// <summary>
-        /// Generic method for getting the related resources for a to-one relationship
-        /// </summary>
-        protected async Task<ISingleResourceDocument> GetRelatedToOne<TRelated>(string id,
-            ResourceTypeRelationship relationship, HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var param = Expression.Parameter(typeof(T));
-            var accessorExpr = Expression.Property(param, relationship.Property);
-            var lambda = Expression.Lambda<Func<T, TRelated>>(accessorExpr, param);
-
-            var primaryEntityQuery = FilterById<T>(id, _resourceTypeRegistration);
-            var primaryEntityExists = await primaryEntityQuery.AnyAsync(cancellationToken);
-            if (!primaryEntityExists)
-                throw JsonApiException.CreateForNotFound(string.Format("No resource of type `{0}` exists with id `{1}`.",
-                    _resourceTypeRegistration.ResourceTypeName, id));
-            var relatedResource = await primaryEntityQuery.Select(lambda).FirstOrDefaultAsync(cancellationToken);
-            return _singleResourceDocumentBuilder.BuildDocument(relatedResource, GetBaseUrlFromRequest(request), null, null);
-        }
-
-
+      
         /// <summary>
         /// Manipulate entity before create.
         /// </summary>
@@ -189,11 +154,34 @@ namespace JSONAPI.EntityFramework.Http
             await record;
         }
 
-        private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
+        /// <summary>
+        /// This method allows to include <see cref="QueryableExtensions.Include{T}"/> into query.
+        /// This can reduce the number of queries (eager loading)
+        /// </summary>
+        /// <typeparam name="TResource"></typeparam>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        protected virtual Expression<Func<TResource, object>>[] GetNavigationPropertiesIncludes<TResource>(string[] includes)
+        {
+            List<Expression<Func<TResource, object>>> list = new List<Expression<Func<TResource, object>>>();
+            foreach (var include in includes)
+            {
+                var incl = include.Pascalize();
+                var param = Expression.Parameter(typeof(TResource));
+                var lambda =
+                    Expression.Lambda<Func<TResource, object>>(
+                        Expression.PropertyOrField(param, incl),param);
+                    list.Add(lambda);
+            }
+            return list.ToArray();
+        }
+
+
+        private IQueryable<TResource> QueryIncludeNavigationProperties<TResource>(Expression<Func<TResource, bool>> predicate,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
             IQueryable<TResource> query = DbContext.Set<TResource>();
-            if (includes != null && includes.Any())
+            if (includes != null && includes.Any()) // eager loading
                 query = includes.Aggregate(query, (current, include) => current.Include(include));
 
             if (predicate != null)
@@ -208,7 +196,7 @@ namespace JSONAPI.EntityFramework.Http
             var param = Expression.Parameter(typeof(TResource));
             var filterByIdExpression = resourceTypeRegistration.GetFilterByIdExpression(param, id);
             var predicate = Expression.Lambda<Func<TResource, bool>>(filterByIdExpression, param);
-            return Filter(predicate, includes);
+            return QueryIncludeNavigationProperties(predicate, includes);
         }
     }
 }

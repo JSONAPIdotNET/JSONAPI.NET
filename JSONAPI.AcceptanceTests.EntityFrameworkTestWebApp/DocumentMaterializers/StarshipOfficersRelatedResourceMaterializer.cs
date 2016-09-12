@@ -17,8 +17,9 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.DocumentMaterializer
         public StarshipOfficersRelatedResourceMaterializer(ResourceTypeRelationship relationship, DbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IResourceTypeRegistration primaryTypeRegistration)
-            : base(relationship, dbContext, queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, primaryTypeRegistration)
+            : base(relationship, dbContext, queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, includeExpressionExtractor, primaryTypeRegistration)
         {
             _dbContext = dbContext;
         }

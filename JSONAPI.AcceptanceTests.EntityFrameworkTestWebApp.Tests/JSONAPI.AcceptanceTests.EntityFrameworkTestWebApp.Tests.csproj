@@ -271,6 +271,10 @@
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseID.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Requests\PatchWithAttributeUpdateRequestLongId.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateResponseLongId.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResources\Get_included_to_one_response.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_include_response.json" />
+    <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_empty_id_and_include_author_Response.json" />
+    <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateWithIncludeResponse.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

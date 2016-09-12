@@ -18,6 +18,7 @@ namespace JSONAPI.Documents.Builders
         private readonly IQueryableResourceCollectionDocumentBuilder _queryableResourceCollectionDocumentBuilder;
         private readonly IResourceCollectionDocumentBuilder _resourceCollectionDocumentBuilder;
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
+        private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
         private readonly Lazy<MethodInfo> _openBuildDocumentFromQueryableMethod;
         private readonly Lazy<MethodInfo> _openBuildDocumentFromEnumerableMethod;
@@ -29,12 +30,14 @@ namespace JSONAPI.Documents.Builders
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             IResourceCollectionDocumentBuilder resourceCollectionDocumentBuilder,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IBaseUrlService baseUrlService)
         {
             _singleResourceDocumentBuilder = singleResourceDocumentBuilder;
             _queryableResourceCollectionDocumentBuilder = queryableResourceCollectionDocumentBuilder;
             _resourceCollectionDocumentBuilder = resourceCollectionDocumentBuilder;
             _sortExpressionExtractor = sortExpressionExtractor;
+            _includeExpressionExtractor = includeExpressionExtractor;
             _baseUrlService = baseUrlService;
 
             _openBuildDocumentFromQueryableMethod =
@@ -53,6 +56,9 @@ namespace JSONAPI.Documents.Builders
         {
             var type = obj.GetType();
 
+            // TODO: test includes
+            var includeExpressions = _includeExpressionExtractor.ExtractIncludeExpressions(requestMessage);
+
             var queryableInterfaces = type.GetInterfaces();
             var queryableInterface =
                 queryableInterfaces.FirstOrDefault(
@@ -66,7 +72,7 @@ namespace JSONAPI.Documents.Builders
                 var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(requestMessage);
 
                 dynamic materializedQueryTask = buildDocumentMethod.Invoke(_queryableResourceCollectionDocumentBuilder,
-                    new[] { obj, requestMessage, sortExpressions, cancellationToken, null });
+                    new[] { obj, requestMessage, sortExpressions, cancellationToken, includeExpressions });
 
                 return await materializedQueryTask;
             }
@@ -89,7 +95,7 @@ namespace JSONAPI.Documents.Builders
             }
 
             // Single resource object
-            return _singleResourceDocumentBuilder.BuildDocument(obj, linkBaseUrl, null, null);
+            return _singleResourceDocumentBuilder.BuildDocument(obj, linkBaseUrl, includeExpressions, null);
         }
 
         private static Type GetEnumerableElementType(Type collectionType)

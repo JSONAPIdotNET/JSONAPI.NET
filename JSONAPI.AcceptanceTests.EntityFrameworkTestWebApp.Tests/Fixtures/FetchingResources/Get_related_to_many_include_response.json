@@ -1,0 +1,140 @@
+﻿{
+  "data": [
+    {
+      "type": "comments",
+      "id": "101",
+      "attributes": {
+        "created": "2015-01-31T14:30:00.0000000+00:00",
+        "text": "Comment 1"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/comments/101/relationships/author",
+            "related": "https://www.example.com/comments/101/author"
+          },
+          "data": {
+            "type": "users",
+            "id": "403"
+          }
+        },
+        "post": {
+          "links": {
+            "self": "https://www.example.com/comments/101/relationships/post",
+            "related": "https://www.example.com/comments/101/post"
+          }
+        }
+      }
+    },
+    {
+      "type": "comments",
+      "id": "102",
+      "attributes": {
+        "created": "2015-01-31T14:35:00.0000000+00:00",
+        "text": "Comment 2"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/comments/102/relationships/author",
+            "related": "https://www.example.com/comments/102/author"
+          },
+          "data": {
+            "type": "users",
+            "id": "402"
+          }
+        },
+        "post": {
+          "links": {
+            "self": "https://www.example.com/comments/102/relationships/post",
+            "related": "https://www.example.com/comments/102/post"
+          }
+        }
+      }
+    },
+    {
+      "type": "comments",
+      "id": "103",
+      "attributes": {
+        "created": "2015-01-31T14:41:00.0000000+00:00",
+        "text": "Comment 3"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/comments/103/relationships/author",
+            "related": "https://www.example.com/comments/103/author"
+          },
+          "data": {
+            "type": "users",
+            "id": "403"
+          }
+        },
+        "post": {
+          "links": {
+            "self": "https://www.example.com/comments/103/relationships/post",
+            "related": "https://www.example.com/comments/103/post"
+          }
+        }
+      }
+    }
+  ],
+  "included": [
+    {
+      "type": "users",
+      "id": "403",
+      "attributes": {
+        "first-name": "Charlie",
+        "last-name": "Michaels"
+      },
+      "relationships": {
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/users/403/relationships/comments",
+            "related": "https://www.example.com/users/403/comments"
+          }
+        },
+        "posts": {
+          "links": {
+            "self": "https://www.example.com/users/403/relationships/posts",
+            "related": "https://www.example.com/users/403/posts"
+          }
+        },
+        "user-groups": {
+          "links": {
+            "self": "https://www.example.com/users/403/relationships/user-groups",
+            "related": "https://www.example.com/users/403/user-groups"
+          }
+        }
+      }
+    },
+    {
+      "type": "users",
+      "id": "402",
+      "attributes": {
+        "first-name": "Bob",
+        "last-name": "Jones"
+      },
+      "relationships": {
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/users/402/relationships/comments",
+            "related": "https://www.example.com/users/402/comments"
+          }
+        },
+        "posts": {
+          "links": {
+            "self": "https://www.example.com/users/402/relationships/posts",
+            "related": "https://www.example.com/users/402/posts"
+          }
+        },
+        "user-groups": {
+          "links": {
+            "self": "https://www.example.com/users/402/relationships/user-groups",
+            "related": "https://www.example.com/users/402/user-groups"
+          }
+        }
+      }
+    }
+  ]
+}

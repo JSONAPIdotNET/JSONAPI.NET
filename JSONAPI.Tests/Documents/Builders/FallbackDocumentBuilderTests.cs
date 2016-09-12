@@ -30,9 +30,10 @@ namespace JSONAPI.Tests.Documents.Builders
             var objectContent = new Fruit { Id = "984", Name = "Kiwi" };
 
             var mockDocument = new Mock<ISingleResourceDocument>(MockBehavior.Strict);
+            var includePathExpression = new string[] {};
 
             var singleResourceDocumentBuilder = new Mock<ISingleResourceDocumentBuilder>(MockBehavior.Strict);
-            singleResourceDocumentBuilder.Setup(b => b.BuildDocument(objectContent, It.IsAny<string>(), null, null, null)).Returns(mockDocument.Object);
+            singleResourceDocumentBuilder.Setup(b => b.BuildDocument(objectContent, It.IsAny<string>(), includePathExpression, null, null)).Returns(mockDocument.Object);
 
             var mockQueryableDocumentBuilder = new Mock<IQueryableResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             var mockResourceCollectionDocumentBuilder = new Mock<IResourceCollectionDocumentBuilder>(MockBehavior.Strict);
@@ -44,11 +45,14 @@ namespace JSONAPI.Tests.Documents.Builders
             mockBaseUrlService.Setup(s => s.GetBaseUrl(request)).Returns("https://www.example.com");
 
             var mockSortExpressionExtractor = new Mock<ISortExpressionExtractor>(MockBehavior.Strict);
-            mockSortExpressionExtractor.Setup(e => e.ExtractSortExpressions(request)).Returns(new [] { "id "});
+            mockSortExpressionExtractor.Setup(e => e.ExtractSortExpressions(request)).Returns(new[] { "id " });
+
+            var mockIncludeExpressionExtractor = new Mock<IIncludeExpressionExtractor>(MockBehavior.Strict);
+            mockIncludeExpressionExtractor.Setup(e => e.ExtractIncludeExpressions(request)).Returns(includePathExpression);
 
             // Act
             var fallbackDocumentBuilder = new FallbackDocumentBuilder(singleResourceDocumentBuilder.Object,
-                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockBaseUrlService.Object);
+                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockIncludeExpressionExtractor.Object, mockBaseUrlService.Object);
             var resultDocument = await fallbackDocumentBuilder.BuildDocument(objectContent, request, cancellationTokenSource.Token);
 
             // Assert
@@ -75,12 +79,14 @@ namespace JSONAPI.Tests.Documents.Builders
             mockBaseUrlService.Setup(s => s.GetBaseUrl(request)).Returns("https://www.example.com/");
 
             var sortExpressions = new[] { "id" };
+
+            var includeExpressions = new string[] { };
             
             var cancellationTokenSource = new CancellationTokenSource();
 
             var mockQueryableDocumentBuilder = new Mock<IQueryableResourceCollectionDocumentBuilder>(MockBehavior.Strict);
             mockQueryableDocumentBuilder
-                .Setup(b => b.BuildDocument(items, request, sortExpressions, cancellationTokenSource.Token, null))
+                .Setup(b => b.BuildDocument(items, request, sortExpressions, cancellationTokenSource.Token, includeExpressions))
                 .Returns(Task.FromResult(mockDocument.Object));
 
             var mockResourceCollectionDocumentBuilder = new Mock<IResourceCollectionDocumentBuilder>(MockBehavior.Strict);
@@ -88,9 +94,12 @@ namespace JSONAPI.Tests.Documents.Builders
             var mockSortExpressionExtractor = new Mock<ISortExpressionExtractor>(MockBehavior.Strict);
             mockSortExpressionExtractor.Setup(e => e.ExtractSortExpressions(request)).Returns(sortExpressions);
 
+            var mockIncludeExpressionExtractor = new Mock<IIncludeExpressionExtractor>(MockBehavior.Strict);
+            mockIncludeExpressionExtractor.Setup(e => e.ExtractIncludeExpressions(request)).Returns(includeExpressions);
+
             // Act
             var fallbackDocumentBuilder = new FallbackDocumentBuilder(singleResourceDocumentBuilder.Object,
-                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockBaseUrlService.Object);
+                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockIncludeExpressionExtractor.Object, mockBaseUrlService.Object);
             var resultDocument = await fallbackDocumentBuilder.BuildDocument(items, request, cancellationTokenSource.Token);
 
             // Assert
@@ -127,9 +136,12 @@ namespace JSONAPI.Tests.Documents.Builders
             var mockSortExpressionExtractor = new Mock<ISortExpressionExtractor>(MockBehavior.Strict);
             mockSortExpressionExtractor.Setup(e => e.ExtractSortExpressions(request)).Returns(new[] { "id " });
 
+            var mockIncludeExpressionExtractor = new Mock<IIncludeExpressionExtractor>(MockBehavior.Strict);
+            mockIncludeExpressionExtractor.Setup(e => e.ExtractIncludeExpressions(request)).Returns(new string[] { });
+
             // Act
             var fallbackDocumentBuilder = new FallbackDocumentBuilder(singleResourceDocumentBuilder.Object,
-                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockBaseUrlService.Object);
+                mockQueryableDocumentBuilder.Object, mockResourceCollectionDocumentBuilder.Object, mockSortExpressionExtractor.Object, mockIncludeExpressionExtractor.Object, mockBaseUrlService.Object);
             var resultDocument = await fallbackDocumentBuilder.BuildDocument(items, request, cancellationTokenSource.Token);
 
             // Assert

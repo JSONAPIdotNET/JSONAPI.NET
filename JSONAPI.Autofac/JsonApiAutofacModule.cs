@@ -166,6 +166,7 @@ namespace JSONAPI.Autofac
 
             // Misc
             builder.RegisterType<DefaultSortExpressionExtractor>().As<ISortExpressionExtractor>().SingleInstance();
+            builder.RegisterType<DefaultIncludeExpressionExtractor>().As<IIncludeExpressionExtractor>().SingleInstance();
         }
     }
 }

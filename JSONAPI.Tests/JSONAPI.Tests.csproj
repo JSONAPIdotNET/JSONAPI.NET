@@ -91,6 +91,7 @@
     <Compile Include="Core\ResourceTypeRegistryTests.cs" />
     <Compile Include="Extensions\TypeExtensionsTests.cs" />
     <Compile Include="Http\BaseUrlServiceTest.cs" />
+    <Compile Include="Http\DefaultIncludeExpressionExtractorTests.cs" />
     <Compile Include="Http\DefaultSortExpressionExtractorTests.cs" />
     <Compile Include="Json\JsonApiFormatterTests.cs" />
     <Compile Include="Models\Author.cs" />

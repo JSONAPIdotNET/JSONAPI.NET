@@ -112,5 +112,34 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
                 }
             }
         }
+
+
+        [TestMethod]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
+        public async Task Post_with_empty_id_and_include()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitPost(effortConnection, "posts?include=author", @"Fixtures\CreatingResources\Requests\Post_with_empty_id_Request.json");
+
+                await AssertResponseContent(response, @"Fixtures\CreatingResources\Responses\Post_with_empty_id_and_include_author_Response.json", HttpStatusCode.OK);
+
+                using (var dbContext = new TestDbContext(effortConnection, false))
+                {
+                    var allPosts = dbContext.Posts.ToArray();
+                    allPosts.Length.Should().Be(5);
+                    var actualPost = allPosts.First(t => t.Id == "230");
+                    actualPost.Id.Should().Be("230");
+                    actualPost.Title.Should().Be("New post");
+                    actualPost.Content.Should().Be("The server generated my ID");
+                    actualPost.Created.Should().Be(new DateTimeOffset(2015, 04, 13, 12, 09, 0, new TimeSpan(0, 3, 0, 0)));
+                    actualPost.AuthorId.Should().Be("401");
+                }
+            }
+        }
     }
 }

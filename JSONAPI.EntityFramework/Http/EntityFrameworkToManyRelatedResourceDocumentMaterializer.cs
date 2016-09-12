@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
+using JSONAPI.Extensions;
 using JSONAPI.Http;
 
 namespace JSONAPI.EntityFramework.Http
@@ -29,8 +30,9 @@ namespace JSONAPI.EntityFramework.Http
             DbContext dbContext,
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISortExpressionExtractor sortExpressionExtractor,
+            IIncludeExpressionExtractor includeExpressionExtractor,
             IResourceTypeRegistration primaryTypeRegistration)
-            : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor)
+            : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, includeExpressionExtractor)
         {
             _relationship = relationship;
             _dbContext = dbContext;
@@ -43,8 +45,7 @@ namespace JSONAPI.EntityFramework.Http
             var param = Expression.Parameter(typeof (TPrimaryResource));
             var accessorExpr = Expression.Property(param, _relationship.Property);
             var lambda = Expression.Lambda<Func<TPrimaryResource, IEnumerable<TRelated>>>(accessorExpr, param);
-
-            var primaryEntityQuery = FilterById<TPrimaryResource>(primaryResourceId, _primaryTypeRegistration);
+            var primaryEntityQuery = FilterById(primaryResourceId, _primaryTypeRegistration, GetNavigationPropertiesIncludes<TPrimaryResource>(Includes));
 
             // We have to see if the resource even exists, so we can throw a 404 if it doesn't
             var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
@@ -56,6 +57,29 @@ namespace JSONAPI.EntityFramework.Http
             return primaryEntityQuery.SelectMany(lambda);
         }
 
+
+        /// <summary>
+        /// This method allows to include <see cref="QueryableExtensions.Include{T}"/> into query.
+        /// This can reduce the number of queries (eager loading)
+        /// </summary>
+        /// <typeparam name="TResource"></typeparam>
+        /// <param name="includes"></param>
+        /// <returns></returns>
+        protected virtual Expression<Func<TResource, object>>[] GetNavigationPropertiesIncludes<TResource>(string[] includes)
+        {
+            List<Expression<Func<TResource, object>>> list = new List<Expression<Func<TResource, object>>>();
+            foreach (var include in includes)
+            {
+                var incl = include.Pascalize();
+                var param = Expression.Parameter(typeof(TResource));
+                var lambda =
+                    Expression.Lambda<Func<TResource, object>>(
+                        Expression.PropertyOrField(param, incl), param);
+                list.Add(lambda);
+            }
+            return list.ToArray();
+        }
+
         private IQueryable<TResource> FilterById<TResource>(string id,
             IResourceTypeRegistration resourceTypeRegistration,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
@@ -63,10 +87,10 @@ namespace JSONAPI.EntityFramework.Http
             var param = Expression.Parameter(typeof (TResource));
             var filterByIdExpression = resourceTypeRegistration.GetFilterByIdExpression(param, id);
             var predicate = Expression.Lambda<Func<TResource, bool>>(filterByIdExpression, param);
-            return Filter(predicate, includes);
+            return QueryIncludeNavigationProperties(predicate, includes);
         }
 
-        private IQueryable<TResource> Filter<TResource>(Expression<Func<TResource, bool>> predicate,
+        private IQueryable<TResource> QueryIncludeNavigationProperties<TResource>(Expression<Func<TResource, bool>> predicate,
             params Expression<Func<TResource, object>>[] includes) where TResource : class
         {
             IQueryable<TResource> query = _dbContext.Set<TResource>();
