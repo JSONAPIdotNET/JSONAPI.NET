@@ -43,9 +43,9 @@ namespace JSONAPI.EntityFramework.Documents.Builders
             var metadata = new Metadata();
             if (paginationResult.PaginationWasApplied)
             {
-                var count = filteredQuery.CountAsync(cancellationToken);
-                metadata.MetaObject.Add("total-pages", (int)Math.Ceiling((decimal) await count / paginationResult.PageSize));
-                metadata.MetaObject.Add("total-count", await count);
+                var count = await filteredQuery.CountAsync(cancellationToken);
+                metadata.MetaObject.Add("total-pages", (int)Math.Ceiling((decimal) count / paginationResult.PageSize));
+                metadata.MetaObject.Add("total-count", count);
             }
             if (metadata.MetaObject.HasValues)
                 return metadata;
