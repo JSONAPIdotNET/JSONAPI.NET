@@ -11,6 +11,7 @@ using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
 using JSONAPI.Extensions;
 using JSONAPI.Http;
+using JSONAPI.QueryableResolvers;
 
 namespace JSONAPI.EntityFramework.Http
 {
@@ -27,6 +28,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
+        private IResourceCollectionResolver<T> _collectionResolver;
 
         /// <summary>
         /// Creates a new EntityFrameworkDocumentMaterializer
@@ -39,7 +41,8 @@ namespace JSONAPI.EntityFramework.Http
             IEntityFrameworkResourceObjectMaterializer entityFrameworkResourceObjectMaterializer,
             ISortExpressionExtractor sortExpressionExtractor,
             IIncludeExpressionExtractor includeExpressionExtractor,
-            IBaseUrlService baseUrlService)
+            IBaseUrlService baseUrlService,
+            IResourceCollectionResolver<T> collectionResolver = null)
         {
             DbContext = dbContext;
             _resourceTypeRegistration = resourceTypeRegistration;
@@ -49,14 +52,19 @@ namespace JSONAPI.EntityFramework.Http
             _sortExpressionExtractor = sortExpressionExtractor;
             _includeExpressionExtractor = includeExpressionExtractor;
             _baseUrlService = baseUrlService;
+            _collectionResolver = collectionResolver;
         }
 
-        public virtual Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
+        public virtual async Task<IResourceCollectionDocument> GetRecords(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
             var includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
             var query = QueryIncludeNavigationProperties(null, GetNavigationPropertiesIncludes<T>(includes));
-            return _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes);
+            if (_collectionResolver != null)
+            {
+                query = await _collectionResolver.GetQueryForResourceCollection(query, request, cancellationToken);
+            }
+            return await _queryableResourceCollectionDocumentBuilder.BuildDocument(query, request, sortExpressions, cancellationToken, includes);
         }
 
         public virtual async Task<ISingleResourceDocument> GetRecordById(string id, HttpRequestMessage request, CancellationToken cancellationToken)

@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using JSONAPI.Core;
 using JSONAPI.Http;
+using JSONAPI.QueryableResolvers;
 
 namespace JSONAPI.Configuration
 {
@@ -30,6 +31,7 @@ namespace JSONAPI.Configuration
         public IDictionary<string, IResourceTypeRelationshipConfiguration> RelationshipConfigurations { get; private set; }
         public Func<ParameterExpression, string, BinaryExpression> FilterByIdExpressionFactory { get; private set; }
         public Func<ParameterExpression, Expression> SortByIdExpressionFactory { get; private set; }
+        public Type ResourceCollectionResolverType { get; private set; }
 
         public void ConfigureRelationship(Expression<Func<TResourceType, object>> property,
             Action<IResourceTypeRelationshipConfigurator> configurationAction)
@@ -70,6 +72,12 @@ namespace JSONAPI.Configuration
         public void OverrideDefaultSortById(Func<ParameterExpression, Expression> sortByIdExpressionFactory)
         {
             SortByIdExpressionFactory = sortByIdExpressionFactory;
+        }
+
+        public IResourceTypeConfigurator<TResourceType> ResolveCollectionWith<TCollectionResolver>() where TCollectionResolver : IResourceCollectionResolver<TResourceType>
+        {
+            ResourceCollectionResolverType = typeof(TCollectionResolver);
+            return this;
         }
 
         public IResourceTypeRegistration BuildResourceTypeRegistration()

@@ -8,6 +8,7 @@ using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
 using JSONAPI.Http;
 using JSONAPI.Json;
+using JSONAPI.QueryableResolvers;
 using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Autofac
@@ -38,6 +39,8 @@ namespace JSONAPI.Autofac
 
                 if (resourceTypeConfiguration.DocumentMaterializerType != null)
                     builder.RegisterType(resourceTypeConfiguration.DocumentMaterializerType);
+                if (resourceTypeConfiguration.ResourceCollectionResolverType != null)
+                    builder.RegisterType(resourceTypeConfiguration.ResourceCollectionResolverType);
 
                 foreach (var relationship in resourceTypeRegistration.Relationships)
                 {
@@ -68,7 +71,12 @@ namespace JSONAPI.Autofac
                 {
                     var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(resourceTypeName);
                     var registration = registry.GetRegistrationForResourceTypeName(resourceTypeName);
-                    var parameters = new Parameter[] { new TypedParameter(typeof (IResourceTypeRegistration), registration) };
+                    var parameters = new Parameter[] { new TypedParameter(typeof (IResourceTypeRegistration), registration)};
+                    if (configuration.ResourceCollectionResolverType != null)
+                    {
+                        var collectionResolver = context.Resolve(configuration.ResourceCollectionResolverType, parameters);
+                        parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration), new NamedParameter("collectionResolver", collectionResolver), };
+                    }
                     if (configuration.DocumentMaterializerType != null)
                         return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
                     return context.Resolve<IDocumentMaterializer>(parameters);
@@ -82,7 +90,12 @@ namespace JSONAPI.Autofac
                 {
                     var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(clrType);
                     var registration = registry.GetRegistrationForType(clrType);
-                    var parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration) };
+                    var parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration)};
+                    if (configuration.ResourceCollectionResolverType != null)
+                    {
+                        var collectionResolver = context.Resolve(configuration.ResourceCollectionResolverType, parameters);
+                        parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration), new NamedParameter("collectionResolver", collectionResolver), };
+                    }
                     if (configuration.DocumentMaterializerType != null)
                         return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
                     return context.Resolve<IDocumentMaterializer>(parameters);

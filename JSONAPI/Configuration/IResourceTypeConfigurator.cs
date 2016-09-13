@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using JSONAPI.Core;
 using JSONAPI.Http;
+using JSONAPI.QueryableResolvers;
 
 namespace JSONAPI.Configuration
 {
@@ -42,7 +43,9 @@ namespace JSONAPI.Configuration
         /// <summary>
         /// Specifies a function to use build expressions that allow sorting resources of this type by ID
         /// </summary>
-         void OverrideDefaultSortById(Func<ParameterExpression, Expression> sortByIdExpressionFactory);
+        void OverrideDefaultSortById(Func<ParameterExpression, Expression> sortByIdExpressionFactory);
 
+        IResourceTypeConfigurator<TResourceType> ResolveCollectionWith<TCollectionResolver>()
+            where TCollectionResolver : IResourceCollectionResolver<TResourceType>;
     }
 }

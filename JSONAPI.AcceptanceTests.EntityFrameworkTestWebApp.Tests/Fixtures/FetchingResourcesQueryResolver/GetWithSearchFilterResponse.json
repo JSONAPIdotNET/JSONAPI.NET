@@ -1,0 +1,73 @@
+{
+  "data": [
+    {
+      "type": "post-searchs",
+      "id": "201",
+      "attributes": {
+        "content": "Post def content",
+        "created": "2015-01-31T14:00:00.0000000+00:00",
+        "title": "Post abc"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/201/relationships/author",
+            "related": "https://www.example.com/post-searchs/201/author"
+          }
+        },
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/201/relationships/comments",
+            "related": "https://www.example.com/post-searchs/201/comments"
+          }
+        }
+      }
+    },
+    {
+      "type": "post-searchs",
+      "id": "202",
+      "attributes": {
+        "content": "Post cde content",
+        "created": "2015-02-05T08:10:00.0000000+00:00",
+        "title": "Post efg"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/202/relationships/author",
+            "related": "https://www.example.com/post-searchs/202/author"
+          }
+        },
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/202/relationships/comments",
+            "related": "https://www.example.com/post-searchs/202/comments"
+          }
+        }
+      }
+    },
+    {
+      "type": "post-searchs",
+      "id": "203",
+      "attributes": {
+        "content": "Post efg content",
+        "created": "2015-02-07T11:11:00.0000000+00:00",
+        "title": "Post hij"
+      },
+      "relationships": {
+        "author": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/203/relationships/author",
+            "related": "https://www.example.com/post-searchs/203/author"
+          }
+        },
+        "comments": {
+          "links": {
+            "self": "https://www.example.com/post-searchs/203/relationships/comments",
+            "related": "https://www.example.com/post-searchs/203/comments"
+          }
+        }
+      }
+    }
+  ]
+}

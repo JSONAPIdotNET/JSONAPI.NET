@@ -93,6 +93,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
             configuration.RegisterResourceType<StarshipOfficerDto>();
             configuration.RegisterEntityFrameworkResourceType<Master>();
             configuration.RegisterEntityFrameworkResourceType<Child>();
+            configuration.RegisterResourceType<PostSearch>().ResolveCollectionWith<PostSearchResourceQueryResolver>();
+            configuration.RegisterEntityFrameworkResourceType<CommentSearch>();
             return configuration;
         }
 
