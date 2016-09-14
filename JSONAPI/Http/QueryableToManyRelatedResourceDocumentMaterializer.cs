@@ -20,6 +20,11 @@ namespace JSONAPI.Http
         /// List of includes given by url.
         /// </summary>
         protected string[] Includes = {};
+        /// <summary>
+        /// The current http-request.
+        /// </summary>
+        protected HttpRequestMessage Request;
+
 
         /// <summary>
         /// Creates a new QueryableRelatedResourceDocumentMaterializer
@@ -38,6 +43,7 @@ namespace JSONAPI.Http
             CancellationToken cancellationToken)
         {
             Includes = _includeExpressionExtractor.ExtractIncludeExpressions(request);
+            Request = request;
             var query = await GetRelatedQuery(primaryResourceId, cancellationToken);
             var sortExpressions = _sortExpressionExtractor.ExtractSortExpressions(request);
             if (sortExpressions == null || sortExpressions.Length < 1)

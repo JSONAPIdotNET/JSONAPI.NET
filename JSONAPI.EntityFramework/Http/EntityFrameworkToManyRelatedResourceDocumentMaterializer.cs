@@ -9,6 +9,7 @@ using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 using JSONAPI.Extensions;
 using JSONAPI.Http;
+using JSONAPI.QueryableResolvers;
 
 namespace JSONAPI.EntityFramework.Http
 {
@@ -21,6 +22,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly IResourceTypeRegistration _primaryTypeRegistration;
         private readonly ResourceTypeRelationship _relationship;
         private readonly DbContext _dbContext;
+        private readonly IResourceCollectionResolver<TRelated> _collectionResolver;
 
         /// <summary>
         /// Builds a new EntityFrameworkToManyRelatedResourceDocumentMaterializer.
@@ -31,12 +33,14 @@ namespace JSONAPI.EntityFramework.Http
             IQueryableResourceCollectionDocumentBuilder queryableResourceCollectionDocumentBuilder,
             ISortExpressionExtractor sortExpressionExtractor,
             IIncludeExpressionExtractor includeExpressionExtractor,
-            IResourceTypeRegistration primaryTypeRegistration)
+            IResourceTypeRegistration primaryTypeRegistration,
+            IResourceCollectionResolver<TRelated> collectionResolver = null)
             : base(queryableResourceCollectionDocumentBuilder, sortExpressionExtractor, includeExpressionExtractor)
         {
             _relationship = relationship;
             _dbContext = dbContext;
             _primaryTypeRegistration = primaryTypeRegistration;
+            _collectionResolver = collectionResolver;
         }
 
         protected override async Task<IQueryable<TRelated>> GetRelatedQuery(string primaryResourceId,
@@ -56,6 +60,10 @@ namespace JSONAPI.EntityFramework.Http
                     _primaryTypeRegistration.ResourceTypeName, primaryResourceId));
             var includes = GetNavigationPropertiesIncludes(Includes);
             var query = primaryEntityQuery.SelectMany(lambda);
+            if (_collectionResolver != null)
+            {
+                query = await _collectionResolver.GetQueryForResourceCollection(query, Request, cancellationToken);
+            }
 
             if (includes != null && includes.Any())
                 query = includes.Aggregate(query, (current, include) => current.Include(include));

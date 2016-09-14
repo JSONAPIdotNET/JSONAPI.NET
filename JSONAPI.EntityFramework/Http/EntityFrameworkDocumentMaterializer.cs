@@ -28,7 +28,7 @@ namespace JSONAPI.EntityFramework.Http
         private readonly ISortExpressionExtractor _sortExpressionExtractor;
         private readonly IIncludeExpressionExtractor _includeExpressionExtractor;
         private readonly IBaseUrlService _baseUrlService;
-        private IResourceCollectionResolver<T> _collectionResolver;
+        private readonly IResourceCollectionResolver<T> _collectionResolver;
 
         /// <summary>
         /// Creates a new EntityFrameworkDocumentMaterializer

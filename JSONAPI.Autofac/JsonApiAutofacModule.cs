@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Core;
 using JSONAPI.ActionFilters;
@@ -90,11 +91,11 @@ namespace JSONAPI.Autofac
                 {
                     var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(clrType);
                     var registration = registry.GetRegistrationForType(clrType);
-                    var parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration)};
+                    var parameters = new List<Parameter> { new TypedParameter(typeof(IResourceTypeRegistration), registration)};
                     if (configuration.ResourceCollectionResolverType != null)
                     {
                         var collectionResolver = context.Resolve(configuration.ResourceCollectionResolverType, parameters);
-                        parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration), new NamedParameter("collectionResolver", collectionResolver), };
+                        parameters.Add(new NamedParameter("collectionResolver", collectionResolver));
                     }
                     if (configuration.DocumentMaterializerType != null)
                         return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
@@ -114,12 +115,17 @@ namespace JSONAPI.Autofac
                         throw JsonApiException.CreateForNotFound(
                             string.Format("No relationship `{0}` exists for the resource type `{1}`.", relationshipName, resourceTypeName));
                     
-                    var parameters = new Parameter[]
+                    var parameters = new List<Parameter>
                     {
                         new TypedParameter(typeof(IResourceTypeRegistration), registration),
                         new TypedParameter(typeof(ResourceTypeRelationship), relationship)
                     };
-
+                    var relConfiguration = context.ResolveKeyed<IResourceTypeConfiguration>(relationshipName);
+                    if (relConfiguration.ResourceCollectionResolverType != null)
+                    {
+                        var collectionResolver = context.Resolve(relConfiguration.ResourceCollectionResolverType, parameters);
+                        parameters.Add(new NamedParameter("collectionResolver", collectionResolver));
+                    }
                     // First, see if they have set an explicit materializer for this relationship
                     IResourceTypeRelationshipConfiguration relationshipConfiguration;
                     if (configuration.RelationshipConfigurations.TryGetValue(relationship.Property.Name,
