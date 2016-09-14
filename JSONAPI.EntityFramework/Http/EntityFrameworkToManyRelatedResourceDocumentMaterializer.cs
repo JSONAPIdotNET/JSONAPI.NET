@@ -45,7 +45,8 @@ namespace JSONAPI.EntityFramework.Http
             var param = Expression.Parameter(typeof (TPrimaryResource));
             var accessorExpr = Expression.Property(param, _relationship.Property);
             var lambda = Expression.Lambda<Func<TPrimaryResource, IEnumerable<TRelated>>>(accessorExpr, param);
-            var primaryEntityQuery = FilterById(primaryResourceId, _primaryTypeRegistration, GetNavigationPropertiesIncludes<TPrimaryResource>(Includes));
+
+            var primaryEntityQuery = FilterById<TPrimaryResource>(primaryResourceId, _primaryTypeRegistration);
 
             // We have to see if the resource even exists, so we can throw a 404 if it doesn't
             var relatedResource = await primaryEntityQuery.FirstOrDefaultAsync(cancellationToken);
@@ -53,8 +54,12 @@ namespace JSONAPI.EntityFramework.Http
                 throw JsonApiException.CreateForNotFound(string.Format(
                     "No resource of type `{0}` exists with id `{1}`.",
                     _primaryTypeRegistration.ResourceTypeName, primaryResourceId));
+            var includes = GetNavigationPropertiesIncludes(Includes);
+            var query = primaryEntityQuery.SelectMany(lambda);
 
-            return primaryEntityQuery.SelectMany(lambda);
+            if (includes != null && includes.Any())
+                query = includes.Aggregate(query, (current, include) => current.Include(include));
+            return query;
         }
 
 
@@ -62,18 +67,17 @@ namespace JSONAPI.EntityFramework.Http
         /// This method allows to include <see cref="QueryableExtensions.Include{T}"/> into query.
         /// This can reduce the number of queries (eager loading)
         /// </summary>
-        /// <typeparam name="TResource"></typeparam>
         /// <param name="includes"></param>
         /// <returns></returns>
-        protected virtual Expression<Func<TResource, object>>[] GetNavigationPropertiesIncludes<TResource>(string[] includes)
+        protected virtual Expression<Func<TRelated, object>>[] GetNavigationPropertiesIncludes(string[] includes)
         {
-            List<Expression<Func<TResource, object>>> list = new List<Expression<Func<TResource, object>>>();
+            List<Expression<Func<TRelated, object>>> list = new List<Expression<Func<TRelated, object>>>();
             foreach (var include in includes)
             {
                 var incl = include.Pascalize();
-                var param = Expression.Parameter(typeof(TResource));
+                var param = Expression.Parameter(typeof(TRelated));
                 var lambda =
-                    Expression.Lambda<Func<TResource, object>>(
+                    Expression.Lambda<Func<TRelated, object>>(
                         Expression.PropertyOrField(param, incl), param);
                 list.Add(lambda);
             }
@@ -81,26 +85,14 @@ namespace JSONAPI.EntityFramework.Http
         }
 
         private IQueryable<TResource> FilterById<TResource>(string id,
-            IResourceTypeRegistration resourceTypeRegistration,
-            params Expression<Func<TResource, object>>[] includes) where TResource : class
+            IResourceTypeRegistration resourceTypeRegistration) where TResource : class
         {
             var param = Expression.Parameter(typeof (TResource));
             var filterByIdExpression = resourceTypeRegistration.GetFilterByIdExpression(param, id);
             var predicate = Expression.Lambda<Func<TResource, bool>>(filterByIdExpression, param);
-            return QueryIncludeNavigationProperties(predicate, includes);
-        }
-
-        private IQueryable<TResource> QueryIncludeNavigationProperties<TResource>(Expression<Func<TResource, bool>> predicate,
-            params Expression<Func<TResource, object>>[] includes) where TResource : class
-        {
             IQueryable<TResource> query = _dbContext.Set<TResource>();
-            if (includes != null && includes.Any())
-                query = includes.Aggregate(query, (current, include) => current.Include(include));
-
-            if (predicate != null)
-                query = query.Where(predicate);
-
-            return query.AsQueryable();
+            return query.Where(predicate);
         }
+
     }
 }

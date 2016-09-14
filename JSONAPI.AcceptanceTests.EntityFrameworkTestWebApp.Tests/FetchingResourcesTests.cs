@@ -116,6 +116,23 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             }
         }
 
+
+        [TestMethod]
+        [DeploymentItem(@"Data\Comment.csv", @"Data")]
+        [DeploymentItem(@"Data\Post.csv", @"Data")]
+        [DeploymentItem(@"Data\PostTagLink.csv", @"Data")]
+        [DeploymentItem(@"Data\Tag.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
+        public async Task Get_related_to_many_included_external()
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "users/401/posts?include=tags");
+
+                await AssertResponseContent(response, @"Fixtures\FetchingResources\Get_related_to_many_include_external_response.json", HttpStatusCode.OK);
+            }
+        }
+
         [TestMethod]
         [DeploymentItem(@"Data\Comment.csv", @"Data")]
         [DeploymentItem(@"Data\Post.csv", @"Data")]

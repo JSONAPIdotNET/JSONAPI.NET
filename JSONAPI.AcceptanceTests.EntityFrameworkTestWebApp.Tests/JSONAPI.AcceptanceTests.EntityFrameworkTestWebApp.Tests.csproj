@@ -280,6 +280,7 @@
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-2-1.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted-desc.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_include_external_response.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
