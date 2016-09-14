@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "type": "comment-searchs",
+      "id": "102",
+      "attributes": {
+        "created": "2015-01-31T14:35:00.0000000+00:00",
+        "text": "efgComment"
+      },
+      "relationships": {
+        "post": {
+          "links": {
+            "self": "https://www.example.com/comment-searchs/102/relationships/post",
+            "related": "https://www.example.com/comment-searchs/102/post"
+          }
+        }
+      }
+    }
+  ]
+}

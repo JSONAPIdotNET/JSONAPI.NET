@@ -157,6 +157,7 @@
     <Compile Include="Models\TestDbContext.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserGroup.cs" />
+    <Compile Include="CommentSearchResourceQueryResolver.cs" />
     <Compile Include="PostSearchResourceQueryResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

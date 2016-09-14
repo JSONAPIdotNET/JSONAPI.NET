@@ -50,5 +50,20 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Tests
             }
         }
 
+
+        [TestMethod]
+        [DeploymentItem(@"Data\CommentSearch.csv", @"Data")]
+        [DeploymentItem(@"Data\PostSearch.csv", @"Data")]
+        [DeploymentItem(@"Data\User.csv", @"Data")]
+        public async Task GetWithSearchFilter_related_to_many() // this enables logic in Query resolver for related
+        {
+            using (var effortConnection = GetEffortConnection())
+            {
+                var response = await SubmitGet(effortConnection, "post-searchs/201/comments?searchterm=efg");
+
+                await AssertResponseContent(response, @"Fixtures\FetchingResourcesQueryResolver\GetWithSearchFilter_related_to_many_Response.json", HttpStatusCode.OK);
+            }
+        }
+
     }
 }
