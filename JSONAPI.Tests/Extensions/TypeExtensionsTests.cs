@@ -1,6 +1,7 @@
 ﻿using System;
 using JSONAPI.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Tests.Extensions
 {
@@ -46,6 +47,9 @@ namespace JSONAPI.Tests.Extensions
             Assert.IsTrue(typeof(String).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for String!");
             Assert.IsTrue(typeof(TestEnum).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for enum!");
             Assert.IsTrue(typeof(TestEnum?).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for nullable enum!");
+            Assert.IsTrue(typeof(JToken).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for JToken!");
+            Assert.IsTrue(typeof(JObject).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for JObject!");
+            Assert.IsTrue(typeof(JArray).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for Jarray!");
             Assert.IsFalse(typeof(Object).CanWriteAsJsonApiAttribute(), "CanWriteTypeAsAttribute returned wrong answer for Object!");
         }
 

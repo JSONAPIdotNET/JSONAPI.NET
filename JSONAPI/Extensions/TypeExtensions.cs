@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.Extensions
 {
@@ -17,6 +17,7 @@ namespace JSONAPI.Extensions
                    || typeof (DateTime).IsAssignableFrom(objectType)
                    || typeof (DateTimeOffset).IsAssignableFrom(objectType)
                    || typeof (String).IsAssignableFrom(objectType)
+                   || typeof (JToken).IsAssignableFrom(objectType)
                    || objectType.IsEnum;
         }
 

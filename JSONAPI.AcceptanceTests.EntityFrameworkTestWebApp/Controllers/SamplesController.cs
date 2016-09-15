@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Web.Http;
 using JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
 {
@@ -44,7 +46,10 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
                 StringField = null,
                 EnumField = default(SampleEnum),
                 NullableEnumField = null,
-                ComplexAttributeField = null
+                ComplexAttributeField = null,
+                JTokenStringField = null,
+                JTokenObjectField = null,
+                JTokenArrayField = null
             };
             var s2 = new Sample
             {
@@ -82,10 +87,27 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Controllers
                 StringField = "Some string 156",
                 EnumField = SampleEnum.Value1,
                 NullableEnumField = SampleEnum.Value2,
-                ComplexAttributeField = "{\"foo\": { \"baz\": [11] }, \"bar\": 5}"
+                ComplexAttributeField = "{\"foo\": { \"baz\": [11] }, \"bar\": 5}",
+                JTokenStringField = "Andrew Jackson",
+                JTokenObjectField = JToken.FromObject(new SomeSerializableClass { MyField1 = "Abraham Lincoln", MyField2 = true, MyField3 = 439 }),
+                JTokenArrayField = new JArray(
+                    JToken.FromObject(new SomeSerializableClass { MyField1 = "George Washington", MyField2 = null, MyField3 = 216 }),
+                    JToken.FromObject(new SomeSerializableClass { MyField1 = "Thomas Jefferson", MyField2 = false, MyField3 = 631 }))
             };
 
             return Ok(new[] { s1, s2 });
+        }
+        
+        [Serializable]
+        public class SomeSerializableClass
+        {
+            [JsonProperty("my-field1")]
+            public string MyField1 { get; set; }
+
+            [JsonProperty("overridden-field2")]
+            public bool? MyField2 { get; set; }
+
+            public int MyField3 { get; set; }
         }
     }
 }
