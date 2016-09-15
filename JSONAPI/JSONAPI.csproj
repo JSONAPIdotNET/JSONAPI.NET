@@ -91,6 +91,7 @@
     <Compile Include="Core\ToManyResourceTypeRelationship.cs" />
     <Compile Include="Core\ToOneResourceTypeRelationship.cs" />
     <Compile Include="Http\DefaultIncludeExpressionExtractor.cs" />
+    <Compile Include="Documents\Metadata.cs" />
     <Compile Include="Http\DefaultSortExpressionExtractor.cs" />
     <Compile Include="Http\DocumentMaterializerLocator.cs" />
     <Compile Include="Http\IDocumentMaterializerLocator.cs" />

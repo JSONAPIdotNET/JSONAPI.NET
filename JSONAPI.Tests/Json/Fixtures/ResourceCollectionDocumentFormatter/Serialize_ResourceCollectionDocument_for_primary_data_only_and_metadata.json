@@ -1,7 +1,7 @@
 ﻿{
-    "data": [
-        "Primary data 1",
-        "Primary data 2"
-    ],
-    "meta": "Placeholder metadata object"
+  "meta": "Placeholder metadata object",
+  "data": [
+    "Primary data 1",
+    "Primary data 2"
+  ]
 }

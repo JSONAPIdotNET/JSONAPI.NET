@@ -14,6 +14,8 @@ using JSONAPI.EntityFramework;
 using JSONAPI.EntityFramework.Configuration;
 using Owin;
 using System.Collections.Generic;
+using JSONAPI.Documents.Builders;
+using JSONAPI.EntityFramework.Documents.Builders;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
 {
@@ -112,6 +114,8 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp
                 builder.RegisterType<CustomEntityFrameworkResourceObjectMaterializer>()
                     .As<IEntityFrameworkResourceObjectMaterializer>();
                 builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
+                builder.RegisterType<EntityFrameworkQueryableResourceCollectionDocumentBuilder>().As<IQueryableResourceCollectionDocumentBuilder>();
+
             });
             configurator.OnApplicationLifetimeScopeBegun(applicationLifetimeScope =>
             {

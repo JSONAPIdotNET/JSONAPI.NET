@@ -75,6 +75,12 @@ namespace JSONAPI.Json
         {
             writer.WriteStartObject();
 
+            if (document.Metadata != null)
+            {
+                writer.WritePropertyName(MetaKeyName);
+                MetadataFormatter.Serialize(document.Metadata, writer);
+            }
+
             writer.WritePropertyName(PrimaryDataKeyName);
 
             writer.WriteStartArray();
@@ -95,11 +101,7 @@ namespace JSONAPI.Json
                 writer.WriteEndArray();
             }
 
-            if (document.Metadata != null)
-            {
-                writer.WritePropertyName(MetaKeyName);
-                MetadataFormatter.Serialize(document.Metadata, writer);
-            }
+
 
             writer.WriteEndObject();
 

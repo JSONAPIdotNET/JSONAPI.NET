@@ -60,7 +60,7 @@ namespace JSONAPI.Documents.Builders
         protected virtual Task<IMetadata> GetDocumentMetadata<T>(IQueryable<T> originalQuery, IQueryable<T> filteredQuery, IOrderedQueryable<T> sortedQuery,
             IPaginationTransformResult<T> paginationResult, CancellationToken cancellationToken)
         {
-            return Task.FromResult((IMetadata)null);
+            return Task.FromResult((IMetadata) null);
         }
     }
 }

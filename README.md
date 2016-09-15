@@ -139,3 +139,13 @@ configuration.CustomBaseUrlService = new BaseUrlService(new Uri("https://api.exa
 
 ```
 
+# Metadata
+
+
+
+## Pagination
+
+### total-pages / total-count
+When using Entity Framework you can register type `EntityFrameworkQueryableResourceCollectionDocumentBuilder` to enable the `total-pages` and `total-count` meta properties.
+When pagination is used the `total-pages` and `total-count` meta properties are provided to indicate the number of pages and records to the client.
+

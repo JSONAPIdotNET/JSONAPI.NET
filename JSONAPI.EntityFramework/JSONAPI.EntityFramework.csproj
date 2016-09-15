@@ -72,6 +72,7 @@
   <ItemGroup>
     <Compile Include="ActionFilters\AsynchronousEnumerationTransformer.cs" />
     <Compile Include="DbContextExtensions.cs" />
+    <Compile Include="Documents\Builders\EntityFrameworkQueryableResourceCollectionDocumentBuilder.cs" />
     <Compile Include="Http\EntityFrameworkDocumentMaterializer.cs" />
     <Compile Include="EntityFrameworkPluralizationService.cs" />
     <Compile Include="Http\EntityFrameworkToOneRelatedResourceDocumentMaterializer.cs" />
