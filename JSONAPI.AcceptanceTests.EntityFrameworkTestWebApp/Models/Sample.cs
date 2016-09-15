@@ -1,5 +1,6 @@
 ﻿using System;
 using JSONAPI.Attributes;
+using Newtonsoft.Json.Linq;
 
 namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 {
@@ -48,5 +49,11 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
 
         [SerializeAsComplex]
         public string ComplexAttributeField { get; set; }
+
+        public JToken JTokenStringField { get; set; }
+
+        public JToken JTokenObjectField { get; set; }
+
+        public JToken JTokenArrayField { get; set; }
     }
 }
