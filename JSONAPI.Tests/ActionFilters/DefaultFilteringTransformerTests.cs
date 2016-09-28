@@ -583,6 +583,58 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_wildcard_string_property_end()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=String value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%String value 1");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_end()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%String value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_end_ignoreCase()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%string value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%value 2");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("101");
+            returnedArray[1].Id.Should().Be("102");
+        }
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part_no_match()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%value 3");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_part_no_match()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=String vall%");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
         public void Filters_by_missing_string_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=");

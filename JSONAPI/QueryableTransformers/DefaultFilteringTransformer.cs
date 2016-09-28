@@ -16,6 +16,13 @@ namespace JSONAPI.QueryableTransformers
     {
         private readonly IResourceTypeRegistry _resourceTypeRegistry;
 
+        private static readonly MethodInfo ContainsMethod = typeof(string).GetMethod("Contains");
+        private static readonly MethodInfo StartsWithMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
+        private static readonly MethodInfo EndsWithMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
+        private static readonly MethodInfo ToLowerMethod = typeof(string).GetMethod("ToLower", new Type[] {});
+
+
+
         /// <summary>
         /// Creates a new FilteringQueryableTransformer
         /// </summary>
@@ -135,9 +142,45 @@ namespace JSONAPI.QueryableTransformers
                     expr = Expression.Equal(propertyExpr, Expression.Constant(null));
                 }
                 else
-                {
-                    Expression propertyExpr = Expression.Property(param, prop);
-                    expr = Expression.Equal(propertyExpr, Expression.Constant(queryValue));
+                { // inspired by http://stackoverflow.com/questions/5374481/like-operator-in-linq
+                    if (queryValue.StartsWith("%") || queryValue.EndsWith("%"))
+                    {
+                        var startWith = queryValue.StartsWith("%");
+                        var endsWith = queryValue.EndsWith("%");
+
+                        if (startWith) // remove %
+                            queryValue = queryValue.Remove(0, 1);
+
+                        if (endsWith) // remove %
+                            queryValue = queryValue.Remove(queryValue.Length - 1, 1);
+
+                        var constant = Expression.Constant(queryValue.ToLower());
+                        Expression propertyExpr = Expression.Property(param, prop);
+
+                        Expression nullCheckExpression = Expression.NotEqual(propertyExpr, Expression.Constant(null));
+
+                        if (endsWith && startWith)
+                        {
+                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr,ToLowerMethod), ContainsMethod, constant));
+                        }
+                        else if (startWith)
+                        {
+                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), EndsWithMethod, constant));
+                        }
+                        else if (endsWith)
+                        {
+                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), StartsWithMethod, constant));
+                        }
+                        else
+                        {
+                            expr = Expression.Equal(propertyExpr, constant);
+                        }
+                    }
+                    else
+                    {
+                        Expression propertyExpr = Expression.Property(param, prop);
+                        expr = Expression.Equal(propertyExpr, Expression.Constant(queryValue));
+                    }
                 }
             }
             else if (propertyType == typeof(Boolean))
