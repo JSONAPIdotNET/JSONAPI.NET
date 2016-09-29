@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Globalization;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using JSONAPI.Core;
 using JSONAPI.Documents.Builders;
 
@@ -20,7 +22,7 @@ namespace JSONAPI.QueryableTransformers
         private static readonly MethodInfo StartsWithMethod = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
         private static readonly MethodInfo EndsWithMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
         private static readonly MethodInfo ToLowerMethod = typeof(string).GetMethod("ToLower", new Type[] {});
-
+        private static readonly MethodInfo GetPropertyExpressionMethod = typeof(DefaultFilteringTransformer).GetMethod("GetPropertyExpression", BindingFlags.NonPublic | BindingFlags.Static);
 
 
         /// <summary>
@@ -127,265 +129,238 @@ namespace JSONAPI.QueryableTransformers
             return GetPredicateBodyForProperty(resourceTypeAttribute.Property, queryValue, param);
         }
 
-        // ReSharper disable once FunctionComplexityOverflow
-        // TODO: should probably break this method up
         private Expression GetPredicateBodyForProperty(PropertyInfo prop, string queryValue, ParameterExpression param)
         {
             var propertyType = prop.PropertyType;
 
-            Expression expr;
-            if (propertyType == typeof(String))
+            Expression expr = null;
+            if (propertyType == typeof(string))
             {
-                if (String.IsNullOrWhiteSpace(queryValue))
+                if (string.IsNullOrWhiteSpace(queryValue))
                 {
                     Expression propertyExpr = Expression.Property(param, prop);
                     expr = Expression.Equal(propertyExpr, Expression.Constant(null));
                 }
                 else
-                { // inspired by http://stackoverflow.com/questions/5374481/like-operator-in-linq
-                    if (queryValue.StartsWith("%") || queryValue.EndsWith("%"))
+                {
+                    List<string> parts = new List<string>();
+                    if (queryValue.Contains("\""))
                     {
-                        var startWith = queryValue.StartsWith("%");
-                        var endsWith = queryValue.EndsWith("%");
-
-                        if (startWith) // remove %
-                            queryValue = queryValue.Remove(0, 1);
-
-                        if (endsWith) // remove %
-                            queryValue = queryValue.Remove(queryValue.Length - 1, 1);
-
-                        var constant = Expression.Constant(queryValue.ToLower());
-                        Expression propertyExpr = Expression.Property(param, prop);
-
-                        Expression nullCheckExpression = Expression.NotEqual(propertyExpr, Expression.Constant(null));
-
-                        if (endsWith && startWith)
+                        queryValue= queryValue.Replace("\"\"", "_#quote#_"); // escaped quotes
+                        queryValue = Regex.Replace(queryValue, "\"([^\"]*)\"", delegate (Match match)
                         {
-                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr,ToLowerMethod), ContainsMethod, constant));
-                        }
-                        else if (startWith)
+                            string v = match.ToString();
+                            v = v.Trim('"');
+                            v = v.Replace("_#quote#_", "\""); // restore quotes
+                            parts.Add(v);
+                            return string.Empty;
+                        });
+                    } 
+                    
+                    parts.AddRange(queryValue.Split(','));
+                    
+                    foreach (var qpart in parts)
+                    {
+                        Expression innerExpression;
+                        // inspired by http://stackoverflow.com/questions/5374481/like-operator-in-linq
+                        if (qpart.StartsWith("%") || qpart.EndsWith("%"))
                         {
-                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), EndsWithMethod, constant));
-                        }
-                        else if (endsWith)
-                        {
-                            expr = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), StartsWithMethod, constant));
+                            var startWith = qpart.StartsWith("%");
+                            var endsWith = qpart.EndsWith("%");
+                            string innerPart = qpart;
+
+                            if (startWith) // remove %
+                                innerPart = innerPart.Remove(0, 1);
+
+                            if (endsWith) // remove %
+                                innerPart = innerPart.Remove(innerPart.Length - 1, 1);
+
+                            var constant = Expression.Constant(innerPart.ToLower());
+                            Expression propertyExpr = Expression.Property(param, prop);
+
+                            Expression nullCheckExpression = Expression.NotEqual(propertyExpr, Expression.Constant(null));
+
+                            if (endsWith && startWith)
+                            {
+                                innerExpression = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), ContainsMethod, constant));
+                            }
+                            else if (startWith)
+                            {
+                                innerExpression = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), EndsWithMethod, constant));
+                            }
+                            else if (endsWith)
+                            {
+                                innerExpression = Expression.AndAlso(nullCheckExpression, Expression.Call(Expression.Call(propertyExpr, ToLowerMethod), StartsWithMethod, constant));
+                            }
+                            else
+                            {
+                                innerExpression = Expression.Equal(propertyExpr, constant);
+                            }
                         }
                         else
                         {
-                            expr = Expression.Equal(propertyExpr, constant);
+                            Expression propertyExpr = Expression.Property(param, prop);
+                            innerExpression = Expression.Equal(propertyExpr, Expression.Constant(qpart));
+                        }
+
+                        if (expr == null)
+                        {
+                            expr = innerExpression;
+                        }
+                        else
+                        {
+                            expr = Expression.OrElse(expr, innerExpression);
                         }
                     }
-                    else
-                    {
-                        Expression propertyExpr = Expression.Property(param, prop);
-                        expr = Expression.Equal(propertyExpr, Expression.Constant(queryValue));
-                    }
+                    
                 }
-            }
-            else if (propertyType == typeof(Boolean))
-            {
-                bool value;
-                expr = bool.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Boolean?))
-            {
-                bool tmp;
-                var value = bool.TryParse(queryValue, out tmp) ? tmp : (bool?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(SByte))
-            {
-                SByte value;
-                expr = SByte.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(SByte?))
-            {
-                SByte tmp;
-                var value = SByte.TryParse(queryValue, out tmp) ? tmp : (SByte?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Byte))
-            {
-                Byte value;
-                expr = Byte.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Byte?))
-            {
-                Byte tmp;
-                var value = Byte.TryParse(queryValue, out tmp) ? tmp : (Byte?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Int16))
-            {
-                Int16 value;
-                expr = Int16.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Int16?))
-            {
-                Int16 tmp;
-                var value = Int16.TryParse(queryValue, out tmp) ? tmp : (Int16?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(UInt16))
-            {
-                UInt16 value;
-                expr = UInt16.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(UInt16?))
-            {
-                UInt16 tmp;
-                var value = UInt16.TryParse(queryValue, out tmp) ? tmp : (UInt16?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Int32))
-            {
-                Int32 value;
-                expr = Int32.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Int32?))
-            {
-                Int32 tmp;
-                var value = Int32.TryParse(queryValue, out tmp) ? tmp : (Int32?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(UInt32))
-            {
-                UInt32 value;
-                expr = UInt32.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(UInt32?))
-            {
-                UInt32 tmp;
-                var value = UInt32.TryParse(queryValue, out tmp) ? tmp : (UInt32?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Int64))
-            {
-                Int64 value;
-                expr = Int64.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Int64?))
-            {
-                Int64 tmp;
-                var value = Int64.TryParse(queryValue, out tmp) ? tmp : (Int64?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(UInt64))
-            {
-                UInt64 value;
-                expr = UInt64.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(UInt64?))
-            {
-                UInt64 tmp;
-                var value = UInt64.TryParse(queryValue, out tmp) ? tmp : (UInt64?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Single))
-            {
-                Single value;
-                expr = Single.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Single?))
-            {
-                Single tmp;
-                var value = Single.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Single?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Double))
-            {
-                Double value;
-                expr = Double.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Double?))
-            {
-                Double tmp;
-                var value = Double.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Double?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(Decimal))
-            {
-                Decimal value;
-                expr = Decimal.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(Decimal?))
-            {
-                Decimal tmp;
-                var value = Decimal.TryParse(queryValue, NumberStyles.Any, CultureInfo.InvariantCulture, out tmp) ? tmp : (Decimal?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(DateTime))
-            {
-                DateTime value;
-                expr = DateTime.TryParse(queryValue, out value)
-                    ? GetPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(DateTime?))
-            {
-                DateTime tmp;
-                var value = DateTime.TryParse(queryValue, out tmp) ? tmp : (DateTime?)null;
-                expr = GetPropertyExpression(value, prop, param);
-            }
-            else if (propertyType == typeof(DateTimeOffset))
-            {
-                DateTimeOffset value;
-                expr = DateTimeOffset.TryParse(queryValue, out value)
-                    ? GetPropertyExpression<DateTimeOffset>(value, prop, param)
-                    : Expression.Constant(false);
-            }
-            else if (propertyType == typeof(DateTimeOffset?))
-            {
-                DateTimeOffset tmp;
-                var value = DateTimeOffset.TryParse(queryValue, out tmp) ? tmp : (DateTimeOffset?)null;
-                expr = GetPropertyExpression(value, prop, param);
             }
             else if (propertyType.IsEnum)
             {
-                int value;
-                expr = (int.TryParse(queryValue, out value) && Enum.IsDefined(propertyType, value))
-                    ? GetEnumPropertyExpression(value, prop, param)
-                    : Expression.Constant(false);
+                if (string.IsNullOrWhiteSpace(queryValue)) // missing enum property
+                {
+                    expr = Expression.Constant(false);
+                }
+                else
+                {
+                    // try to split up for multiple values
+                    var parts = queryValue.Split(',');
+
+                    foreach (var part in parts)
+                    {
+                        int value;
+                        var partExpr = (int.TryParse(part, out value) && Enum.IsDefined(propertyType, value))
+                            ? GetEnumPropertyExpression(value, prop, param)
+                            : Expression.Constant(false);
+                        if (expr == null)
+                        {
+                            expr = partExpr;
+                        }
+                        else
+                        {
+                            expr = Expression.OrElse(expr, partExpr);
+                        }
+                    }
+                }
             }
-            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof (Nullable<>) &&
+            else if (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>) &&
                      propertyType.GenericTypeArguments[0].IsEnum)
             {
-                int tmp;
-                var value = int.TryParse(queryValue, out tmp) ? tmp : (int?) null;
-                expr = GetEnumPropertyExpression(value, prop, param);
+                if (string.IsNullOrWhiteSpace(queryValue))
+                {
+                    Expression propertyExpr = Expression.Property(param, prop);
+                    expr = Expression.Equal(propertyExpr, Expression.Constant(null));
+                }
+                else
+                {
+                    // try to split up for multiple values
+                    var parts = queryValue.Split(',');
+
+                    foreach (var part in parts)
+                    {
+                        int tmp;
+                        var value = int.TryParse(part, out tmp) ? tmp : (int?)null;
+                        var partExpr = GetEnumPropertyExpression(value, prop, param);
+                        if (expr == null)
+                        {
+                            expr = partExpr;
+                        }
+                        else
+                        {
+                            expr = Expression.OrElse(expr, partExpr);
+                        }
+                    }
+                }
+            }
+            else if (Nullable.GetUnderlyingType(propertyType) != null) // It's nullable
+            {
+                expr = GetExpressionNullable(queryValue, prop, propertyType, param);
             }
             else
             {
-                expr = Expression.Constant(true);
+                expr = GetExpression(queryValue, prop, propertyType, param);
+                if (expr == null)
+                {
+                    expr = Expression.Constant(true);
+                }
             }
 
             return expr;
         }
+
+        private Expression GetExpressionNullable(string queryValue, PropertyInfo prop, Type propertyType, ParameterExpression param)
+        {
+            Type underlayingType = Nullable.GetUnderlyingType(propertyType);
+            try
+            {
+
+                var methodInfo = GetPropertyExpressionMethod.MakeGenericMethod(propertyType);
+
+                if (queryValue == null)
+                {
+                    return (Expression)methodInfo.Invoke(null, new object[] { null, prop, param });
+                }
+
+                // try to split up for multiple values
+                var parts = queryValue.Split(',');
+
+                Expression expr = null;
+                foreach (var part in parts)
+                {
+                    TypeConverter conv =TypeDescriptor.GetConverter(underlayingType);
+                    var value = conv.ConvertFromInvariantString(part);
+
+                    if (expr == null)
+                    {
+                        expr = (Expression) methodInfo.Invoke(null, new[] { value, prop, param });
+                    }
+                    else
+                    {
+                        expr = Expression.OrElse(expr, (Expression)methodInfo.Invoke(null, new[] { value, prop, param }));
+                    }
+                }
+                return expr;
+            }
+            catch (NotSupportedException)
+            {
+                return Expression.Constant(false);
+            }
+
+        }
+
+
+ 
+
+        private Expression GetExpression(string queryValue, PropertyInfo prop, Type propertyType, ParameterExpression param)
+        {
+            try
+            {
+                if(queryValue == null) // missing property
+                    return Expression.Constant(false);
+
+                var parts = queryValue.Split(',');
+                Expression expr = null;
+                foreach (var part in parts)
+                {
+                    dynamic value = TypeDescriptor.GetConverter(propertyType).ConvertFromInvariantString(part);
+                    if (expr == null)
+                    {
+                        expr = GetPropertyExpression(value, prop, param);
+                    }
+                    else
+                    {
+                        expr = Expression.OrElse(expr, GetPropertyExpression(value, prop, param));
+                    }
+                }
+                return expr;
+            }
+            catch (NotSupportedException)
+            {
+                return Expression.Constant(false);
+            }
+        }
+
+
 
         private Expression GetPredicateBodyForRelationship(ResourceTypeRelationship resourceTypeProperty, string queryValue, ParameterExpression param)
         {
