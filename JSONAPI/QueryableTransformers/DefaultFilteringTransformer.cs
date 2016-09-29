@@ -23,6 +23,7 @@ namespace JSONAPI.QueryableTransformers
         private static readonly MethodInfo EndsWithMethod = typeof(string).GetMethod("EndsWith", new[] { typeof(string) });
         private static readonly MethodInfo ToLowerMethod = typeof(string).GetMethod("ToLower", new Type[] {});
         private static readonly MethodInfo GetPropertyExpressionMethod = typeof(DefaultFilteringTransformer).GetMethod("GetPropertyExpression", BindingFlags.NonPublic | BindingFlags.Static);
+        private static readonly MethodInfo GetPropertyExpressionBetweenMethod = typeof(DefaultFilteringTransformer).GetMethod("GetPropertyExpressionBetween", BindingFlags.NonPublic | BindingFlags.Static);
 
 
         /// <summary>
@@ -304,6 +305,12 @@ namespace JSONAPI.QueryableTransformers
                 // try to split up for multiple values
                 var parts = queryValue.Split(',');
 
+                if (underlayingType == typeof(DateTime) || underlayingType == typeof(DateTimeOffset))
+                {
+                    return GetDateReangeExpression(parts, prop, underlayingType, propertyType, param);
+                }
+
+
                 Expression expr = null;
                 foreach (var part in parts)
                 {
@@ -328,8 +335,78 @@ namespace JSONAPI.QueryableTransformers
 
         }
 
+        private Expression GetDateReangeExpression(string[] parts, PropertyInfo prop, Type underlyingType, Type propertyType, ParameterExpression param)
+        {
+            Expression expr = null;
+            foreach (var part in parts)
+            {
+                var mode = "";
+                if (!part.Contains("-"))
+                    mode = "year";
+                if (part.Contains("-"))
+                    mode = "month";
+                if (part.Count(x => x.Equals('-')) == 2)
+                {
+                    mode = "day";
+                    if (part.Contains(" ")) // there is a time
+                    {
+                        mode = "hour";
+                        if (part.Contains(":"))
+                            mode = "minute";
+                        if (part.Count(x => x.Equals(':')) == 2)
+                        {
+                            mode = "second";
+                        }
+                    }
+                }
+                var partToParse = part;
 
- 
+                // make the datetime valid
+                if (mode == "year")
+                    partToParse += "-01-01";
+                if (mode == "hour")
+                    partToParse += ":00";
+
+                TypeConverter conv = TypeDescriptor.GetConverter(underlyingType);
+                dynamic value = conv.ConvertFromInvariantString(partToParse);
+                var upper =value;
+                switch (mode)
+                {
+                    case "year":
+                        upper= upper.AddYears(1);
+                        break;
+                    case "month":
+                        upper = upper.AddMonths(1);
+                        break;
+                    case "day":
+                        upper = upper.AddDays(1);
+                        break;
+                    case "hour":
+                        upper = upper.AddHours(1);
+                        break;
+                    case "minute":
+                        upper = upper.AddMinutes(1);
+                        break;
+                    case "second":
+                        upper = upper.AddSeconds(1);
+                        break;
+                }
+                upper = upper.AddTicks(-1);
+                var methodInfo = GetPropertyExpressionBetweenMethod.MakeGenericMethod(propertyType);
+                Expression innerExpr = (Expression)methodInfo.Invoke(null, new object[] {value, upper, prop, param});
+                if (expr == null)
+                {
+                    expr = innerExpr;
+                }
+                else
+                {
+                    expr = Expression.OrElse(expr, innerExpr);
+                }
+
+            }
+            return expr;
+        }
+
 
         private Expression GetExpression(string queryValue, PropertyInfo prop, Type propertyType, ParameterExpression param)
         {
@@ -450,6 +527,17 @@ namespace JSONAPI.QueryableTransformers
             var valueExpr = Expression.Constant(value);
             Expression castedConstantExpr = Expression.Convert(valueExpr, typeof(T));
             return Expression.Equal(propertyExpr, castedConstantExpr);
+        }
+
+        private static Expression GetPropertyExpressionBetween<T>(T lowerValue, T upperValue, PropertyInfo property,
+            ParameterExpression param)
+        {
+            Expression propertyExpr = Expression.Property(param, property);
+            var lowerValueExpr = Expression.Constant(lowerValue);
+            var upperValueExpr = Expression.Constant(upperValue);
+            Expression lowerCastedConstantExpr = Expression.Convert(lowerValueExpr, typeof(T));
+            Expression upperCastedConstantExpr = Expression.Convert(upperValueExpr, typeof(T));
+            return Expression.AndAlso(Expression.GreaterThanOrEqual(propertyExpr, lowerCastedConstantExpr), Expression.LessThanOrEqual(propertyExpr, upperCastedConstantExpr));
         }
 
         private static Expression GetEnumPropertyExpression(int? value, PropertyInfo property,

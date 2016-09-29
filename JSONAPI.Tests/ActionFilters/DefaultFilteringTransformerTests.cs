@@ -148,6 +148,27 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "120",
                     NullableDateTimeField = new DateTime(1961, 2, 18)
                 },
+                new Dummy
+                {
+                    Id = "121",
+                    NullableDateTimeField = new DateTime(1961, 5, 31)
+                },
+                new Dummy
+                {
+                    Id = "122",
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 18, 58, 0)
+                },
+                new Dummy
+                {
+                    Id = "123",
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 19, 01, 0)
+                },
+
+                new Dummy
+                {
+                    Id = "124",
+                    NullableDateTimeField = new DateTime(1962, 5, 31, 19, 01, 0)
+                },
 
                 #endregion
 
@@ -808,11 +829,72 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_nullable_datetime_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("120");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02-18,1961-05-31");
+            returnedArray.Length.Should().Be(4);
+            returnedArray[0].Id.Should().Be("120");
+            returnedArray[1].Id.Should().Be("121");
+            returnedArray[2].Id.Should().Be("122");
+            returnedArray[3].Id.Should().Be("123");
+        }
+
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_year()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961");
+            returnedArray.Length.Should().Be(4);
+            returnedArray[0].Id.Should().Be("120");
+            returnedArray[1].Id.Should().Be("121");
+            returnedArray[2].Id.Should().Be("122");
+            returnedArray[3].Id.Should().Be("123");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("120");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_hour()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("123");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_hour_minute()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19:01");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("123");
+        }
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_time_missing()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19:01:12");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
         public void Filters_by_missing_nullable_datetime_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=");
-            returnedArray.Length.Should().Be(_fixtures.Count - 1);
-            returnedArray.Any(d => d.Id == "120").Should().BeFalse();
+            returnedArray.Length.Should().Be(_fixtures.Count - 5);
+            returnedArray.Any(d => d.Id == "120" || d.Id == "121" || d.Id == "122" || d.Id == "123" || d.Id == "124").Should().BeFalse();
         }
 
         #endregion
@@ -838,6 +920,14 @@ namespace JSONAPI.Tests.ActionFilters
         public void Filters_by_matching_nullable_datetimeoffset_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-offset-field]=2014-05-05");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("140");
+        }
+
+        [TestMethod]
+        public void Filters_by_matching_nullable_datetimeoffset_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-offset-field]=2014-05");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("140");
         }
