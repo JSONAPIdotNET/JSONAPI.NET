@@ -156,18 +156,18 @@ namespace JSONAPI.Tests.ActionFilters
                 new Dummy
                 {
                     Id = "122",
-                    NullableDateTimeField = new DateTime(1961, 5, 31, 18, 58, 0)
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 18, 58, 0, DateTimeKind.Utc)
                 },
                 new Dummy
                 {
                     Id = "123",
-                    NullableDateTimeField = new DateTime(1961, 5, 31, 19, 01, 0)
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 19, 01, 0, DateTimeKind.Utc)
                 },
 
                 new Dummy
                 {
                     Id = "124",
-                    NullableDateTimeField = new DateTime(1962, 5, 31, 19, 01, 0)
+                    NullableDateTimeField = new DateTime(1962, 5, 31, 19, 01, 0, DateTimeKind.Utc)
                 },
 
                 #endregion
@@ -870,7 +870,10 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_multiple_matching_nullable_datetime_property_hour()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19");
+            var dt = new DateTime(1961,05,31,19,00,00, DateTimeKind.Utc);
+            var localdt = dt.ToLocalTime();
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 " + string.Format("{0,2:D2}", localdt.Hour));
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("123");
         }
@@ -878,7 +881,10 @@ namespace JSONAPI.Tests.ActionFilters
         [TestMethod]
         public void Filters_by_multiple_matching_nullable_datetime_property_hour_minute()
         {
-            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19:01");
+            var dt = new DateTime(1961, 05, 31, 19, 00, 00, DateTimeKind.Utc);
+            var localdt = dt.ToLocalTime();
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 " + string.Format("{0,2:D2}", localdt.Hour) + ":01");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("123");
         }

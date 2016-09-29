@@ -392,6 +392,9 @@ namespace JSONAPI.QueryableTransformers
                         break;
                 }
                 upper = upper.AddTicks(-1);
+                value = value.ToUniversalTime();
+                upper = upper.ToUniversalTime();
+
                 var methodInfo = GetPropertyExpressionBetweenMethod.MakeGenericMethod(propertyType);
                 Expression innerExpr = (Expression)methodInfo.Invoke(null, new object[] {value, upper, prop, param});
                 if (expr == null)
