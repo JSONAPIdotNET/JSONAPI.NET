@@ -95,7 +95,7 @@ If you want to filter by multiple values you can concatenate the values separate
  => this returns all posts with title "Post one, which is awesome"
 ```
 ``` URL
-/posts?filter[title]="Post one","awesome"
+/posts?filter[title]="Post one","which is awesome"
  => this returns all posts with title "Post one" OR  "which is awesome"
 ```
 
@@ -119,18 +119,53 @@ In case of string properties you can provide a percent sign (%) at the beginning
 ```
 
 > :information_source: HINT: the comparison with wildcards is made case **insensitive**.
+
 > :information_source: HINT: If there is a comma inside of the quoted filter value the term gets not split.
+
 > :information_source: HINT: The percent sign is used to start an encoded character in the URL so the filter values **must unconditionally be encoded** before put in an URL. The above example should look like this when sent to server:`filter%5Btitle%5D=%22%25one%22%2C%22%25awesome%25%22` 
   
 ## DateTime filters
-DateTime filters with equal can be a pain. If you store DateTime with full resolution you must provide the full resolution to make the filter value equal the stored value.
+DateTime filters with equal can be a pain. If you store DateTime with full resolution (milliseconds) you must provide the full resolution to make the filter value equal the stored value.
 
+To avoid this problem JSONAPI.Net is automatically filtering by a DateTime range. If you provide a "day" (YYYY-MM-DD) as filter value the filter will be this: `BETWEEN day 00:00:00.000 AND day 23:59:59.999`.
+
+Now if the property is DateTime or DateTimeOffset you can provide the following types of filter values:
+
+| Part   | Format              | Filter                                            |
+|--------|---------------------|---------------------------------------------------|
+| year   | YYYY                | YYYY-01-01 00:00:00.000 - YYYY-12-31 23:59:59.999 |
+| month* | YYYY-MM             | YYYY-MM-01 00:00:00.000 - YYYY-MM-31 23:59:59.999 |
+| day    | YYYY-MM-DD          | YYYY-MM-DD 00:00:00.000 - YYYY-MM-DD 23:59:59.999 |
+| hour   | YYYY-MM-DD HH       | YYYY-MM-DD HH:00:00.000 - YYYY-MM-DD HH:59:59.999 |
+| minute | YYYY-MM-DD HH:mm    | YYYY-MM-DD HH:mm:00.000 - YYYY-MM-DD HH:mm:59.999 |
+| second | YYYY-MM-DD HH:mm:ss | YYYY-MM-DD HH:mm:ss.000 - YYYY-MM-DD HH:mm:ss.999 |
+
+*) assuming this month has 31 days. JSONAPI.Net automatically determines the last day of month by adding one month to the given date. This respects months with less than 31 days.
+
+If you want to filter all posts created in month May of year 2016 you must provide the format for month filled by your needed date:
+
+
+``` URL
+/posts?filter[date-created]=2016-05
+ => this returns all posts with date-created in may 2016
+```
 
 ## Range filters
-There is no implementation on filtering number or date ranges. If you need things like this you can open an issue or even better provide a pull request.
+There is no implementation on filtering number or date ranges. If you need things like that you can open an issue or even better provide a pull request.
 
 ## Logical operation
-There is no implementation on filtering with a tree of logical AND and OR operations. If you need things like this you can open an issue or even better provide a pull request.
+Filters can be combined for multiple fields. You can filter posts created in May 2016 and containing awesome in title:
+
+``` URL
+/posts?filter[date-created]=2016-05&filter[title]="%awesome%"
+ => this returns all posts with date-created in may 2016 with title containing "awesome"
+```
+So we have the following standard behavior to concatenate multiple filters together:
+- multiple values on the same property are concatenated with OR
+- multiple filters on multiple properties are always concatenated with AND
+
+
+There is no implementation on filtering with a tree of logical AND and OR operations other than described above. If you need things like that you can open an issue or even better provide a pull request.
 
 
 # Great! But what's all this other stuff?
