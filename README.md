@@ -54,6 +54,85 @@ One of the benefits of the JSON API spec is that it provides several ways to [se
 
 > :information_source: As a side note, the RelationAggregator class handles the work of pulling any included related objects into the document--which may be a recursive process: for example, if an object has a relationship of its own type and that relationship property is annotated to be included, then it will recursively include all related objects of the same type! However, those related objects will all be included in a flat array for that type, according to the spec.
 
+
+# Filtering
+
+JSONAPI defines the URL query parameter for filtering is `filter` and should be combined with the associations but there is not much more how the syntax should be. So the JSONAPI.Net framework provides the following filter syntax.
+
+## Basic
+If you want to get a Resource by Id you provide the Id in the URL as part of the path e.g:
+
+``` URL
+/posts/1 
+```
+With this call you get the post with Id 1 or a status code 404 if no post with the Id 1 exists.
+
+If you would filter all related comments on post with the Id 1 you append the name of relationship e.g:
+
+``` URL
+/posts/1/comments 
+```
+
+In both above cases you can add the `filter` query parameter to filter the result on non Id properties. The property to filter on is specified in squared brackets like below.
+The value(s) after the equal sing we would call filter value.
+
+``` URL
+/posts/1/comments?filter[autor]=Bob
+```
+This will only return objects where "Bob" is the value of the author property.
+
+``` URL
+/posts/1/comments?filter[category]=3
+```
+This will only return objects where 3 is the value of the category property.
+
+## Multiple value filter
+
+If you want to filter by multiple values you can concatenate the values separated by comma. In case of strings you need to quote the strings to provide multiple values.
+
+``` URL
+/posts?filter[title]=Post one, which is awesome
+ => this returns all posts with title "Post one, which is awesome"
+```
+``` URL
+/posts?filter[title]="Post one","awesome"
+ => this returns all posts with title "Post one" OR  "which is awesome"
+```
+
+If the field is numeric or DateTime you can concatenate values with comma.
+``` URL
+/posts?filter[category]=1,2,3
+ => this returns all posts with category 1 OR 2 OR 3
+```
+``` URL
+/posts?filter[date-created]=2016-09-01,2016-09-02
+ => this returns all posts with date-created 2016-09-01 OR 2016-09-02
+```
+
+## Wildcard filters
+
+In case of string properties you can provide a percent sign (%) at the beginning or end of the filter value. This will advice to not compare with equal but with contains.
+
+``` URL
+/posts?filter[title]="%one","%awesome%"
+ => this returns all posts with title ending on "one" OR containing the word "awesome"
+```
+
+> :information_source: HINT: the comparison with wildcards is made case **insensitive**.
+> :information_source: HINT: If there is a comma inside of the quoted filter value the term gets not split.
+> :information_source: HINT: The percent sign is used to start an encoded character in the URL so the filter values **must unconditionally be encoded** before put in an URL. The above example should look like this when sent to server:`filter%5Btitle%5D=%22%25one%22%2C%22%25awesome%25%22` 
+  
+## DateTime filters
+DateTime filters with equal can be a pain. If you store DateTime with full resolution you must provide the full resolution to make the filter value equal the stored value.
+
+
+## Range filters
+There is no implementation on filtering number or date ranges. If you need things like this you can open an issue or even better provide a pull request.
+
+## Logical operation
+There is no implementation on filtering with a tree of logical AND and OR operations. If you need things like this you can open an issue or even better provide a pull request.
+
+
 # Great! But what's all this other stuff?
 
 
