@@ -16,7 +16,7 @@ namespace JSONAPI.Autofac
     {
         private readonly IJsonApiConfiguration _jsonApiConfiguration;
 
-        internal JsonApiAutofacModule(IJsonApiConfiguration jsonApiConfiguration)
+        public JsonApiAutofacModule(IJsonApiConfiguration jsonApiConfiguration)
         {
             _jsonApiConfiguration = jsonApiConfiguration;
         }
