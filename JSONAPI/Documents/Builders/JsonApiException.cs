@@ -99,5 +99,20 @@ namespace JSONAPI.Documents.Builders
             };
             return new JsonApiException(error);
         }
+
+        /// <summary>
+        /// Creates a JsonApiException to send a 405 Method Not Allowed error.
+        /// </summary>
+        public static JsonApiException CreateForMethodNotAllowed(string detail = null)
+        {
+            var error = new Error
+            {
+                Id = Guid.NewGuid().ToString(),
+                Status = HttpStatusCode.MethodNotAllowed,
+                Title = "Method not allowed",
+                Detail = detail
+            };
+            return new JsonApiException(error);
+        }
     }
 }
