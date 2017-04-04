@@ -2,17 +2,11 @@ JSONAPI.NET
 ===========
 [![jsonapi MyGet Build Status](https://www.myget.org/BuildSource/Badge/jsonapi?identifier=caf48269-c15b-4850-a29e-b41a23d9854d)](https://www.myget.org/)
 
-News
-----
+_Deprecation notice_
+------------------
 
-The NuGet packages are out!
-* [JSONAPI](https://www.nuget.org/packages/JSONAPI/)
-* [JSONAPI.EntityFramework](https://www.nuget.org/packages/JSONAPI.EntityFramework/)
+JSONAPI.NET is no longer actively maintained. It is not recommended for use in new projects. It does NOT work with .NET Core. Please consider [one of the other .NET server implementations](http://jsonapi.org/implementations/#server-libraries-net) instead.
 
-JSON API Compliance
-----------------------
-
-The master branch is roughly compatible with the RC3 version of JSON API. The major missing feature is inclusion of related resources. Many changes made to the spec since RC3 are not yet available in this library. Full 1.0 compliance is planned, so stay tuned!
 
 What is JSONAPI.NET?
 ====================
