@@ -19,7 +19,7 @@ namespace JSONAPI.Documents.Builders
         /// Creates a new JsonApiException
         /// </summary>
         /// <param name="error"></param>
-        public JsonApiException(IError error)
+        public JsonApiException(IError error) : base(error?.Detail ?? "An error occurred in JSONAPI")
         {
             Error = error;
         }
