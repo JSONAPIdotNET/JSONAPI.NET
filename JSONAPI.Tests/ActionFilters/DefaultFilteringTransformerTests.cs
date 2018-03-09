@@ -22,7 +22,10 @@ namespace JSONAPI.Tests.ActionFilters
         {
             EnumValue1 = 1,
             EnumValue2 = 2,
-            EnumValue3 = 3
+            EnumValue3 = 3,
+            EnumValue4 = 4,
+            EnumValue5 = 5,
+            EnumValue6 = 6
         }
 
         private class SomeUnknownType
@@ -101,7 +104,26 @@ namespace JSONAPI.Tests.ActionFilters
                     StringField = "String value 2",
                     EnumField = SomeEnum.EnumValue3
                 },
-
+                new Dummy
+                {
+                    Id = "103",
+                    StringField = "abc",
+                },
+                new Dummy
+                {
+                    Id = "104",
+                    StringField = "bcd",
+                },
+                new Dummy
+                {
+                    Id = "105",
+                    StringField = "def",
+                },
+                new Dummy
+                {
+                    Id = "106",
+                    StringField = "sentence containing a comma, which can happen",
+                },
                 #endregion
 
                 #region DateTimeField
@@ -125,6 +147,27 @@ namespace JSONAPI.Tests.ActionFilters
                 {
                     Id = "120",
                     NullableDateTimeField = new DateTime(1961, 2, 18)
+                },
+                new Dummy
+                {
+                    Id = "121",
+                    NullableDateTimeField = new DateTime(1961, 5, 31)
+                },
+                new Dummy
+                {
+                    Id = "122",
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 18, 58, 0, DateTimeKind.Utc)
+                },
+                new Dummy
+                {
+                    Id = "123",
+                    NullableDateTimeField = new DateTime(1961, 5, 31, 19, 01, 0, DateTimeKind.Utc)
+                },
+
+                new Dummy
+                {
+                    Id = "124",
+                    NullableDateTimeField = new DateTime(1962, 5, 31, 19, 01, 0, DateTimeKind.Utc)
                 },
 
                 #endregion
@@ -151,6 +194,11 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "140",
                     NullableDateTimeOffsetField = new DateTime(2014, 5, 5)
                 },
+                new Dummy
+                {
+                    Id = "141",
+                    NullableDateTimeOffsetField = new DateTime(2015, 6, 13)
+                },
 
                 #endregion
 
@@ -166,6 +214,41 @@ namespace JSONAPI.Tests.ActionFilters
                     Id = "151",
                     EnumField = SomeEnum.EnumValue2
                 },
+                new Dummy
+                {
+                    Id = "152",
+                    EnumField = SomeEnum.EnumValue3
+                },
+                new Dummy
+                {
+                    Id = "153",
+                    EnumField = SomeEnum.EnumValue4
+                },
+                new Dummy
+                {
+                    Id = "154",
+                    EnumField = SomeEnum.EnumValue5
+                },
+                new Dummy
+                {
+                    Id = "155",
+                    EnumField = SomeEnum.EnumValue6
+                },
+                new Dummy
+                {
+                    Id = "156",
+                    EnumField = SomeEnum.EnumValue5
+                },
+                new Dummy
+                {
+                    Id = "157",
+                    EnumField = SomeEnum.EnumValue6
+                },
+                new Dummy
+                {
+                    Id = "158",
+                    EnumField = SomeEnum.EnumValue5
+                },
 
                 #endregion
 
@@ -175,6 +258,11 @@ namespace JSONAPI.Tests.ActionFilters
                 {
                     Id = "160",
                     NullableEnumField = SomeEnum.EnumValue3
+                },
+                new Dummy
+                {
+                    Id = "161",
+                    NullableEnumField = SomeEnum.EnumValue6
                 },
 
                 #endregion
@@ -190,6 +278,16 @@ namespace JSONAPI.Tests.ActionFilters
                 {
                     Id = "171",
                     DecimalField = (decimal) 6.37
+                },
+                new Dummy
+                {
+                    Id = "172",
+                    DecimalField = (decimal) 5.08
+                },
+                new Dummy
+                {
+                    Id = "173",
+                    DecimalField = (decimal) 17.3
                 },
 
                 #endregion
@@ -583,11 +681,124 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_string_property_comma_not_matching()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=sentence containing a comma, which can happen");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Filters_by_matching_string_property_comma_matching()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=abc,bcd");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("103");
+            returnedArray[1].Id.Should().Be("104");
+        }
+
+        [TestMethod]
+        public void Filters_by_matching_string_property_comma()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=\"sentence containing a comma, which can happen\"");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("106");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=String value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%String value 1");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_end()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%String value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_end_ignoreCase()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%string value 1%");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("100");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_end_comma()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=\"%,%\"");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("106");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%value 2");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("101");
+            returnedArray[1].Id.Should().Be("102");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part_quote()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=\"%value 2\"");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("101");
+            returnedArray[1].Id.Should().Be("102");
+        }
+
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part_quote_comma()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=\"%, which can happen\"");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("106");
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_end_part_no_match()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=%value 3");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Filters_by_wildcard_string_property_start_part_no_match()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=String vall%");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_string_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=\"abc\",\"def\"");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("103");
+            returnedArray[1].Id.Should().Be("105");
+        }
+
+        [TestMethod]
         public void Filters_by_missing_string_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[string-field]=");
-            returnedArray.Length.Should().Be(_fixtures.Count - 3);
-            returnedArray.Any(d => d.Id == "100" || d.Id == "101" || d.Id == "102").Should().BeFalse();
+            returnedArray.Length.Should().Be(_fixtures.Count - 7);
+            returnedArray.Any(d => d.Id == "100" || d.Id == "101" || d.Id == "102" || d.Id == "103" || d.Id == "104" || d.Id == "105" || d.Id == "106").Should().BeFalse();
         }
 
         #endregion
@@ -618,11 +829,78 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_nullable_datetime_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("120");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02-18,1961-05-31");
+            returnedArray.Length.Should().Be(4);
+            returnedArray[0].Id.Should().Be("120");
+            returnedArray[1].Id.Should().Be("121");
+            returnedArray[2].Id.Should().Be("122");
+            returnedArray[3].Id.Should().Be("123");
+        }
+
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_year()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961");
+            returnedArray.Length.Should().Be(4);
+            returnedArray[0].Id.Should().Be("120");
+            returnedArray[1].Id.Should().Be("121");
+            returnedArray[2].Id.Should().Be("122");
+            returnedArray[3].Id.Should().Be("123");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-02");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("120");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_hour()
+        {
+            var dt = new DateTime(1961,05,31,19,00,00, DateTimeKind.Utc);
+            var localdt = dt.ToLocalTime();
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 " + string.Format("{0,2:D2}", localdt.Hour));
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("123");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_hour_minute()
+        {
+            var dt = new DateTime(1961, 05, 31, 19, 00, 00, DateTimeKind.Utc);
+            var localdt = dt.ToLocalTime();
+
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 " + string.Format("{0,2:D2}", localdt.Hour) + ":01");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("123");
+        }
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetime_property_time_missing()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=1961-05-31 19:01:12");
+            returnedArray.Length.Should().Be(0);
+        }
+
+        [TestMethod]
         public void Filters_by_missing_nullable_datetime_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-field]=");
-            returnedArray.Length.Should().Be(_fixtures.Count - 1);
-            returnedArray.Any(d => d.Id == "120").Should().BeFalse();
+            returnedArray.Length.Should().Be(_fixtures.Count - 5);
+            returnedArray.Any(d => d.Id == "120" || d.Id == "121" || d.Id == "122" || d.Id == "123" || d.Id == "124").Should().BeFalse();
         }
 
         #endregion
@@ -653,11 +931,28 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_matching_nullable_datetimeoffset_property_month()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-offset-field]=2014-05");
+            returnedArray.Length.Should().Be(1);
+            returnedArray[0].Id.Should().Be("140");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_nullable_datetimeoffset_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-offset-field]=2014-05-05,2015-06-13");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("140");
+            returnedArray[1].Id.Should().Be("141");
+        }
+
+        [TestMethod]
         public void Filters_by_missing_nullable_datetimeoffset_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-date-time-offset-field]=");
-            returnedArray.Length.Should().Be(_fixtures.Count - 1);
-            returnedArray.Any(d => d.Id == "140").Should().BeFalse();
+            returnedArray.Length.Should().Be(_fixtures.Count - 2);
+            returnedArray.Any(d => d.Id == "140" || d.Id == "141").Should().BeFalse();
         }
 
         #endregion
@@ -670,6 +965,26 @@ namespace JSONAPI.Tests.ActionFilters
             var returnedArray = GetArray("http://api.example.com/dummies?filter[enum-field]=1");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("150");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_enum_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[enum-field]=1,2");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("150");
+            returnedArray[1].Id.Should().Be("151");
+        }
+
+        [TestMethod]
+        public void Filters_by_multiple_matching_enum_property2()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[enum-field]=1,5");
+            returnedArray.Length.Should().Be(4);
+            returnedArray[0].Id.Should().Be("150");
+            returnedArray[1].Id.Should().Be("154");
+            returnedArray[2].Id.Should().Be("156");
+            returnedArray[3].Id.Should().Be("158");
         }
 
         [TestMethod]
@@ -688,11 +1003,20 @@ namespace JSONAPI.Tests.ActionFilters
         }
 
         [TestMethod]
+        public void Filters_by_multiple_matching_nullable_enum_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-enum-field]=3,6");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("160");
+            returnedArray[1].Id.Should().Be("161");
+        }
+
+        [TestMethod]
         public void Filters_by_missing_nullable_enum_property()
         {
             var returnedArray = GetArray("http://api.example.com/dummies?filter[nullable-enum-field]=");
-            returnedArray.Length.Should().Be(_fixtures.Count - 1);
-            returnedArray.Any(d => d.Id == "160").Should().BeFalse();
+            returnedArray.Length.Should().Be(_fixtures.Count - 2);
+            returnedArray.Any(d => d.Id == "160" || d.Id == "161").Should().BeFalse();
         }
 
         #endregion
@@ -705,6 +1029,15 @@ namespace JSONAPI.Tests.ActionFilters
             var returnedArray = GetArray("http://api.example.com/dummies?filter[decimal-field]=4.03");
             returnedArray.Length.Should().Be(1);
             returnedArray[0].Id.Should().Be("170");
+        }
+
+        [TestMethod]
+        public void Filters_by_matching_multiple_decimal_property()
+        {
+            var returnedArray = GetArray("http://api.example.com/dummies?filter[decimal-field]=4.03,5.08");
+            returnedArray.Length.Should().Be(2);
+            returnedArray[0].Id.Should().Be("170");
+            returnedArray[1].Id.Should().Be("172");
         }
 
         [TestMethod]
