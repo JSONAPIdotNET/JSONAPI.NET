@@ -21,28 +21,27 @@ namespace JSONAPI.EntityFramework
         /// <returns></returns>
         public static IEnumerable<string> GetKeyNames(this DbContext dbContext, Type type)
         {
-            if (dbContext == null) throw new ArgumentNullException("dbContext");
-            if (type == null) throw new ArgumentNullException("type");
+            if (dbContext == null) throw new ArgumentNullException(nameof(dbContext));
+            if (type == null) throw new ArgumentNullException(nameof(type));
 
-            var originalType = type;
-
-            while (type != null)
+            var baseEntityType = type;
+            while (baseEntityType.BaseType != typeof(Object))
             {
-                var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.Public | BindingFlags.Static);
-                var method = openMethod.MakeGenericMethod(type);
+                baseEntityType = baseEntityType.BaseType;
+            }
+            
+            var openMethod = typeof(DbContextExtensions).GetMethod("GetKeyNamesFromGeneric", BindingFlags.Public | BindingFlags.Static);
+            var method = openMethod.MakeGenericMethod(baseEntityType);
 
-                try
-                {
-                    return (IEnumerable<string>) method.Invoke(null, new object[] {dbContext});
-                }
-                catch (TargetInvocationException)
-                {
-                }
-
-                type = type.BaseType;
+            try
+            {
+                return (IEnumerable<string>) method.Invoke(null, new object[] {dbContext});
+            }
+            catch (TargetInvocationException)
+            {
             }
 
-            throw new Exception(string.Format("Failed to identify the key names for {0} or any of its parent classes.", originalType.Name));
+            throw new Exception(string.Format("Failed to identify the key names for {0} or any of its parent classes.", type.Name));
         }
 
         /// <summary>
@@ -59,7 +58,6 @@ namespace JSONAPI.EntityFramework
             try
             {
                 objectSet = objectContext.CreateObjectSet<T>();
-
             }
             catch (InvalidOperationException e)
             {
