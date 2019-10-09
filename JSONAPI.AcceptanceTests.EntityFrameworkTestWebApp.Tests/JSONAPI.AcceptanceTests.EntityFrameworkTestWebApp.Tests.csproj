@@ -106,6 +106,7 @@
     <Compile Include="CreatingResourcesTests.cs" />
     <Compile Include="DeletingResourcesTests.cs" />
     <Compile Include="ErrorsTests.cs" />
+    <Compile Include="FetchingResourcesQueryResolverTests.cs" />
     <Compile Include="PaginationTests.cs" />
     <Compile Include="FetchingResourcesTests.cs" />
     <Compile Include="HeterogeneousTests.cs" />
@@ -144,10 +145,16 @@
     <None Include="Data\Child.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\CommentSearch.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\Master.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\Officer.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\PostSearch.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\PostLongId.csv">
@@ -276,11 +283,15 @@
     <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_include_response.json" />
     <EmbeddedResource Include="Fixtures\CreatingResources\Responses\Post_with_empty_id_and_include_author_Response.json" />
     <EmbeddedResource Include="Fixtures\UpdatingResources\Responses\PatchWithAttributeUpdateWithIncludeResponse.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResourcesQueryResolver\GetAllResponse.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResourcesQueryResolver\GetWithFilterResponse.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResourcesQueryResolver\GetWithSearchFilterResponse.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetAllResponsePaged-2-2.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-2-1.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted.json" />
     <EmbeddedResource Include="Fixtures\Pagination\GetFilterPaged-1-2-sorted-desc.json" />
     <EmbeddedResource Include="Fixtures\FetchingResources\Get_related_to_many_include_external_response.json" />
+    <EmbeddedResource Include="Fixtures\FetchingResourcesQueryResolver\GetWithSearchFilter_related_to_many_Response.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

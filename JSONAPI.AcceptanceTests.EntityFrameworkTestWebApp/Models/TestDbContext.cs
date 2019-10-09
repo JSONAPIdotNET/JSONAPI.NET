@@ -38,8 +38,10 @@ namespace JSONAPI.AcceptanceTests.EntityFrameworkTestWebApp.Models
         public DbSet<Building> Buildings { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<CommentSearch> CommentSearchs { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<PostSearch> PostSearchs { get; set; }
         public DbSet<PostID> PostsID { get; set; }
         public DbSet<PostLongId> PostsLongId { get; set; }
         public DbSet<Tag> Tags { get; set; }

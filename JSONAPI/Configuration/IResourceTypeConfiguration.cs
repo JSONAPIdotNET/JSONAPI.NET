@@ -50,5 +50,7 @@ namespace JSONAPI.Configuration
         /// </summary>
         /// <returns></returns>
         IResourceTypeRegistration BuildResourceTypeRegistration();
+
+        Type ResourceCollectionResolverType { get; }
     }
 }

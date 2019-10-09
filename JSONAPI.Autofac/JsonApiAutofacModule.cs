@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Autofac;
 using Autofac.Core;
 using JSONAPI.ActionFilters;
@@ -8,6 +9,7 @@ using JSONAPI.Documents;
 using JSONAPI.Documents.Builders;
 using JSONAPI.Http;
 using JSONAPI.Json;
+using JSONAPI.QueryableResolvers;
 using JSONAPI.QueryableTransformers;
 
 namespace JSONAPI.Autofac
@@ -38,6 +40,8 @@ namespace JSONAPI.Autofac
 
                 if (resourceTypeConfiguration.DocumentMaterializerType != null)
                     builder.RegisterType(resourceTypeConfiguration.DocumentMaterializerType);
+                if (resourceTypeConfiguration.ResourceCollectionResolverType != null)
+                    builder.RegisterType(resourceTypeConfiguration.ResourceCollectionResolverType);
 
                 foreach (var relationship in resourceTypeRegistration.Relationships)
                 {
@@ -68,7 +72,12 @@ namespace JSONAPI.Autofac
                 {
                     var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(resourceTypeName);
                     var registration = registry.GetRegistrationForResourceTypeName(resourceTypeName);
-                    var parameters = new Parameter[] { new TypedParameter(typeof (IResourceTypeRegistration), registration) };
+                    var parameters = new Parameter[] { new TypedParameter(typeof (IResourceTypeRegistration), registration)};
+                    if (configuration.ResourceCollectionResolverType != null)
+                    {
+                        var collectionResolver = context.Resolve(configuration.ResourceCollectionResolverType, parameters);
+                        parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration), new NamedParameter("collectionResolver", collectionResolver), };
+                    }
                     if (configuration.DocumentMaterializerType != null)
                         return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
                     return context.Resolve<IDocumentMaterializer>(parameters);
@@ -82,7 +91,15 @@ namespace JSONAPI.Autofac
                 {
                     var configuration = context.ResolveKeyed<IResourceTypeConfiguration>(clrType);
                     var registration = registry.GetRegistrationForType(clrType);
-                    var parameters = new Parameter[] { new TypedParameter(typeof(IResourceTypeRegistration), registration) };
+                    var parameters = new List<Parameter> { new TypedParameter(typeof(IResourceTypeRegistration), registration)};
+                    
+                    // add parameter for collectionResolver
+                    if (configuration.ResourceCollectionResolverType != null)
+                    {
+                        var collectionResolver = context.Resolve(configuration.ResourceCollectionResolverType, parameters);
+                        parameters.Add(new NamedParameter("collectionResolver", collectionResolver));
+                    }
+
                     if (configuration.DocumentMaterializerType != null)
                         return (IDocumentMaterializer)context.Resolve(configuration.DocumentMaterializerType, parameters);
                     return context.Resolve<IDocumentMaterializer>(parameters);
@@ -101,11 +118,21 @@ namespace JSONAPI.Autofac
                         throw JsonApiException.CreateForNotFound(
                             string.Format("No relationship `{0}` exists for the resource type `{1}`.", relationshipName, resourceTypeName));
                     
-                    var parameters = new Parameter[]
+                    var parameters = new List<Parameter>
                     {
                         new TypedParameter(typeof(IResourceTypeRegistration), registration),
                         new TypedParameter(typeof(ResourceTypeRelationship), relationship)
                     };
+                    
+                    // add parameter for collectionResolver
+                    if (context.IsRegisteredWithKey<IResourceTypeConfiguration>(relationship.RelatedType)) { 
+                        var relConfiguration = context.ResolveKeyed<IResourceTypeConfiguration>(relationship.RelatedType);
+                        if (relConfiguration.ResourceCollectionResolverType != null)
+                        {
+                            var collectionResolver = context.Resolve(relConfiguration.ResourceCollectionResolverType, parameters);
+                            parameters.Add(new NamedParameter("collectionResolver", collectionResolver));
+                        }
+                    }
 
                     // First, see if they have set an explicit materializer for this relationship
                     IResourceTypeRelationshipConfiguration relationshipConfiguration;
